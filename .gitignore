@@ -1,0 +1,8 @@
+*.db
+*.suo
+*.user
+Release
+Debug
+bin
+obj
+
