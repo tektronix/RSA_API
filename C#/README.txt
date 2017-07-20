@@ -34,7 +34,7 @@ http://www.tek.com/model/rsa306-software-2
             api.DPX_SetSpectrumTraceType(2, TraceType.TraceTypeAverage);
             api.DPX_GetSettings(ref settings);
             api.DPX_SetEnable(true);
-			api.DEVICE_Run();
+	    api.DEVICE_Run();
 
             bool ready = false;
             bool available = false;
@@ -68,9 +68,9 @@ IFDataToR3F
 The file streaming example saves a waveform to the hard drive using a variety of file types. 
 These files can contain formatted, raw or only header information depending on streaming settings. For 
 IF streaming, raw (.r3a and .r3h) or formatted (.r3f) file types are used which have both ADC data and 
-header information. For IQ streaming, the .tiq or .sig file format is used and contains the processed I and 
-Q data and can be opened directly in signal-vu for playback. This example uses the StreamingModeFramed mode 
-for saving data from and IF stream 
+header information. For IQ streaming, the .tiq or .sig file format is used and contains the processed I
+and Q data and can be opened directly in signal-vu for playback. This example uses the 
+StreamingModeFramed mode for saving data from and IF stream 
 
 IQBlockAcquisition 
  
@@ -86,7 +86,7 @@ and IQ data is streamed to a file until the defined time limit is reached.
 
 SpectrumTraceAcquisition 
  
-A console example of how to stream live spectrum data. The program searches for a device and connects to the 
-first device discovered. The spectrum streaming settings are configured and spectrum data is streamed until the set 
-time has elapsed. 
+A console example of how to stream live spectrum data. The program searches for a device and connects to
+the first device discovered. The spectrum streaming settings are configured and spectrum data is streamed 
+until the set time has elapsed. 
 
