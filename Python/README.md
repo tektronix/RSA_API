@@ -1,7 +1,7 @@
-# rsa_api_python_36
+# Python Example Code
 
-The RSA_API allows anyone to write scripts, lightweight applications, or plugins that directly control and acquire data from Tektronix USB RSAs without needing to run SignalVu-PC.
-This repository contains complete RSA_API usage examples for Python, including configuring the RSA hardware, capturing and plotting data, and streaming IF and IQ data to disk.
+The RSA API allows anyone to write scripts, lightweight applications, or plugins that directly control and acquire data from Tektronix USB RSAs without needing to run SignalVu-PC.
+This repository contains complete RSA API usage examples for Python, including configuring the RSA hardware, capturing and plotting data, and streaming IF and IQ data to disk.
 
 There are two versions, the Python-ctypes version and a Cython version.
 The Python-ctypes version calls functions directly from RSA_API.dll and handles all the Python-C type conversions in the script itself. There is a very detailed PDF walkthrough for this version.
