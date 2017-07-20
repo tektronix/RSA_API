@@ -1,0 +1,3 @@
+The RSA_API allows anyone to write scripts, lightweight applications, or plugins that directly control and acquire data from Tektronix USB RSAs without needing to run SignalVu-PC. This repository contains complete RSA_API usage examples for C++, including configuring the RSA hardware, capturing data, and streaming IF and IQ data to disk.
+
+The project contains 3 files, main.cpp, consumers.cpp, and rsa_cpp.h. consumers.cpp contains the guts of the application, providing basic example scripts for grabbing spectrums, blocks of IQ data, and streaming data to disk. It assumes you have already installed the RSA_API and have configured the linker to point to it directly. There is a pdf guide that walks you through configuring the linker in Microsoft Visual Studio.
