@@ -1,2 +1,4 @@
 # RSA_API
-Code examples for the Tektronix RSA API used with RSA300/500/600 USB instruments
+Code examples for the Tektronix RSA API used with RSA300/500/600 USB instruments. The RSA_API allows anyone to write scripts, lightweight applications, or plugins that directly control and acquire data from Tektronix USB RSA instruments without running SignalVu-PC. This repository contains complete RSA API usage examples for Python, C++, C#, Matlab, and VB.Net including configuring the RSA hardware, capturing data, and streaming IF and IQ data to disk.
+
+To use these code examples, download and install the most recent version of the RSA API. As of this writing, the most recent version is 3.9.0029 and can be downloaded here: http://www.tek.com/model/rsa306-software. Download the accompanying documentation for the API as well. The most recent version is 077-1031-03 and can be downloaded here: http://www.tek.com/spectrum-analyzer/rsa306-manual-0.
