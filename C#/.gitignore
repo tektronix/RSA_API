@@ -1,4 +1,5 @@
 *.db
+*.opendb
 *.suo
 *.user
 Release
@@ -6,4 +7,5 @@ Debug
 bin
 obj
 
-*.opendb
+
+
