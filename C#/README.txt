@@ -53,8 +53,7 @@ http://www.tek.com/model/rsa306-software-2
 
 APILibrary
 
-Managed C++ wrapper for the c-based RSA API makes C# development against the API much easier and
-more .Net friendly. 
+Managed C++ wrapper for the c-based RSA API makes .Net development against the RSA API much easier. 
 
 DPXFrameAcquisition 
  

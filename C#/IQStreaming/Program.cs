@@ -12,6 +12,7 @@ namespace IQStreaming
         private static void Main(string[] args)
         {
             var api = new APIWrapper();
+
             // Search for devices.
             int[] devId = null;
             string[] devSn = null;
@@ -26,7 +27,7 @@ namespace IQStreaming
             // Reset and connect to the first device detected.
             if (rs == ReturnStatus.noError)
             {
-                api.DEVICE_Reset(devId[0]);
+                rs = api.DEVICE_Reset(devId[0]);
                 rs = api.DEVICE_Connect(devId[0]);
             }
 
