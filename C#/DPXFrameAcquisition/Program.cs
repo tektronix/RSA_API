@@ -28,13 +28,13 @@ namespace DPXFrameAcquisition
 	        // This is a fatal error: the device could not be connected.
             if (rs != ReturnStatus.noError)
             {
-                Console.WriteLine("\nERROR: " + rs);
+                Console.WriteLine("ERROR: {0}", rs);
                 goto end;
             }
             else
             {
                 // print the name of the connected device.
-                Console.WriteLine("\nCONNECTED TO: " + devType[0]);
+                Console.WriteLine("CONNECTED TO: {0}", devType[0]);
             }
 
             // Set the center frequency and reference level.
@@ -50,7 +50,9 @@ namespace DPXFrameAcquisition
             double maxRBW = 0;
             rs = api.DPX_GetRBWRange(bandwidth, ref minRBW, ref maxRBW);
 
-            Console.WriteLine("\nMinimum RBW: " + minRBW + "\nMaximum RBW: " + maxRBW);
+            Console.WriteLine(string.Empty);
+            Console.WriteLine("Minimum RBW: {0}", minRBW);
+            Console.WriteLine("Maximum RBW: {0}", maxRBW);
 
             // Reset DPX before acquisition.
             rs = api.DPX_Reset();
@@ -84,12 +86,18 @@ namespace DPXFrameAcquisition
             rs = api.DPX_GetSettings(ref getSettings);
 
             // Display the settings.
-            Console.WriteLine("\nDPX Settings:\n\tSpectrum: " + (getSettings.enableSpectrum ? "ON" : "OFF") + "\n\tSogram: " + (getSettings.enableSpectrogram ? "ON" : "OFF") 
-                + "\n\tBitmap Width: " + getSettings.bitmapWidth + "\n\tBitmap Height: " + getSettings.bitmapHeight + "\n\tTrace Length: " + getSettings.traceLength 
-                + "\n\tDecay Factor: " + (double)getSettings.decayFactor + "\n\tRBW: " + getSettings.actualRBW / 1e6 + "\n");
-	
-	        // Initialize frame buffers.
-	        var frameBuffer = new DPX_FrameBuffer();
+            Console.WriteLine();
+            Console.WriteLine("DPX Settings:");
+            Console.WriteLine("\tSpectrum: {0}", getSettings.enableSpectrum ? "ON" : "OFF");
+            Console.WriteLine("\tSogram: {0}", getSettings.enableSpectrogram ? "ON" : "OFF");
+            Console.WriteLine("\tBitmap Width: {0}", getSettings.bitmapWidth);
+            Console.WriteLine("\tBitmap Height: {0}", getSettings.bitmapHeight);
+            Console.WriteLine("\tTrace Length: {0}", getSettings.traceLength);
+            Console.WriteLine("\tDecay Factor: {0}", getSettings.decayFactor);
+            Console.WriteLine("\tRBW: {0}", (getSettings.actualRBW / 1000000.0));
+
+            // Initialize frame buffers.
+            var frameBuffer = new DPX_FrameBuffer();
     
             // Enable DPX operation.
             rs = api.DPX_SetEnable(true); // This function must be called before DEVICE_Run().
@@ -165,7 +173,7 @@ namespace DPXFrameAcquisition
                             {
                                 bitmapFile.Write("{0} ", bitmap[nh * bitmapWidth + nw]);
                             }
-                            bitmapFile.WriteLine("\n");
+                            bitmapFile.WriteLine();
                         }
 
                         Console.WriteLine("Frame generated.\n");
