@@ -1,0 +1,4077 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MATLABInstrumentDriver>
+   <FileVersion>2.42</FileVersion>
+   <DriverName>RSA_API_Driver</DriverName>
+   <DriverType>MATLAB generic</DriverType>
+   <InstrumentType>Spectrum Analyzer</InstrumentType>
+   <InstrumentManufacturer>Tektronix</InstrumentManufacturer>
+   <InstrumentModel>RSA306, RSA306B, RSA503A, RSA507A, RSA603A,  RSA607A</InstrumentModel>
+   <InstrumentVersion>2.02</InstrumentVersion>
+   <Identify/>
+   <Reset/>
+   <Selftest/>
+   <Error/>
+   <CreateInitCode>
+      <Code>function init(obj)
+% This function is called after the object is created.
+% OBJ is the device object.
+% End of function definition - DO NOT EDIT
+
+addpath(obj.apiIncludePath);
+addpath(obj.apiLibPath);
+if ~libisloaded('RSA_API')
+    %load the DLL
+    loadlibrary('RSA_API', @RSA_API_prototype_pcwin64);
+    %loadlibrary('RSA_API');
+end
+
+if(strcmp(obj.RsrcName, ''))
+    obj.DriverData.deviceID = 0;
+elseif(strcmp(obj.RsrcName, 'File'))
+    obj.DriverData.deviceID = obj.RsrcName;
+else
+    obj.DriverData.deviceID = str2double(obj.RsrcName);
+end</Code>
+   </CreateInitCode>
+   <ConnectInitCode>
+      <Type>MCode</Type>
+      <Code>function init(obj)
+% This function is called after the object is connected.
+% OBJ is the device object.
+% End of function definition - DO NOT EDIT
+
+%ensure RSA_API dll is loaded
+if ~libisloaded('RSA_API')
+    %load the DLL
+    loadlibrary('RSA_API', @RSA_API_prototype_pcwin64);
+end
+
+if ~strcmp(obj.DriverData.deviceID, 'File')
+    %initialize variables
+    numDevicesFound = 0;            
+    deviceIDs = zeros(1,20);        %20 devices max
+
+    for i = 1:20
+        deviceIDs(i) = -1;
+    end
+
+    %create pointer parameters
+    numDevicesFoundPtr = libpointer('int32Ptr', numDevicesFound);
+    deviceIDsPtr = libpointer('int32Ptr', deviceIDs);
+    deviceSerialPtr = libpointer('cstring', repmat('0', 100, 1));
+    deviceTypePtr = libpointer('cstring', repmat('0', 20, 1));
+
+    %search for connected device
+    [ReturnStatus, numDevicesFound, deviceIDs, deviceSerial, deviceType] = calllib('RSA_API', 'DEVICE_Search', numDevicesFoundPtr, deviceIDsPtr, deviceSerialPtr, deviceTypePtr);
+    if (strcmp(ReturnStatus, 'noError') == 0)
+        errorMessage = calllib('RSA_API', 'DEVICE_GetErrorString', ReturnStatus);
+        error('RSA_API:DEVICE_Search', 'error returned from DEVICE_Search: %s', errorMessage);
+    end
+
+    deviceIDs = deviceIDs(1:numDevicesFound);
+
+    if numDevicesFound == 0
+        error('no RSA300/500 devices detected.');
+    end
+
+    if ~strcmp(obj.DriverData.deviceID, '')
+        if(obj.DriverData.deviceID + 1 &gt; numDevicesFound)
+            disp('Valid device IDs returned from search:')
+            disp(deviceIDs)
+            error('Device ID %d does not exist. Please use a valid device ID.', obj.DriverData.deviceID)
+        end
+    end
+
+    %connect found device
+    ReturnStatus = calllib('RSA_API', 'DEVICE_Connect', obj.DriverData.deviceID);
+    if (strcmp(ReturnStatus, 'noError') == 0)
+        errorMessage = calllib('RSA_API', 'DEVICE_GetErrorString', ReturnStatus);
+        error('RSA_API:DEVICE_Connect', 'Attempted to connect to device %d\nError returned from DEVICE_Connect: %s', obj.DriverData.deviceID, errorMessage);
+    end
+end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+% 
+% %initialize variables
+% numDevicesFound = 0;            
+% deviceIDs = zeros(1,20);        %20 devices max
+% deviceSerial = zeros(1,100);    %allocate 100 characters for the serial number
+% deviceType = zeros(1,20);       %allocate 20 characters for the device type
+%  
+% %create parameter pointers
+% numDevicesFoundPtr = libpointer('int32Ptr', numDevicesFound);
+% deviceIDsPtr = libpointer('longPtr', deviceIDs);
+% deviceSerialPtr = libpointer('voidPtr', [uint16(deviceSerial) 0]); %voidPtr to hold wchar_t*
+% deviceTypePtr = libpointer('voidPtr', [uint16(deviceType) 0]);
+% 
+% %search for the device.
+% ReturnStatus = calllib('RSA_API', 'DEVICE_Search', numDevicesFoundPtr, deviceIDsPtr, deviceSerialPtr, deviceTypePtr);
+% 
+% if (strcmp(ReturnStatus, 'noError') == 0)
+%     errorMessage = calllib('RSA_API', 'GetErrorString', ReturnStatus);
+%     error('RSA_API:DEVICE_Search', 'error returned from DEVICE_Search: %s', errorMessage);
+% end
+% 
+% %place the found device IDs in an array
+% deviceIDs = [];
+% for i=1:numDevicesFoundPtr.Value
+%     deviceIDs = [deviceIDs deviceIDsPtr.Value(i)];
+% end
+% 
+% serialNumber = char(deviceSerialPtr.Value);     %convert from decimal to ASCII
+% numDevices = numDevicesFoundPtr.Value;
+% 
+% if numDevices == 0
+%     error('no RSA300/600 devices detected.');
+% end
+% 
+% if ~strcmp(obj.DriverData.deviceID, '')
+%     if(obj.DriverData.deviceID + 1 &gt; numDevices)
+%         disp('Valid device IDs returned from search:')
+%         disp(deviceIDs)
+%         error('Device ID %d does not exist. Please use a valid device ID.', obj.DriverData.deviceID)
+%     end
+% end
+% 
+% %delete pointers
+% delete(numDevicesFoundPtr);
+% delete(deviceSerialPtr);
+% delete(deviceIDsPtr);
+% delete(deviceTypePtr);
+% 
+% %connect found device
+% ReturnStatus = calllib('RSA_API', 'DEVICE_Connect', obj.DriverData.deviceID);
+% 
+% if (strcmp(ReturnStatus, 'noError') == 0)
+%     errorMessage = calllib('RSA_API', 'GetErrorString', ReturnStatus);
+%     error('RSA_API:DEVICE_Connect', 'Attempted to connect to device %d\nError returned from DEVICE_Connect: %s', obj.DriverData.deviceID, errorMessage);
+% end
+</Code>
+   </ConnectInitCode>
+   <CleanupCode>
+      <Type>MCode</Type>
+      <Code>function cleanup(obj)
+% This function is called before the object is disconnected.
+% OBJ is the device object.
+% End of function definition - DO NOT EDIT
+
+%disconnect connected device
+[ReturnStatus] = calllib('RSA_API', 'DEVICE_Disconnect');
+if (strcmp(ReturnStatus, 'noError') == 0)
+    errorMessage = calllib('RSA_API', 'DEVICE_GetErrorString', ReturnStatus);
+    error('RSA_API:DEVICE_Disconnect', 'error returned from DEVICE_Disconnect: %s', errorMessage);
+end</Code>
+   </CleanupCode>
+   <GroupInfo>
+      <Group>
+         <Name>parent</Name>
+         <Description/>
+         <Command/>
+         <Size>1</Size>
+         <Mappings>
+            <ChannelMap Command="parent1" Index="1"/>
+         </Mappings>
+         <PropertyInfo>
+            <Property>
+               <Name>apiIncludePath</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <GetMCode>function propertyValue = getProperty(obj, propertyName)
+% Return a property value.
+%   This function is called to return the device or group object property
+%   value. If the property is a group property, OBJ is the group object. If
+%   the property is a base device property, OBJ is the device object.
+</GetMCode>
+                  <SetMCode>function set(obj, propertyName, propertyValue)
+% Set a property value.
+%   This function is called to set the device or group object property
+%   value. If the property is a group property, OBJ is the group object. If
+%   the property is a base device property, OBJ is the device object.
+</SetMCode>
+               </Code>
+               <PermissibleType>
+                  <Type>String</Type>
+                  <Constraint>none</Constraint>
+               </PermissibleType>
+               <DefaultValue>C:\\Tektronix\\RSA_API\\include</DefaultValue>
+               <ReadOnly>while open</ReadOnly>
+               <Description>Modify this path if you have installed the API in a non-standard location.</Description>
+            </Property>
+            <Property>
+               <Name>apiLibPath</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <GetMCode>function propertyValue = getProperty(obj, propertyName)
+% Return a property value.
+%   This function is called to return the device or group object property
+%   value. If the property is a group property, OBJ is the group object. If
+%   the property is a base device property, OBJ is the device object.
+</GetMCode>
+                  <SetMCode>function set(obj, propertyName, propertyValue)
+% Set a property value.
+%   This function is called to set the device or group object property
+%   value. If the property is a group property, OBJ is the group object. If
+%   the property is a base device property, OBJ is the device object.
+</SetMCode>
+               </Code>
+               <PermissibleType>
+                  <Type>String</Type>
+                  <Constraint>none</Constraint>
+               </PermissibleType>
+               <DefaultValue>C:\\Tektronix\\RSA_API\\lib\\x64</DefaultValue>
+               <ReadOnly>while open</ReadOnly>
+               <Description>Modify this path if you have installed the API in a non-standard location.</Description>
+            </Property>
+         </PropertyInfo>
+         <MethodInfo>
+            <Method>
+               <Name>ReportError</Name>
+               <Location>parent</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function ReportError(obj, ReturnStatus, funcname)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%add function name to error string
+msgIdent = strcat('RSA_API:', funcname);
+
+%query error message
+if (strcmp(ReturnStatus, 'noError') == 0)
+    errorMessage = calllib('RSA_API', 'DEVICE_GetErrorString', ReturnStatus);
+    error(msgIdent, 'error returned from %s: %s', funcname, errorMessage);
+end</MCode>
+               </Code>
+               <Description/>
+            </Method>
+         </MethodInfo>
+      </Group>
+      <Group>
+         <Name>alignment</Name>
+         <Description/>
+         <Command/>
+         <Size>1</Size>
+         <Mappings>
+            <ChannelMap Command="Alignment1" Index="1"/>
+         </Mappings>
+         <PropertyInfo/>
+         <MethodInfo>
+            <Method>
+               <Name>GetAlignmentNeeded</Name>
+               <Location>alignment</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function [needed] =  GetAlignmentNeeded(obj)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%create pointer parameter
+needed = '';
+neededPtr = libpointer('voidPtr', [int8(needed) 0]);
+
+%query if an alignment is needed
+[ReturnStatus, needed] = calllib('RSA_API', 'ALIGN_GetAlignmentNeeded', neededPtr);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'ALIGN_GetAlignmentNeeded');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>GetWarmupStatus</Name>
+               <Location>alignment</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function [warmedUp] = GetWarmupStatus(obj)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%create pointer parameter
+warmedUp = '';
+warmedUpPtr = libpointer('voidPtr', [int8(warmedUp) 0]);
+
+%query if an warm up status is complete
+[ReturnStatus, warmedUp] = calllib('RSA_API', 'ALIGN_GetWarmupStatus', warmedUpPtr);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'ALIGN_GetWarmupStatus');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>RunAlignment</Name>
+               <Location>alignment</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function RunAlignment(obj)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%calibrate device based on current temperature
+[ReturnStatus] = calllib('RSA_API', 'ALIGN_RunAlignment');
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'ALIGN_RunAlignment');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+         </MethodInfo>
+      </Group>
+      <Group>
+         <Name>audio</Name>
+         <Description/>
+         <Command/>
+         <Size>1</Size>
+         <Mappings>
+            <ChannelMap Command="Audio1" Index="1"/>
+         </Mappings>
+         <PropertyInfo>
+            <Property>
+               <Name>FrequencyOffset</Name>
+               <Location>audio</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <GetMCode>function propertyValue = getProperty(obj, propertyName)
+% Return a property value.
+%   This function is called to return the device or group object property
+%   value. If the property is a group property, OBJ is the group object. If
+%   the property is a base device property, OBJ is the device object.
+
+%create pointer parameter
+freqOffsetHz = 0;
+freqOffsetHzPtr = libpointer('doublePtr', freqOffsetHz);
+
+%query frequency offset
+[ReturnStatus, propertyValue] = calllib('RSA_API', 'AUDIO_GetFrequencyOffset', freqOffsetHzPtr);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'AUDIO_GetFrequencyOffset');</GetMCode>
+                  <SetMCode>function set(obj, propertyName, propertyValue)
+% Set a property value.
+%   This function is called to set the device or group object property
+%   value. If the property is a group property, OBJ is the group object. If
+%   the property is a base device property, OBJ is the device object.
+
+%set frequency offset
+ReturnStatus = calllib('RSA_API', 'AUDIO_SetFrequencyOffset', propertyValue);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'AUDIO_SetFrequencyOffset');</SetMCode>
+               </Code>
+               <PermissibleType>
+                  <Type>Double</Type>
+                  <Constraint>none</Constraint>
+               </PermissibleType>
+               <DefaultValue>0</DefaultValue>
+               <ReadOnly>never</ReadOnly>
+               <Description/>
+            </Property>
+            <Property>
+               <Name>Mode</Name>
+               <Location>audio</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <GetMCode>function propertyValue = getProperty(obj, propertyName)
+% Return a property value.
+%   This function is called to return the device or group object property
+%   value. If the property is a group property, OBJ is the group object. If
+%   the property is a base device property, OBJ is the device object.
+
+%create pointer parameter
+mode = 0;
+modePtr = libpointer('AudioDemodMode', mode);
+
+%query audio demodulation mode
+[ReturnStatus, propertyValue] = calllib('RSA_API', 'AUDIO_GetMode', modePtr);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'AUDIO_GetMode');</GetMCode>
+                  <SetMCode>function set(obj, propertyName, propertyValue)
+% Set a property value.
+%   This function is called to set the device or group object property
+%   value. If the property is a group property, OBJ is the group object. If
+%   the property is a base device property, OBJ is the device object.
+
+%set audio demodulation mode
+[ReturnStatus] = calllib('RSA_API', 'AUDIO_SetMode', propertyValue);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'AUDIO_SetMode');</SetMCode>
+               </Code>
+               <PermissibleType>
+                  <Type>Double</Type>
+                  <Constraint>enum</Constraint>
+                  <ConstraintValue>
+                     <Value>0.0</Value>
+                     <Value>1.0</Value>
+                     <Value>2.0</Value>
+                     <Value>3.0</Value>
+                     <Value>4.0</Value>
+                  </ConstraintValue>
+               </PermissibleType>
+               <PermissibleType>
+                  <Type>String</Type>
+                  <Constraint>none</Constraint>
+               </PermissibleType>
+               <DefaultValue>0.0</DefaultValue>
+               <ReadOnly>never</ReadOnly>
+               <Description/>
+            </Property>
+            <Property>
+               <Name>Mute</Name>
+               <Location>audio</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <GetMCode>function propertyValue = getProperty(obj, propertyName)
+% Return a property value.
+%   This function is called to return the device or group object property
+%   value. If the property is a group property, OBJ is the group object. If
+%   the property is a base device property, OBJ is the device object.
+
+%create pointer parameter
+mute = '';
+mutePtr = libpointer('voidPtr', [int8(mute) 0]);
+
+%query status of mute
+[ReturnStatus, propertyValue] = calllib('RSA_API', 'AUDIO_GetMute', mutePtr);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'AUDIO_GetMute');</GetMCode>
+                  <SetMCode>function set(obj, propertyName, propertyValue)
+% Set a property value.
+%   This function is called to set the device or group object property
+%   value. If the property is a group property, OBJ is the group object. If
+%   the property is a base device property, OBJ is the device object.
+
+%set status of mute
+[ReturnStatus] = calllib('RSA_API', 'AUDIO_SetMute', propertyValue);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'AUDIO_SetMute');</SetMCode>
+               </Code>
+               <PermissibleType>
+                  <Type>Double</Type>
+                  <Constraint>enum</Constraint>
+                  <ConstraintValue>
+                     <Value>0.0</Value>
+                     <Value>1.0</Value>
+                  </ConstraintValue>
+               </PermissibleType>
+               <DefaultValue>0.0</DefaultValue>
+               <ReadOnly>never</ReadOnly>
+               <Description/>
+            </Property>
+            <Property>
+               <Name>Volume</Name>
+               <Location>audio</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <GetMCode>function propertyValue = getProperty(obj, propertyName)
+% Return a property value.
+%   This function is called to return the device or group object property
+%   value. If the property is a group property, OBJ is the group object. If
+%   the property is a base device property, OBJ is the device object.
+
+%create pointer parameter
+volume = 0;
+volumePtr = libpointer('singlePtr', volume);
+
+%query volume level
+[ReturnStatus, propertyValue] = calllib('RSA_API', 'AUDIO_GetVolume', volumePtr);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'AUDIO_GetVolume');</GetMCode>
+                  <SetMCode>function set(obj, propertyName, propertyValue)
+% Set a property value.
+%   This function is called to set the device or group object property
+%   value. If the property is a group property, OBJ is the group object. If
+%   the property is a base device property, OBJ is the device object.
+
+%set volume level
+[ReturnStatus] = calllib('RSA_API', 'AUDIO_SetVolume', propertyValue);
+
+% report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'AUDIO_SetVolume');</SetMCode>
+               </Code>
+               <PermissibleType>
+                  <Type>Double</Type>
+                  <Constraint>bounded</Constraint>
+                  <ConstraintValue>
+                     <Range Max="1.0" Min="0.0"/>
+                  </ConstraintValue>
+               </PermissibleType>
+               <DefaultValue>0.0</DefaultValue>
+               <ReadOnly>never</ReadOnly>
+               <Description/>
+            </Property>
+         </PropertyInfo>
+         <MethodInfo>
+            <Method>
+               <Name>GetData</Name>
+               <Location>audio</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function [data, outSize] = GetData(obj, inSize)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%Create buffer to store audio data
+audioData = zeros(1,inSize);
+audioDataPtr = libpointer('int16Ptr', audioData);
+
+%create pointer parameter
+outSize = 0;
+outSizePtr = libpointer('uint16Ptr', outSize);
+
+%query audio data
+[ReturnStatus, data, outSize] = calllib('RSA_API', 'AUDIO_GetData', audioDataPtr, inSize, outSizePtr);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'AUDIO_GetData');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>GetEnable</Name>
+               <Location>audio</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function [enable] = GetEnable(obj)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%create pointer parameter
+enable = '';
+enablePtr = libpointer('voidPtr', [int8(enable) 0]);
+
+%query status of audio
+[ReturnStatus, enable] = calllib('RSA_API', 'AUDIO_GetEnable', enablePtr);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'AUDIO_GetEnable');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>Start</Name>
+               <Location>audio</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function Start(obj)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%start playing audio
+[ReturnStatus] = calllib('RSA_API', 'AUDIO_Start');
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'AUDIO_Start');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>Stop</Name>
+               <Location>audio</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function Stop(obj)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%stop playing audio
+[ReturnStatus] = calllib('RSA_API', 'AUDIO_Stop');
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'AUDIO_Stop');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+         </MethodInfo>
+      </Group>
+      <Group>
+         <Name>configure</Name>
+         <Description/>
+         <Command/>
+         <Size>1</Size>
+         <Mappings>
+            <ChannelMap Command="Configure1" Index="1"/>
+         </Mappings>
+         <PropertyInfo>
+            <Property>
+               <Name>AutoAttenuationEnable</Name>
+               <Location>configure</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <GetMCode>function propertyValue = getProperty(obj, propertyName)
+% Return a property value.
+%   This function is called to return the device or group object property
+%   value. If the property is a group property, OBJ is the group object. If
+%   the property is a base device property, OBJ is the device object.
+
+%create pointer parameter
+boolean = '';
+booleanPtr = libpointer('voidPtr', [int8(boolean) 0]);
+
+%query status of auto gain
+[ReturnStatus, propertyValue] = calllib('RSA_API', 'CONFIG_GetAutoAttenuationEnable', booleanPtr);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'CONFIG_GetAutoAttenuationEnable');</GetMCode>
+                  <SetMCode>function set(obj, propertyName, propertyValue)
+% Set a property value.
+%   This function is called to set the device or group object property
+%   value. If the property is a group property, OBJ is the group object. If
+%   the property is a base device property, OBJ is the device object.
+
+%set status of auto gain
+ReturnStatus = calllib('RSA_API', 'CONFIG_SetAutoAttenuationEnable', propertyValue);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'CONFIG_SetAutoAttenuationEnable');</SetMCode>
+               </Code>
+               <PermissibleType>
+                  <Type>Double</Type>
+                  <Constraint>enum</Constraint>
+                  <ConstraintValue>
+                     <Value>0.0</Value>
+                     <Value>1.0</Value>
+                  </ConstraintValue>
+               </PermissibleType>
+               <DefaultValue>0.0</DefaultValue>
+               <ReadOnly>never</ReadOnly>
+               <Description/>
+            </Property>
+            <Property>
+               <Name>CenterFreq</Name>
+               <Location>configure</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <GetMCode>function propertyValue = getProperty(obj, propertyName)
+% Return a property value.
+%   This function is called to return the device or group object property
+%   value. If the property is a group property, OBJ is the group object. If
+%   the property is a base device property, OBJ is the device object.
+
+%create pointer parameter
+cf = 0;
+cfPtr = libpointer('doublePtr', cf);
+
+%query center frequency
+[ReturnStatus, propertyValue] = calllib('RSA_API', 'CONFIG_GetCenterFreq', cfPtr);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'CONFIG_GetCenterFreq');</GetMCode>
+                  <SetMCode>function set(obj, propertyName, propertyValue)
+% Set a property value.
+%   This function is called to set the device or group object property
+%   value. If the property is a group property, OBJ is the group object. If
+%   the property is a base device property, OBJ is the device object.
+
+%set center frequency
+ReturnStatus = calllib('RSA_API', 'CONFIG_SetCenterFreq', propertyValue);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'CONFIG_SetCenterFreq');</SetMCode>
+               </Code>
+               <PermissibleType>
+                  <Type>Double</Type>
+                  <Constraint>none</Constraint>
+               </PermissibleType>
+               <DefaultValue>0</DefaultValue>
+               <ReadOnly>never</ReadOnly>
+               <Description/>
+            </Property>
+            <Property>
+               <Name>ExternalRefEnable</Name>
+               <Location>configure</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <GetMCode>function propertyValue = getProperty(obj, propertyName)
+% Return a property value.
+%   This function is called to return the device or group object property
+%   value. If the property is a group property, OBJ is the group object. If
+%   the property is a base device property, OBJ is the device object.
+
+%create pointer parameter
+boolean = '';
+booleanPtr = libpointer('voidPtr', [int8(boolean) 0]);
+
+%query status of reference level
+[ReturnStatus, propertyValue] = calllib('RSA_API', 'CONFIG_GetExternalRefEnable', booleanPtr);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'CONFIG_GetExternalRefEnable');</GetMCode>
+                  <SetMCode>function set(obj, propertyName, propertyValue)
+% Set a property value.
+%   This function is called to set the device or group object property
+%   value. If the property is a group property, OBJ is the group object. If
+%   the property is a base device property, OBJ is the device object.
+
+%set status of reference level
+ReturnStatus = calllib('RSA_API', 'CONFIG_SetExternalRefEnable', propertyValue);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'CONFIG_SetExternalRefEnable');</SetMCode>
+               </Code>
+               <PermissibleType>
+                  <Type>Double</Type>
+                  <Constraint>enum</Constraint>
+                  <ConstraintValue>
+                     <Value>0.0</Value>
+                     <Value>1.0</Value>
+                  </ConstraintValue>
+               </PermissibleType>
+               <DefaultValue>0</DefaultValue>
+               <ReadOnly>never</ReadOnly>
+               <Description/>
+            </Property>
+            <Property>
+               <Name>PreampEnable</Name>
+               <Location>configure</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <GetMCode>function propertyValue = getProperty(obj, propertyName)
+% Return a property value.
+%   This function is called to return the device or group object property
+%   value. If the property is a group property, OBJ is the group object. If
+%   the property is a base device property, OBJ is the device object.
+
+%create pointer parameter
+boolean = '';
+booleanPtr = libpointer('voidPtr', [int8(boolean) 0]);
+
+%query status of preamp
+[ReturnStatus, propertyValue] = calllib('RSA_API', 'CONFIG_GetRFPreampEnable', booleanPtr);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'CONFIG_GetRFPreampEnable');</GetMCode>
+                  <SetMCode>function set(obj, propertyName, propertyValue)
+% Set a property value.
+%   This function is called to set the device or group object property
+%   value. If the property is a group property, OBJ is the group object. If
+%   the property is a base device property, OBJ is the device object.
+
+%set status of preamp
+ReturnStatus = calllib('RSA_API', 'CONFIG_SetRFPreampEnable', propertyValue);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'CONFIG_SetRFPreampEnable');</SetMCode>
+               </Code>
+               <PermissibleType>
+                  <Type>Double</Type>
+                  <Constraint>enum</Constraint>
+                  <ConstraintValue>
+                     <Value>0.0</Value>
+                     <Value>1.0</Value>
+                  </ConstraintValue>
+               </PermissibleType>
+               <DefaultValue>0.0</DefaultValue>
+               <ReadOnly>never</ReadOnly>
+               <Description/>
+            </Property>
+            <Property>
+               <Name>ReferenceLevel</Name>
+               <Location>configure</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <GetMCode>function propertyValue = getProperty(obj, propertyName)
+% Return a property value.
+%   This function is called to return the device or group object property
+%   value. If the property is a group property, OBJ is the group object. If
+%   the property is a base device property, OBJ is the device object.
+
+%create pointer parameter
+refLevel = 0;
+refLevelPtr = libpointer('doublePtr', refLevel);
+
+%query reference level
+[ReturnStatus, propertyValue] = calllib('RSA_API', 'CONFIG_GetReferenceLevel', refLevelPtr);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'CONFIG_GetReferenceLevel');</GetMCode>
+                  <SetMCode>function set(obj, propertyName, propertyValue)
+% Set a property value.
+%   This function is called to set the device or group object property
+%   value. If the property is a group property, OBJ is the group object. If
+%   the property is a base device property, OBJ is the device object.
+
+%set reference level
+ReturnStatus = calllib('RSA_API', 'CONFIG_SetReferenceLevel', propertyValue);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'CONFIG_SetReferenceLevel');</SetMCode>
+               </Code>
+               <PermissibleType>
+                  <Type>Double</Type>
+                  <Constraint>bounded</Constraint>
+                  <ConstraintValue>
+                     <Range Max="30.0" Min="-130.0"/>
+                  </ConstraintValue>
+               </PermissibleType>
+               <DefaultValue>0</DefaultValue>
+               <ReadOnly>never</ReadOnly>
+               <Description/>
+            </Property>
+            <Property>
+               <Name>RFAttenuator</Name>
+               <Location>configure</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <GetMCode>function propertyValue = getProperty(obj, propertyName)
+% Return a property value.
+%   This function is called to return the device or group object property
+%   value. If the property is a group property, OBJ is the group object. If
+%   the property is a base device property, OBJ is the device object.
+
+%create pointer parameter
+cf = 0;
+cfPtr = libpointer('doublePtr', cf);
+
+%query RF attenuator
+[ReturnStatus, propertyValue] = calllib('RSA_API', 'CONFIG_GetRFAttenuator', cfPtr);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'CONFIG_GetRFAttenuator');</GetMCode>
+                  <SetMCode>function set(obj, propertyName, propertyValue)
+% Set a property value.
+%   This function is called to set the device or group object property
+%   value. If the property is a group property, OBJ is the group object. If
+%   the property is a base device property, OBJ is the device object.
+
+%set RF attenuator
+ReturnStatus = calllib('RSA_API', 'CONFIG_SetRFAttenuator', propertyValue);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'CONFIG_SetRFAttenuator');</SetMCode>
+               </Code>
+               <PermissibleType>
+                  <Type>Double</Type>
+                  <Constraint>none</Constraint>
+               </PermissibleType>
+               <DefaultValue>0</DefaultValue>
+               <ReadOnly>never</ReadOnly>
+               <Description/>
+            </Property>
+         </PropertyInfo>
+         <MethodInfo>
+            <Method>
+               <Name>GetExternalRefFrequency</Name>
+               <Location>configure</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function [extFreq] = GetExternalRefFrequency(obj)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%create pointer parameter
+extFreq = 0;
+extFreqPtr = libpointer('doublePtr', extFreq);
+
+%query external reference frequency
+[ReturnStatus, extFreq] = calllib('RSA_API', 'CONFIG_GetExternalRefFrequency', extFreqPtr);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'CONFIG_GetExternalRefFrequency');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>GetMaxCenterFreq</Name>
+               <Location>configure</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function [maxCF] = GetMaxCenterFreq(obj)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%create pointer parameter
+maxCF = 0;
+maxCFPtr = libpointer('doublePtr', maxCF);
+
+%query maximum center frequency
+[ReturnStatus, maxCF] = calllib('RSA_API', 'CONFIG_GetMaxCenterFreq', maxCFPtr);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'CONFIG_GetMaxCenterFreq');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>GetMinCenterFreq</Name>
+               <Location>configure</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function [minCF] = GetMinCenterFreq(obj)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%create pointer parameter
+minCF = 0;
+minCFPtr = libpointer('doublePtr', minCF);
+
+%query minimum center frequency
+[ReturnStatus, minCF] = calllib('RSA_API', 'CONFIG_GetMinCenterFreq', minCFPtr);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'CONFIG_GetMinCenterFreq');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>Preset</Name>
+               <Location>configure</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function Preset(obj)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%run preset
+[ReturnStatus] = calllib('RSA_API', 'CONFIG_Preset');
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'CONFIG_Preset');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+         </MethodInfo>
+      </Group>
+      <Group>
+         <Name>device</Name>
+         <Description/>
+         <Command/>
+         <Size>1</Size>
+         <Mappings>
+            <ChannelMap Command="Device1" Index="1"/>
+         </Mappings>
+         <PropertyInfo/>
+         <MethodInfo>
+            <Method>
+               <Name>Connect</Name>
+               <Location>device</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function Connect(obj, deviceID)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%connect device
+[ReturnStatus] = calllib('RSA_API', 'DEVICE_Connect', deviceID);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'DEVICE_Connect');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>Disconnect</Name>
+               <Location>device</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function Disconnect(obj)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%disconnect device
+[ReturnStatus] = calllib('RSA_API', 'DEVICE_Disconnect');
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'DEVICE_Disconnect');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>GetAPIVersion</Name>
+               <Location>device</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function [apiVersion] = GetAPIVersion(obj)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%allocate 100 spaces for API version. query API version
+[ReturnStatus, apiVersion] = calllib('RSA_API', 'DEVICE_GetAPIVersion', blanks(100));
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'DEVICE_GetAPIVersion');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>GetDeviceNomenclature</Name>
+               <Location>device</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function [nomenclature] = GetDeviceNomenclature(obj)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%allocate 100 spaces for nomenclature. query device name
+[ReturnStatus, nomenclature] = calllib('RSA_API', 'DEVICE_GetNomenclature', blanks(100));
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'DEVICE_GetNomenclature');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>GetDeviceNomenclatureW</Name>
+               <Location>device</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function [nomenclature] = GetDeviceNomenclatureW(obj)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%create pointer parameter
+nom = zeros(1,100);
+nomPtr = libpointer('voidPtr', [uint16(nom) 0]);
+
+%query device name
+[ReturnStatus, nomenclature] = calllib('RSA_API', 'DEVICE_GetNomenclatureW', nomPtr);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'DEVICE_GetNomenclatureW');
+
+%convert numerical value back to string
+nomenclature = deblank(char(nomenclature));</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>GetDeviceSerialNumber</Name>
+               <Location>device</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function [serialNum] = GetDeviceSerialNumber(obj)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%allocate 100 spaces for serial number. query serial number
+[ReturnStatus, serialNum] = calllib('RSA_API', 'DEVICE_GetSerialNumber', blanks(100));
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'DEVICE_GetSerialNumber');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>GetEnable</Name>
+               <Location>device</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function [enable] = GetEnable(obj)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%create pointer parameter
+boolean = '';
+booleanPtr = libpointer('voidPtr', [int8(boolean) 0]);
+
+%query running status of device
+[ReturnStatus, enable] = calllib('RSA_API', 'DEVICE_GetEnable', booleanPtr);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'DEVICE_GetEnable');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>GetEventStatus</Name>
+               <Location>device</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function [eventOccurred, eventTimestamp] = GetEventStatus(obj, eventID)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%enumerated types
+overrange = 'DEVEVENT_OVERRANGE';
+trigger = 'DEVEVENT_TRIGGER';
+pps = 'DEVEVENT_1PPS';
+
+%convert enumerated types to respective integer value
+if strcmp(eventID, overrange)
+    eventID = 0;
+elseif strcmp(eventID, trigger)
+    eventID = 1;
+elseif strcmp(eventID, pps)
+    eventID = 2;
+end
+
+%create pointer parameters
+boolean = '';
+timestamp = 0;
+booleanPtr = libpointer('voidPtr', [int8(boolean) 0]);
+timestampPtr = libpointer('uint64Ptr', timestamp);
+
+%query status of events
+[ReturnStatus, eventOccurred, eventTimestamp] = calllib('RSA_API', 'DEVICE_GetEventStatus', eventID, booleanPtr, timestampPtr);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'DEVICE_GetEventStatus');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>GetFPGAVersion</Name>
+               <Location>device</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function [fpgaVersion] = GetFPGAVersion(obj)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%allocate 100 spaces for FPGA version. query FPGA version
+[ReturnStatus, fpgaVersion] = calllib('RSA_API', 'DEVICE_GetFPGAVersion', blanks(100));
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'DEVICE_GetFPGAVersion');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>GetFWVersion</Name>
+               <Location>device</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function [fwVersion] = GetFWVersion(obj)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%allocate 100 spaces for firmware version. query firmware version
+[ReturnStatus, fwVersion] = calllib('RSA_API', 'DEVICE_GetFWVersion', blanks(100));
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'DEVICE_GetFWVersion');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>GetHWVersion</Name>
+               <Location>device</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function [hwVersion] = GetHWVersion(obj)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%allocate 100 spaces for hardware version. query hardware version
+[ReturnStatus, hwVersion] = calllib('RSA_API', 'DEVICE_GetHWVersion', blanks(100));
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'DEVICE_GetHWVersion');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>OverTemperatureStatus</Name>
+               <Location>device</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function [overTemperature] = OverTemperatureStatus(obj)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%create pointer parameter
+boolean = '';
+booleanPtr = libpointer('voidPtr', [int8(boolean) 0]);
+
+%query if device is over temperature
+[ReturnStatus, overTemperature] = calllib('RSA_API', 'DEVICE_GetOverTemperatureStatus', booleanPtr);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'DEVICE_GetOverTemperatureStatus');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>PrepareForRun</Name>
+               <Location>device</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function PrepareForRun(obj)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%prepare device for data transfer. needed for function StartFrameTransfer
+[ReturnStatus] = calllib('RSA_API', 'DEVICE_PrepareForRun');
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'DEVICE_PrepareForRun');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>Reset</Name>
+               <Location>device</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function Reset(obj, deviceID)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%reset device
+[ReturnStatus] = calllib('RSA_API', 'DEVICE_Reset', deviceID);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'DEVICE_Reset');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>Run</Name>
+               <Location>device</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function Run(obj)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%start data acquisition
+[ReturnStatus] = calllib('RSA_API', 'DEVICE_Run');
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'DEVICE_Run');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>Search</Name>
+               <Location>device</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function [numDevicesFound, deviceIDs, deviceSerial, deviceType] = Search(obj)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%initialize variables
+numDevicesFound = 0;            
+deviceIDs = zeros(1,20);        %20 devices max
+
+%differentiate no devices from connected devices with -1 value
+for i = 1:20
+    deviceIDs(i) = -1;
+end
+
+%create pointer parameters
+numDevicesFoundPtr = libpointer('int32Ptr', numDevicesFound);
+deviceIDsPtr = libpointer('int32Ptr', deviceIDs);
+deviceSerialPtr = libpointer('cstring', repmat('0', 100, 1));
+deviceTypePtr = libpointer('cstring', repmat('0', 20, 1));
+
+%search for connected devices
+[ReturnStatus, numDevicesFound, deviceIDs, deviceSerial, deviceType] = calllib('RSA_API', 'DEVICE_Search', numDevicesFoundPtr, deviceIDsPtr, deviceSerialPtr, deviceTypePtr);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'DEVICE_Search');
+
+%adjust device ID array to only include number of devices found
+deviceIDs = deviceIDs(1:numDevicesFound);</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>StartFrameTransfer</Name>
+               <Location>device</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function StartFrameTransfer(obj)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%start data transfer. call PrepareForRun before calling this function.
+[ReturnStatus] = calllib('RSA_API', 'DEVICE_StartFrameTransfer');
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'DEVICE_StartFrameTransfer');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>Stop</Name>
+               <Location>device</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function Stop(obj)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%stop data acquisition
+[ReturnStatus] = calllib('RSA_API', 'DEVICE_Stop');
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'DEVICE_Stop');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+         </MethodInfo>
+      </Group>
+      <Group>
+         <Name>dpx</Name>
+         <Description/>
+         <Command/>
+         <Size>1</Size>
+         <Mappings>
+            <ChannelMap Command="DPX1" Index="1"/>
+         </Mappings>
+         <PropertyInfo>
+            <Property>
+               <Name>Enable</Name>
+               <Location>dpx</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <GetMCode>function propertyValue = getProperty(obj, propertyName)
+% Return a property value.
+%   This function is called to return the device or group object property
+%   value. If the property is a group property, OBJ is the group object. If
+%   the property is a base device property, OBJ is the device object.
+
+%create pointer parameter
+boolean = '';
+booleanPtr = libpointer('voidPtr', [int8(boolean) 0]);
+
+%query status of DPX
+[ReturnStatus, propertyValue] = calllib('RSA_API', 'DPX_GetEnable', booleanPtr);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'DPX_GetEnable');</GetMCode>
+                  <SetMCode>function set(obj, propertyName, propertyValue)
+% Set a property value.
+%   This function is called to set the device or group object property
+%   value. If the property is a group property, OBJ is the group object. If
+%   the property is a base device property, OBJ is the device object.
+
+%set status of DPX
+ReturnStatus = calllib('RSA_API', 'DPX_SetEnable', propertyValue);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'DPX_SetEnable');</SetMCode>
+               </Code>
+               <PermissibleType>
+                  <Type>Double</Type>
+                  <Constraint>enum</Constraint>
+                  <ConstraintValue>
+                     <Value>0.0</Value>
+                     <Value>1.0</Value>
+                  </ConstraintValue>
+               </PermissibleType>
+               <DefaultValue>0.0</DefaultValue>
+               <ReadOnly>never</ReadOnly>
+               <Description/>
+            </Property>
+         </PropertyInfo>
+         <MethodInfo>
+            <Method>
+               <Name>Configure</Name>
+               <Location>dpx</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function Configure(obj, enableSpectrum, enableSpectrogram)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%set status for DPX spectrum and spectrogram
+[ReturnStatus] = calllib('RSA_API', 'DPX_Configure', enableSpectrum, enableSpectrogram);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'DPX_Configure');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>FinishFrameBuffer</Name>
+               <Location>dpx</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function FinishFrameBuffer(obj)
+% If this is a group function, OBJ is the group object. If
+% it a base device function, OBJ is the device object.
+
+%specify frame is finished. needed to call next frame
+ReturnStatus = calllib('RSA_API', 'DPX_FinishFrameBuffer');
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'DPX_FinishFrameBuffer');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>GetFrameBuffer</Name>
+               <Location>dpx</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function [frameBuffer] = GetFrameBuffer(obj)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%create pointer parameter
+buf.fftPerFrame = 0;
+buf.fftCount = 0;
+bufPtr = libpointer('DPX_FrameBuffer', buf);
+
+%query frame
+ReturnStatus = calllib('RSA_API', 'DPX_GetFrameBuffer', bufPtr);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'DPX_GetFrameBuffer');
+
+%set dimensions of certain variables
+setdatatype(bufPtr.Value.spectrumTraces,'singlePtr', bufPtr.Value.spectrumTraceLength,3);
+setdatatype(bufPtr.Value.spectrumBitmap,'singlePtr', 1, bufPtr.Value.spectrumBitmapSize);
+setdatatype(bufPtr.Value.sogramBitmap,'uint8Ptr', 1, bufPtr.Value.sogramBitmapSize);
+setdatatype(bufPtr.Value.sogramBitmapContainTriggerArray,'int16Ptr',1,bufPtr.Value.sogramBitmapHeight);
+setdatatype(bufPtr.Value.sogramBitmapTimestampArray,'doublePtr',1,bufPtr.Value.sogramBitmapHeight);
+
+%retrieve finished frame buffer
+frameBuffer = bufPtr.Value;</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>GetFrameInfo</Name>
+               <Location>dpx</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function [frameCount, fftCount] = GetFrameInfo(obj)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%create pointer parameters
+frameCount = 0.0;
+fftCount = 0.0;
+framePtr = libpointer('int64Ptr', frameCount);
+fftPtr = libpointer('int64Ptr', fftCount);
+
+%query real time information about current frame
+[ReturnStatus, frameCount, fftCount] = calllib('RSA_API', 'DPX_GetFrameInfo', framePtr, fftPtr);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'DPX_GetFrameInfo');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>GetRBWRange</Name>
+               <Location>dpx</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function [minRBW, maxRBW] = GetRBWRange(obj, fspan)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%create pointer parameters
+min = 0.0;
+max = 0.0;
+minRBWPtr = libpointer('doublePtr', min);
+maxRBWPtr = libpointer('doublePtr', max);
+
+%query RBW range
+[ReturnStatus, minRBW, maxRBW] = calllib('RSA_API', 'DPX_GetRBWRange', fspan, minRBWPtr, maxRBWPtr);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'DPX_GetRBWRange');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>GetSettings</Name>
+               <Location>dpx</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function [dpxSettings] = GetSettings(obj)
+% If this is a group function, OBJ is the group object. If
+% it a base device function, OBJ is the device object.
+
+%create pointer parameters
+settings.enableSpectrum = false;
+settings.enableSpectrogram = false;
+settings.bitmapWidth = 0;
+settings.bitmapHeight = 0;
+settings.traceLength = 0;
+settings.decayFactor = 0;
+settings.actualRBW = 0;
+s = libpointer('DPX_SettingsStruct', settings);
+
+%query DPX settings
+[ReturnStatus, dpxSettings]  = calllib('RSA_API', 'DPX_GetSettings', s);
+
+% report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'DPX_GetSettings');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>GetSogramHiResLine</Name>
+               <Location>dpx</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function [vData, dataSF] = GetSogramHiResLine(obj, lineIndex, tracePoints, firstValidPoint)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%create pointer parameters
+vData = zeros(1, tracePoints);
+sogramLineSize = 0;
+dataSF = 0;
+sogramLinePtr = libpointer('int16Ptr', vData);
+sogramLineSizePtr = libpointer('int32Ptr', sogramLineSize);
+scalingFactorPtr = libpointer('doublePtr', dataSF);
+
+%query high resolution line specified by lineIndex parameter
+[ReturnStatus, vData, dataSF] = calllib('RSA_API', 'DPX_GetSogramHiResLine', sogramLinePtr, sogramLineSizePtr, lineIndex, scalingFactorPtr, tracePoints, firstValidPoint);
+
+% report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'DPX_GetSogramHiResLine');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>GetSogramHiResLineCountLatest</Name>
+               <Location>dpx</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function [lineCount] = GetSogramHiResLineCountLatest(obj)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%create pointer parameter
+lineCount = 0;
+lineCountPtr = libpointer('int32Ptr', lineCount);
+
+%query amount of high resolution lines in DPX spectrogram
+[ReturnStatus, lineCount] = calllib('RSA_API', 'DPX_GetSogramHiResLineCountLatest', lineCountPtr);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'DPX_GetSogramHiResLineCountLatest');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>GetSogramHiResLineTimestamp</Name>
+               <Location>dpx</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function [timestamp] = GetSogramHiResLineTimestamp(obj, lineIndex)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%create pointer parameter
+timestamp = 0;
+timestampPtr = libpointer('doublePtr', timestamp);
+
+%query spectrogram high resolution timestamp
+[ReturnStatus, timestamp] = calllib('RSA_API', 'DPX_GetSogramHiResLineTimestamp', timestampPtr, lineIndex);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'DPX_GetSogramHiResLineTimestamp');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>GetSogramHiResLineTriggered</Name>
+               <Location>dpx</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function [triggered] = GetSogramHiResLineTriggered(obj, lineIndex)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%create pointer parameter
+str = '';
+triggerPtr = libpointer('voidPtr', [int8(str) 0]);
+
+%query trigger status of specific lineIndex in DPX spectrogram
+[ReturnStatus, triggered] = calllib('RSA_API', 'DPX_GetSogramHiResLineTriggered', triggerPtr, lineIndex);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'DPX_GetSogramHiResLineTriggered');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>GetSogramSettings</Name>
+               <Location>dpx</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function [sogramSettings] = GetSogramSettings(obj)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%create pointer parameters
+settings.bitmapWidth = 0;
+settings.bitmapHeight = 0;
+settings.sogramTraceLineTime = 0.0;
+settings.sogramBitmapLineTime = 0.0;
+s = libpointer('DPX_SogramSettingsStruct', settings);
+
+%query DPX Sogram settings
+[ReturnStatus, sogramSettings] = calllib('RSA_API', 'DPX_GetSogramSettings', s);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'DPX_GetSogramSettings');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>IsFrameBufferAvailable</Name>
+               <Location>dpx</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function [frameAvailable] = IsFrameBufferAvailable(obj)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%create parameter pointer
+str = '';
+readyPtr = libpointer('voidPtr', [int8(str) 0]);
+
+%query if DPX frame is available
+[ReturnStatus, frameAvailable] = calllib('RSA_API', 'DPX_IsFrameBufferAvailable', readyPtr);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'DPX_IsFrameBufferAvailable');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>Reset</Name>
+               <Location>dpx</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function Reset(obj)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%resets various settings in DPX
+ReturnStatus = calllib('RSA_API', 'DPX_Reset');
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'DPX_Reset');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>SetParameters</Name>
+               <Location>dpx</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function SetParameters(obj, fspan, rbw, bitmapWidth, tracePtsPerPixel, yUnit, yTop, yBottom, infinitePersistance, persistanceTimeSec, showOnlyTrigFrame)
+% If this is a group function, OBJ is the group object. If
+% it a base device function, OBJ is the device object.
+
+%set DPX parameters
+ReturnStatus = calllib('RSA_API', 'DPX_SetParameters', fspan, rbw, bitmapWidth, tracePtsPerPixel, yUnit, yTop, yBottom, infinitePersistance, persistanceTimeSec, showOnlyTrigFrame);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'DPX_SetParameters');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>SetSogramParameters</Name>
+               <Location>dpx</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function SetSogramParameters(obj, timePerBitmapLine, timeResolution, maxPower, minPower)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%set parameters for DPX sogram
+ReturnStatus = calllib('RSA_API', 'DPX_SetSogramParameters', timePerBitmapLine, timeResolution, maxPower, minPower);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'DPX_SetSogramParameters');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>SetSogramTraceType</Name>
+               <Location>dpx</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function SetSogramTraceType(obj, traceType)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%set DPX Sogram trace types
+ReturnStatus = calllib('RSA_API', 'DPX_SetSogramTraceType', traceType);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'DPX_SetSogramTraceType');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>SetSpectrumTraceType</Name>
+               <Location>dpx</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function SetSpectrumTraceType(obj, traceIndex, type)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%set DPX Spectrum trace types
+ReturnStatus = calllib('RSA_API', 'DPX_SetSpectrumTraceType', traceIndex, type);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'DPX_SetSpectrumTraceType');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>WaitForDataReady</Name>
+               <Location>dpx</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function [ready] = WaitForDataReady(obj, timeoutMsec)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%create parameter pointer
+str = '';
+readyPtr = libpointer('voidPtr', [int8(str) 0]);
+
+%query if DPX data is ready, waits for length of given length of time
+[ReturnStatus, ready] = calllib('RSA_API', 'DPX_WaitForDataReady', timeoutMsec, readyPtr);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'DPX_WaitForDataReady');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+         </MethodInfo>
+      </Group>
+      <Group>
+         <Name>gnss</Name>
+         <Description/>
+         <Command/>
+         <Size>1</Size>
+         <Mappings>
+            <ChannelMap Command="GNSS1" Index="1"/>
+         </Mappings>
+         <PropertyInfo>
+            <Property>
+               <Name>AntennaPower</Name>
+               <Location>gnss</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <GetMCode>function propertyValue = getProperty(obj, propertyName)
+% Return a property value.
+%   This function is called to return the device or group object property
+%   value. If the property is a group property, OBJ is the group object. If
+%   the property is a base device property, OBJ is the device object.
+
+%create pointer parameter
+enabled = '';
+enabledPtr = libpointer('voidPtr', [int8(enabled) 0]);
+
+%query status of antenna power
+[ReturnStatus, propertyValue] = calllib('RSA_API', 'GNSS_GetAntennaPower', enabledPtr);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'GNSS_GetAntennaPower');</GetMCode>
+                  <SetMCode>function set(obj, propertyName, propertyValue)
+% Set a property value.
+%   This function is called to set the device or group object property
+%   value. If the property is a group property, OBJ is the group object. If
+%   the property is a base device property, OBJ is the device object.
+
+%set status of antenna power
+ReturnStatus = calllib('RSA_API', 'GNSS_SetAntennaPower', propertyValue);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'GNSS_SetAntennaPower');</SetMCode>
+               </Code>
+               <PermissibleType>
+                  <Type>Double</Type>
+                  <Constraint>enum</Constraint>
+                  <ConstraintValue>
+                     <Value>0.0</Value>
+                     <Value>1.0</Value>
+                  </ConstraintValue>
+               </PermissibleType>
+               <DefaultValue>0.0</DefaultValue>
+               <ReadOnly>never</ReadOnly>
+               <Description/>
+            </Property>
+            <Property>
+               <Name>Enable</Name>
+               <Location>gnss</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <GetMCode>function propertyValue = getProperty(obj, propertyName)
+% Return a property value.
+%   This function is called to return the device or group object property
+%   value. If the property is a group property, OBJ is the group object. If
+%   the property is a base device property, OBJ is the device object.
+
+%create pointer parameter
+enabled = '';
+enabledPtr = libpointer('voidPtr', [int8(enabled) 0]);
+
+%query status of GNSS
+[ReturnStatus, propertyValue] = calllib('RSA_API', 'GNSS_GetEnable', enabledPtr);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'GNSS_GetEnable');</GetMCode>
+                  <SetMCode>function set(obj, propertyName, propertyValue)
+% Set a property value.
+%   This function is called to set the device or group object property
+%   value. If the property is a group property, OBJ is the group object. If
+%   the property is a base device property, OBJ is the device object.
+
+%set status of GNSS
+ReturnStatus = calllib('RSA_API', 'GNSS_SetEnable', propertyValue);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'GNSS_SetEnable');</SetMCode>
+               </Code>
+               <PermissibleType>
+                  <Type>Double</Type>
+                  <Constraint>enum</Constraint>
+                  <ConstraintValue>
+                     <Value>0.0</Value>
+                     <Value>1.0</Value>
+                  </ConstraintValue>
+               </PermissibleType>
+               <DefaultValue>0.0</DefaultValue>
+               <ReadOnly>never</ReadOnly>
+               <Description/>
+            </Property>
+         </PropertyInfo>
+         <MethodInfo>
+            <Method>
+               <Name>ClearNavMessageData</Name>
+               <Location>gnss</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function ClearNavMessageData(obj)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%clear navigation message
+ReturnStatus = calllib('RSA_API', 'GNSS_ClearNavMessageData');
+
+% report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'GNSS_ClearNavMessageData');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>Get1PPSTimestamp</Name>
+               <Location>gnss</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function [isValid, timestamp1PPS, unixTime1PPS] = Get1PPSTimestamp(obj)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%create pointer parameters
+isValid = '';
+timestamp1PPS = 0';
+isValidPtr = libpointer('voidPtr', [int8(isValid) 0]);
+timestamp1PPSPtr = libpointer('uint64Ptr', timestamp1PPS);
+
+%query status and timestamp of 1PPS
+[ReturnStatus, isValid, timestamp1PPS] = calllib('RSA_API', 'GNSS_Get1PPSTimestamp', isValidPtr, timestamp1PPSPtr);
+% 
+% %report error
+% invoke(obj.Parent, 'ReportError', ReturnStatus, 'GNSS_Get1PPSTimestamp');
+
+%create pointer parameters
+o_timeSec = 0;
+o_timeNsec = 0;
+secPtr = libpointer('int64Ptr', o_timeSec);
+nsecPtr = libpointer('uint64Ptr', o_timeNsec);
+
+%query posix time from timestamp
+[ReturnStatus, o_timeSec, o_timeNsec] = calllib('RSA_API', 'REFTIME_GetTimeFromTimestamp', timestamp1PPS, secPtr, nsecPtr);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'REFTIME_GetTimeFromTimestamp');
+
+%convert Unix time into date time format string
+unixTime1PPS = datestr(datetime(o_timeSec, 'ConvertFrom', 'posixtime'));</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>GetHWInstalled</Name>
+               <Location>gnss</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function [installed] = GetHWInstalled(obj)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%create pointer parameter
+installed = '';
+installedPtr = libpointer('voidPtr', [int8(installed) 0]);
+
+%query if GNSS hardware is installed
+[ReturnStatus, installed] = calllib('RSA_API', 'GNSS_GetHwInstalled', installedPtr);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'GNSS_GetHwInstalled');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>GetNavMessageData</Name>
+               <Location>gnss</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function [msgLen, message] = GetNavMessageData(obj)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%create pointer parameters
+msgLen = 0;
+message = {''};
+msgLenPtr = libpointer('int32Ptr', msgLen);
+messagePtr = libpointer('stringPtrPtr', message);
+
+%obtain navigation message
+[ReturnStatus, msgLen, message] = calllib('RSA_API', 'GNSS_GetNavMessageData', msgLenPtr, messagePtr);
+
+%Commented since error will close MATLAB, even though it expected
+%behaviour
+% %report error
+% invoke(obj.Parent, 'ReportError', ReturnStatus, 'GNSS_GetNavMessageData');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+         </MethodInfo>
+      </Group>
+      <Group>
+         <Name>ifstream</Name>
+         <Description/>
+         <Command/>
+         <Size>1</Size>
+         <Mappings>
+            <ChannelMap Command="IFStream1" Index="1"/>
+         </Mappings>
+         <PropertyInfo/>
+         <MethodInfo>
+            <Method>
+               <Name>GetActiveStatus</Name>
+               <Location>ifstream</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function [active] = GetActiveStatus(obj)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%create pointer parameter
+active = '';
+activePtr = libpointer('voidPtr', [int8(active) 0]);
+
+%query status of IF stream writing to disk
+[ReturnStatus, active] = calllib('RSA_API', 'IFSTREAM_GetActiveStatus', activePtr);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'IFSTREAM_GetActiveStatus');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>SetDiskFileCount</Name>
+               <Location>ifstream</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function SetDiskFileCount(obj, count)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%set number of files to create 
+ReturnStatus = calllib('RSA_API', 'IFSTREAM_SetDiskFileCount', count);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'IFSTREAM_SetDiskFileCount');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>SetDiskFileLength</Name>
+               <Location>ifstream</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function SetDiskFileLength(obj, msec)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%set how long to record a file
+ReturnStatus = calllib('RSA_API', 'IFSTREAM_SetDiskFileLength', msec);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'IFSTREAM_SetDiskFileLength');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>SetDiskFileMode</Name>
+               <Location>ifstream</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function SetDiskFileMode(obj, mode)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%set mode
+ReturnStatus = calllib('RSA_API', 'IFSTREAM_SetDiskFileMode', mode);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'IFSTREAM_SetDiskFileMode');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>SetDiskFilenameBase</Name>
+               <Location>ifstream</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function SetDiskFilenameBase(obj, base)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%set name of generated file
+ReturnStatus = calllib('RSA_API', 'IFSTREAM_SetDiskFilenameBase', base);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'IFSTREAM_SetDiskFilenameBase');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>SetDiskFilenameSuffix</Name>
+               <Location>ifstream</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function SetDiskFilenameSuffix(obj, suffixCtl)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%initialize variables to hold enumeration types
+index = 'IFSSDFN_SUFFIX_INCRINDEX_MIN';
+none = 'IFSSDFN_SUFFIX_NONE';
+timestamp = 'IFSSDFN_SUFFIX_TIMESTAMP';
+
+%compare enumeration types and convert to equivalent numeric value
+if strcmp(suffixCtl, none)
+    suffixCtl = -2;
+elseif strcmp(suffixCtl, timestamp)
+    suffixCtl = -1;
+elseif strcmp(suffixCtl, index)
+    suffixCtl = 0;
+end
+
+%set suffix of filename streamed to disk
+ReturnStatus = calllib('RSA_API', 'IFSTREAM_SetDiskFilenameSuffix', suffixCtl);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'IFSTREAM_SetDiskFilenameSuffix');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>SetDiskFilePath</Name>
+               <Location>ifstream</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function SetDiskFilePath(obj, path)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%set path of file
+ReturnStatus = calllib('RSA_API', 'IFSTREAM_SetDiskFilePath', path);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'IFSTREAM_SetDiskFilePath');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>SetEnable</Name>
+               <Location>ifstream</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function SetEnable(obj, enable)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%set status of IF stream to disk
+[ReturnStatus] = calllib('RSA_API', 'IFSTREAM_SetEnable', enable);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'IFSTREAM_SetEnable');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+         </MethodInfo>
+      </Group>
+      <Group>
+         <Name>iqblock</Name>
+         <Description/>
+         <Command/>
+         <Size>1</Size>
+         <Mappings>
+            <ChannelMap Command="IQblk1" Index="1"/>
+         </Mappings>
+         <PropertyInfo>
+            <Property>
+               <Name>IQBandwidth</Name>
+               <Location>iqblock</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <GetMCode>function propertyValue = getProperty(obj, propertyName)
+% Return a property value.
+%   This function is called to return the device or group object property
+%   value. If the property is a group property, OBJ is the group object. If
+%   the property is a base device property, OBJ is the device object.
+
+%create pointer parameter
+iqBandwidth = 0;
+iqBandwidthPtr = libpointer('doublePtr', iqBandwidth);
+
+%query IQ bandwidth
+[ReturnStatus, propertyValue] = calllib('RSA_API', 'IQBLK_GetIQBandwidth', iqBandwidthPtr);
+
+% report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'IQBLK_GetIQBandwidth');</GetMCode>
+                  <SetMCode>function set(obj, propertyName, propertyValue)
+% Set a property value.
+%   This function is called to set the device or group object property
+%   value. If the property is a group property, OBJ is the group object. If
+%   the property is a base device property, OBJ is the device object.
+
+%set IQ bandwidth
+ReturnStatus = calllib('RSA_API', 'IQBLK_SetIQBandwidth', propertyValue);
+
+% report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'IQBLK_SetIQBandwidth');</SetMCode>
+               </Code>
+               <PermissibleType>
+                  <Type>Double</Type>
+                  <Constraint>none</Constraint>
+               </PermissibleType>
+               <DefaultValue>0</DefaultValue>
+               <ReadOnly>never</ReadOnly>
+               <Description/>
+            </Property>
+            <Property>
+               <Name>IQRecordLength</Name>
+               <Location>iqblock</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <GetMCode>function propertyValue = getProperty(obj, propertyName)
+% Return a property value.
+%   This function is called to return the device or group object property
+%   value. If the property is a group property, OBJ is the group object. If
+%   the property is a base device property, OBJ is the device object.
+
+%create pointer parameter
+recordLength = 0;
+recordLengthPtr = libpointer('int32Ptr', recordLength);
+
+%query IQ record length
+[ReturnStatus, propertyValue] = calllib('RSA_API', 'IQBLK_GetIQRecordLength', recordLengthPtr);
+
+% report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'IQBLK_GetIQRecordLength');</GetMCode>
+                  <SetMCode>function set(obj, propertyName, propertyValue)
+% Set a property value.
+%   This function is called to set the device or group object property
+%   value. If the property is a group property, OBJ is the group object. If
+%   the property is a base device property, OBJ is the device object.
+
+%set IQ record length
+ReturnStatus = calllib('RSA_API', 'IQBLK_SetIQRecordLength', propertyValue);
+
+% report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'IQBLK_SetIQRecordLength');</SetMCode>
+               </Code>
+               <PermissibleType>
+                  <Type>Double</Type>
+                  <Constraint>none</Constraint>
+               </PermissibleType>
+               <DefaultValue>0</DefaultValue>
+               <ReadOnly>never</ReadOnly>
+               <Description/>
+            </Property>
+         </PropertyInfo>
+         <MethodInfo>
+            <Method>
+               <Name>AcquireIQData</Name>
+               <Location>iqblock</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function AcquireIQData(obj)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%start data acquisition
+[ReturnStatus] = calllib('RSA_API', 'IQBLK_AcquireIQData');
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'IQBLK_AcquireIQData');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>GetIQAcqInfo</Name>
+               <Location>iqblock</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function [header] = GetIQAcqInfo(obj)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%initialize values for pointer
+header.sample0Timestamp = 0;
+header.triggerSampleIndex = 0;
+header.triggerTimestamp = 0;
+header.acqStatus = 0;
+
+%create pointer parameter
+headerPtr = libpointer('IQBLK_ACQINFO', header);
+
+%query header of IQ block
+[ReturnStatus, header] = calllib('RSA_API', 'IQBLK_GetIQAcqInfo', headerPtr);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'IQBLK_GetIQAcqInfo');
+
+%create pointer parameters
+o_timeSec = 0;
+o_timeNsec = 0;
+secPtr = libpointer('int64Ptr', o_timeSec);
+nsecPtr = libpointer('uint64Ptr', o_timeNsec);
+
+%query posix time from timestamp
+[ReturnStatus, o_timeSec, o_timeNsec] = calllib('RSA_API', 'REFTIME_GetTimeFromTimestamp', header.sample0Timestamp, secPtr, nsecPtr);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'REFTIME_GetTimeFromTimestamp');
+
+%convert Unix time into date time format string
+header.sample0UnixTime = datestr(datetime(o_timeSec, 'ConvertFrom', 'posixtime'));
+
+o_timeSec = 0;
+o_timeNsec = 0;
+secPtr = libpointer('int64Ptr', o_timeSec);
+nsecPtr = libpointer('uint64Ptr', o_timeNsec);
+
+%query posix time from timestamp
+[ReturnStatus, o_timeSec, o_timeNsec] = calllib('RSA_API', 'REFTIME_GetTimeFromTimestamp', header.triggerTimestamp, secPtr, nsecPtr);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'REFTIME_GetTimeFromTimestamp');
+
+%convert Unix time into date time format string
+header.triggerUnixTime = datestr(datetime(o_timeSec, 'ConvertFrom', 'posixtime'));</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>GetIQData</Name>
+               <Location>iqblock</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function [iqData] = GetIQData(obj, startIndex, length)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%The index + length must be less than the IQRecordLength or will
+%attempt to acquire data outside of buffer size
+rec_len = 0;
+lengthPtr = libpointer('longPtr', rec_len);
+
+%query IQ record length
+[ReturnStatus, recordLength] = calllib('RSA_API', 'IQBLK_GetIQRecordLength', lengthPtr);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'IQBLK_GetIQRecordLength');
+
+assert((startIndex + length) &lt;= recordLength, 'Input Error: index + length &gt; IQRecordLength');
+
+%create pointer parameter with proper memory allocated
+memLength = zeros(1,length*2);
+iqBufferPtr = libpointer('singlePtr', memLength); 
+
+%query IQ data
+[ReturnStatus, iqData] = calllib('RSA_API', 'IQBLK_GetIQData', iqBufferPtr, startIndex, length);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'IQBLK_GetIQData');
+
+%example output:
+%iqData = Ival, Qval, Ival, Qval</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>GetIQDataCplx</Name>
+               <Location>iqblock</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function [iqData] = GetIQDataCplx(obj, startIndex, length)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%The index + length must be less than the IQRecordLength or will
+%attempt to acquire data outside of buffer size
+rec_len = 0;
+lengthPtr = libpointer('longPtr', rec_len);
+
+%query IQ record length
+[ReturnStatus, recordLength] = calllib('RSA_API', 'IQBLK_GetIQRecordLength', lengthPtr);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'IQBLK_GetIQRecordLength');
+
+assert((startIndex + length) &lt;= recordLength, 'Input Error: index + length &gt; IQRecordLength');
+
+%creates # number of structs for each IQ pair for proper memory allocation
+memLength = zeros(1, length, 'single');
+for len = 1:length
+    cplx(len).i = 0;
+end
+
+%create pointer parameter
+Cplx32Ptr = libpointer('Cplx32', cplx);
+
+%query IQ data
+[ReturnStatus] = calllib('RSA_API', 'IQBLK_GetIQDataCplx', Cplx32Ptr, startIndex, length);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'IQBLK_GetIQDataCplx');
+
+%create an array to store IQ data. this array stores I and Q data such that
+%it alternates between I and Q
+iqData = zeros(1, length*2);
+
+%steps through each struct and retrieves the IQ data pair. Alternates each
+%into an array, similair to GetIQData
+for len = 1:length
+    increment = len - 1;
+    CplxIQPair = Cplx32Ptr+increment;
+    currentStruct = CplxIQPair.value;
+    I = currentStruct.i;
+    Q = currentStruct.q;
+
+    iqData(1, len+len-1) = I;
+    iqData(1, 2*len) = Q;
+end</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>GetIQDataDeinterleaved</Name>
+               <Location>iqblock</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function [iData, qData] = GetIQDataDeinterleaved(obj, startIndex, length)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%The index + length must be less than the IQRecordLength or will
+%attempt to acquire data outside of buffer size
+rec_len = 0;
+lengthPtr = libpointer('longPtr', rec_len);
+
+%query IQ record length
+[ReturnStatus, recordLength] = calllib('RSA_API', 'IQBLK_GetIQRecordLength', lengthPtr);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'IQBLK_GetIQRecordLength');
+
+assert((startIndex + length) &lt;= recordLength, 'Input Error: index + length &gt; IQRecordLength'); 
+
+%allocate an array to properly store IQ data
+iVal = zeros(1,length);
+qVal = zeros(1,length);
+
+%create pointer parameters
+iPtr = libpointer('singlePtr', iVal);
+qPtr = libpointer('singlePtr', qVal);
+
+%query IQ data
+[ReturnStatus, iData, qData]  = calllib('RSA_API', 'IQBLK_GetIQDataDeinterleaved', iPtr, qPtr, startIndex, length);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'IQBLK_GetIQDataDeinterleaved');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>GetIQSampleRate</Name>
+               <Location>iqblock</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function [iqSampleRate] = GetIQSampleRate(obj)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%create pointer parameter
+iqSampleRate = 0;
+iqSampleRatePtr = libpointer('doublePtr', iqSampleRate);
+
+%query IQ sample rate
+[ReturnStatus, iqSampleRate] = calllib('RSA_API', 'IQBLK_GetIQSampleRate', iqSampleRatePtr);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'IQBLK_GetIQSampleRate');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>GetMaxIQBandwidth</Name>
+               <Location>iqblock</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function [maxBandwidth] = GetMaxIQBandwidth(obj)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%create pointer parameter
+maxBandwidth = 0;
+maxBandwidthPtr = libpointer('doublePtr', maxBandwidth);
+
+%query maximum IQ bandwidth
+[ReturnStatus, maxBandwidth] = calllib('RSA_API', 'IQBLK_GetMaxIQBandwidth', maxBandwidthPtr);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'IQBLK_GetMaxIQBandwidth');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>GetMaxIQRecordLength</Name>
+               <Location>iqblock</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function [maxSamples] = GetMaxIQRecordLength(obj)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%create pointer parameter
+maxSamples = 0;
+maxSamplesPtr = libpointer('int32Ptr', maxSamples);
+
+%query maximum IQ record length
+[ReturnStatus, maxSamples] = calllib('RSA_API', 'IQBLK_GetMaxIQRecordLength', maxSamplesPtr);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'IQBLK_GetMaxIQRecordLength');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>GetMinIQBandwidth</Name>
+               <Location>iqblock</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function [minBandwidth] = GetMinIQBandwidth(obj)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%create pointer parameter
+minBandwidth = 0;
+minBandwidthPtr = libpointer('doublePtr', minBandwidth);
+
+%query minimum IQ bandwidth
+[ReturnStatus, minBandwidth] = calllib('RSA_API', 'IQBLK_GetMinIQBandwidth', minBandwidthPtr);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'IQBLK_GetMinIQBandwidth');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>WaitForIQDataReady</Name>
+               <Location>iqblock</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function [ready] = WaitForIQDataReady(obj, timeoutMsec)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%create pointer parameter
+boolean = '';
+booleanPtr = libpointer('voidPtr', [int8(boolean) 0]);
+
+%wait for data
+[ReturnStatus, ready] = calllib('RSA_API', 'IQBLK_WaitForIQDataReady', timeoutMsec, booleanPtr);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'IQBLK_WaitForIQDataReady');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+         </MethodInfo>
+      </Group>
+      <Group>
+         <Name>iqstream</Name>
+         <Description/>
+         <Command/>
+         <Size>1</Size>
+         <Mappings>
+            <ChannelMap Command="IQStream1" Index="1"/>
+         </Mappings>
+         <PropertyInfo/>
+         <MethodInfo>
+            <Method>
+               <Name>ClearAcqStatus</Name>
+               <Location>iqstream</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function ClearAcqStatus(obj)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%clear sticky bits for acquistition status in IQStream_GetIQData
+calllib('RSA_API', 'IQSTREAM_ClearAcqStatus');
+
+%no return status for error string</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>GetAcqParameters</Name>
+               <Location>iqstream</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function [bwHz_act, srSps] = GetAcqParameters(obj)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%create pointer parameters
+bwHz_act = 0;
+srSps = 0;
+bwHzPtr = libpointer('doublePtr', bwHz_act);
+srSpsPtr = libpointer('doublePtr', srSps);
+
+%query acquisition bandwidth and sample rate
+[ReturnStatus, bwHz_act, srSps]  = calllib('RSA_API', 'IQSTREAM_GetAcqParameters', bwHzPtr, srSpsPtr);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'IQSTREAM_GetAcqParameters');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>GetDiskFileInfo</Name>
+               <Location>iqstream</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function [fileinfo] = GetDiskFileInfo(obj)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%initialize values for pointer
+fileinfo.numberSamples = 0;
+fileinfo.sample0Timestamp = 0;
+fileinfo.triggerSampleIndex = 0;
+fileinfo.triggerTimestamp = 0;
+fileinfo.acqStatus = 0;
+fileinfo.filenames = 0;
+
+%create pointer parameter
+infoPtr = libpointer('IQSTRMFILEINFO', fileinfo);
+
+%query file information of previous file output operation
+[ReturnStatus, xval] = calllib('RSA_API', 'IQSTREAM_GetDiskFileInfo', infoPtr);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'IQSTREAM_GetDiskFileInfo');
+
+%adjust data type of filename. needed due to int16PtrPtr argument
+setdatatype(infoPtr.Value.filenames,'int16Ptr', 1, 100);
+
+%convert interger value to string
+fileinfo = infoPtr.Value;
+fileinfo.filenames = char(fileinfo.filenames);
+
+%fileinfo.filenames contains two strings for header file and data file.
+%MATLAB has limited support for this behaviour. As such, currently only the
+%data file string can be retrieved. For tiq and siq file types, no
+%difference in naming between header and data files. For siqd, the header
+%file ends in .siqh instead of .siqd. This section provides the expected
+%second string for header file which siqd is specified by the user.
+str = {'.tiq', '.siqd', 'siq'};
+extensionSize = [3, 4, 2];
+for i = 1:3
+    found = strfind(fileinfo.filenames, str{i});
+    if ~isempty(found)
+        fileinfo.filenames = fileinfo.filenames(1:(found(1)+extensionSize(i)));
+        if i == 2
+            header = [(fileinfo.filenames(1:end-1)) 'h'];
+            fileinfo.filenames = [fileinfo.filenames;header];
+        else
+            fileinfo.filenames = [fileinfo.filenames;fileinfo.filenames];
+        end
+        break;
+    end
+end
+
+%create pointer parameters
+o_timeSec = 0;
+o_timeNsec = 0;
+secPtr = libpointer('int64Ptr', o_timeSec);
+nsecPtr = libpointer('uint64Ptr', o_timeNsec);
+
+%query posix time from timestamp
+[ReturnStatus, o_timeSec, o_timeNsec] = calllib('RSA_API', 'REFTIME_GetTimeFromTimestamp', fileinfo.sample0Timestamp, secPtr, nsecPtr);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'REFTIME_GetTimeFromTimestamp');
+
+%convert Unix time into date time format string
+fileinfo.unixTime = datestr(datetime(o_timeSec, 'ConvertFrom', 'posixtime'));
+
+if fileinfo.triggerTimestamp == 0
+    fileinfo.triggerUnixTime = 'No Trigger Found';
+else
+    %query posix time from trigger timestamp
+    [ReturnStatus, o_timeSec, o_timeNsec] = calllib('RSA_API', 'REFTIME_GetTimeFromTimestamp', fileinfo.triggerTimestamp, secPtr, nsecPtr);
+
+    %report error
+    invoke(obj.Parent, 'ReportError', ReturnStatus, 'REFTIME_GetTimeFromTimestamp');
+
+    %convert Unix time into date time format string
+    fileinfo.triggerUnixTime = datestr(datetime(o_timeSec, 'ConvertFrom', 'posixtime'));
+end</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>GetDiskFileWriteStatus</Name>
+               <Location>iqstream</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function [isComplete, isWriting] = GetDiskFileWriteStatus(obj)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%create pointer parameters
+isComplete = '';
+isWriting = '';
+completePtr = libpointer('voidPtr', [int8(isComplete) 0]);
+writingPtr = libpointer('voidPtr', [int8(isWriting) 0]);
+
+%query status of IQ stream writing to disk
+[ReturnStatus, isComplete, isWriting] = calllib('RSA_API', 'IQSTREAM_GetDiskFileWriteStatus', completePtr, writingPtr);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'IQSTREAM_GetDiskFileWriteStatus');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>GetEnable</Name>
+               <Location>iqstream</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function [enable] = GetEnable(obj)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%create pointer parameter
+enable = '';
+enablePtr = libpointer('voidPtr', [int8(enable) 0]);
+
+%get status of IQ stream enable
+[ReturnStatus, enable] = calllib('RSA_API', 'IQSTREAM_GetEnable', enablePtr);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'IQSTREAM_GetEnable');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>GetIQData</Name>
+               <Location>iqstream</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function [iqdata, iqlen, iqinfo] = GetIQData(obj, buffer)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%create pointer parameters
+iqlen = 0;
+iqinfo.timestamp = 0;
+iqinfo.triggerCount = 0;
+iqinfo.triggerIndices = 0;
+iqinfo.scaleFactor = 0;
+iqinfo.acqStatus = 0;
+bufferPtr = libpointer('singlePtr', buffer);
+lengthPtr = libpointer('int32Ptr', iqlen);
+infoPtr = libpointer('IQSTRMIQINFO', iqinfo);
+
+%query IQ stream block data and info
+ReturnStatus = calllib('RSA_API', 'IQSTREAM_GetIQData', bufferPtr, lengthPtr, infoPtr);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'IQSTREAM_GetIQData');
+
+%set data type of trigger indices
+if isnumeric(infoPtr.Value.triggerIndices) == 0
+    setdatatype(infoPtr.Value.triggerIndices, 'int32Ptr', 1, 100);
+end
+
+%determine size of iqdata
+iqbuffer = bufferPtr.Value;
+[row, column] = size(iqbuffer);
+
+%reshape matrix for iqdata into an array equivalent to GetIQData in Iqblock
+iqdata = reshape(iqbuffer, 1, 2*column);
+
+iqlen = lengthPtr.Value;
+iqinfo = infoPtr.Value;
+
+%create pointer parameters
+o_timeSec = 0;
+o_timeNsec = 0;
+secPtr = libpointer('int64Ptr', o_timeSec);
+nsecPtr = libpointer('uint64Ptr', o_timeNsec);
+
+%query posix time from timestamp
+[ReturnStatus, o_timeSec, o_timeNsec] = calllib('RSA_API', 'REFTIME_GetTimeFromTimestamp', iqinfo.timestamp, secPtr, nsecPtr);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'REFTIME_GetTimeFromTimestamp');
+
+%convert Unix time into date time format string
+iqinfo.unixTime = datestr(datetime(o_timeSec, 'ConvertFrom', 'posixtime'));</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>GetIQDataBufferSize</Name>
+               <Location>iqstream</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function maxSize = GetIQDataBufferSize(obj)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%create pointer parameter
+maxSize = 0;
+maxSizePtr = libpointer('int32Ptr', maxSize);
+
+%query IQ stream buffer size
+[ReturnStatus, maxSize] = calllib('RSA_API', 'IQSTREAM_GetIQDataBufferSize', maxSizePtr);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'IQSTREAM_GetIQDataBufferSize');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>GetMaxAcqBandwidth</Name>
+               <Location>iqstream</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function [maxBandwidthHz] = GetMaxAcqBandwidth(obj)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%create pointer parameters
+maxBandwidthHz = 0;
+maxBandwidthHzPtr = libpointer('doublePtr', maxBandwidthHz);
+
+%query maximum acquisition bandwidth
+[ReturnStatus, maxBandwidthHz]  = calllib('RSA_API', 'IQSTREAM_GetMaxAcqBandwidth', maxBandwidthHzPtr);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'IQSTREAM_GetMaxAcqBandwidth');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>GetMinAcqBandwidth</Name>
+               <Location>iqstream</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function [minBandwidthHz] = GetMinAcqBandwidth(obj)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%create pointer parameters
+minBandwidthHz = 0;
+minBandwidthHzPtr = libpointer('doublePtr', minBandwidthHz);
+
+%query minimum acquisition bandwidth
+[ReturnStatus, minBandwidthHz]  = calllib('RSA_API', 'IQSTREAM_GetMinAcqBandwidth', minBandwidthHzPtr);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'IQSTREAM_GetMinAcqBandwidth');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>SetAcqBandwidth</Name>
+               <Location>iqstream</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function SetAcqBandwidth(obj, bwHz_req)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%set bandwidth of IQ stream
+ReturnStatus = calllib('RSA_API', 'IQSTREAM_SetAcqBandwidth', bwHz_req);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'IQSTREAM_SetAcqBandwidth');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>SetDiskFileLength</Name>
+               <Location>iqstream</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function SetDiskFileLength(obj, msec)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%set duration to stream IQ data to disk
+ReturnStatus = calllib('RSA_API', 'IQSTREAM_SetDiskFileLength', msec);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'IQSTREAM_SetDiskFileLength');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>SetDiskFilenameBase</Name>
+               <Location>iqstream</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function SetDiskFilenameBase(obj, filenameBase)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%set filename to stream IQ data to disk
+ReturnStatus = calllib('RSA_API', 'IQSTREAM_SetDiskFilenameBase', filenameBase);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'IQSTREAM_SetDiskFilenameBase');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>SetDiskFilenameBaseW</Name>
+               <Location>iqstream</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function SetDiskFilenameBaseW(obj, filenameBaseW)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%create a void pointer to hold wchar_t*
+filenameBaseWPtr = libpointer('voidPtr', [uint16(filenameBaseW) 0]);
+
+%set filename to stream IQ data to disk
+[ReturnStatus]  = calllib('RSA_API', 'IQSTREAM_SetDiskFilenameBaseW', filenameBaseWPtr);
+
+% report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'IQSTREAM_SetDiskFilenameBaseW');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>SetDiskFilenameSuffix</Name>
+               <Location>iqstream</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function SetDiskFilenameSuffix(obj, suffixCtl)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%initialize variables to hold enumeration types
+index = 'IQSSDFN_SUFFIX_INCRINDEX_MIN';
+none = 'IQSSDFN_SUFFIX_NONE';
+timestamp = 'IQSSDFN_SUFFIX_TIMESTAMP';
+
+%compare enumeration types and convert to equivalent numeric value
+if strcmp(suffixCtl, none)
+    suffixCtl = -2;
+elseif strcmp(suffixCtl, timestamp)
+    suffixCtl = -1;
+elseif strcmp(suffixCtl, index)
+    suffixCtl = 0;
+end
+
+%set suffix of filename streamed to disk
+ReturnStatus = calllib('RSA_API', 'IQSTREAM_SetDiskFilenameSuffix', suffixCtl);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'IQSTREAM_SetDiskFilenameSuffix');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>SetIQDataBufferSize</Name>
+               <Location>iqstream</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function SetIQDataBufferSize(obj, reqSize)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%set the buffer size to store IQ data
+ReturnStatus = calllib('RSA_API', 'IQSTREAM_SetIQDataBufferSize', reqSize);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'IQSTREAM_SetIQDataBufferSize');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>SetOutputConfiguration</Name>
+               <Location>iqstream</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function SetOutputConfiguration(obj, dest, dtype)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%set output configuration for IQ stream
+ReturnStatus = calllib('RSA_API', 'IQSTREAM_SetOutputConfiguration', dest, dtype);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'IQSTREAM_SetOutputConfiguration');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>Start</Name>
+               <Location>iqstream</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function Start(obj)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%start data acquisition for IQ stream
+ReturnStatus = calllib('RSA_API', 'IQSTREAM_Start');
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'IQSTREAM_Start');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>Stop</Name>
+               <Location>iqstream</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function Stop(obj)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%stop data acquisition for IQ stream
+ReturnStatus = calllib('RSA_API', 'IQSTREAM_Stop');
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'IQSTREAM_Stop');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+         </MethodInfo>
+      </Group>
+      <Group>
+         <Name>playback</Name>
+         <Description/>
+         <Command/>
+         <Size>1</Size>
+         <Mappings>
+            <ChannelMap Command="Playback1" Index="1"/>
+         </Mappings>
+         <PropertyInfo/>
+         <MethodInfo>
+            <Method>
+               <Name>GetReplayComplete</Name>
+               <Location>playback</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function [complete] = GetReplayComplete(obj)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%create pointer parameter
+complete = '';
+completePtr = libpointer('voidPtr', [int8(complete) 0]);
+
+%query when file playback has completed
+[ReturnStatus, complete] = calllib('RSA_API', 'PLAYBACK_GetReplayComplete', completePtr);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'PLAYBACK_GetReplayComplete');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>OpenDiskFile</Name>
+               <Location>playback</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function OpenDiskFile(obj, filename, startPercentage, stopPercentage, skipTimeBetweenFullAcquisitions, loopAtEndOfFile, emulateRealTime)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%create pointer parameter
+filenamePtr = libpointer('voidPtr', [uint16(filename) 0]);
+
+%if start percentage is below or above an acceptable range, set to closest
+%acceptable value
+if (startPercentage &lt; 0) 
+    startPercentage = 0;
+elseif (startPercentage &gt;= 100) 
+    startPercentage = 99;
+end
+
+%if stop percentage is below or above an acceptable range, set to closest
+%acceptable value
+if (stopPercentage &lt;= 0) 
+    stopPercentage = 1;
+elseif (stopPercentage &gt; 100) 
+    stopPercentage = 100;
+end
+
+%if start is greter then stop, set start below stop value
+if (startPercentage &gt;= stopPercentage)  
+    startPercentage = stopPercentage - 1;
+end
+
+%set parameters of file for file playback 
+ReturnStatus = calllib('RSA_API', 'PLAYBACK_OpenDiskFile', filenamePtr, startPercentage, stopPercentage, skipTimeBetweenFullAcquisitions, loopAtEndOfFile, emulateRealTime);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'PLAYBACK_OpenDiskFile');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+         </MethodInfo>
+      </Group>
+      <Group>
+         <Name>power</Name>
+         <Description/>
+         <Command/>
+         <Size>1</Size>
+         <Mappings>
+            <ChannelMap Command="Power1" Index="1"/>
+         </Mappings>
+         <PropertyInfo/>
+         <MethodInfo>
+            <Method>
+               <Name>GetHWStatus</Name>
+               <Location>power</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function [powerStatus] = GetHWStatus(obj)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%create pointer parameters
+powerStatus.externalPowerPresent = false;
+powerStatus.batteryPresent = false;
+powerStatus.batteryChargeLevel = 0;
+powerStatus.batteryCharging = 0;
+powerStatus.batteryOverTemperature = 0;
+powerStatus.batteryHardwareError = 0;
+s = libpointer('POWER_INFO', powerStatus);
+
+
+%query Power settings
+[ReturnStatus, powerStatus]  = calllib('RSA_API', 'POWER_GetStatus', s);
+
+% report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'POWER_GetStatus');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+         </MethodInfo>
+      </Group>
+      <Group>
+         <Name>reftime</Name>
+         <Description/>
+         <Command/>
+         <Size>1</Size>
+         <Mappings>
+            <ChannelMap Command="Reftime1" Index="1"/>
+         </Mappings>
+         <PropertyInfo/>
+         <MethodInfo>
+            <Method>
+               <Name>GetCurrentTime</Name>
+               <Location>reftime</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function [o_timeSec, o_timeNsec, o_timestamp] = GetCurrentTime(obj)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%create pointer parameters
+o_timeSec = 0;
+o_timeNsec = 0;
+o_timestamp = 0;
+secPtr = libpointer('int64Ptr', o_timeSec);
+nsecPtr = libpointer('uint64Ptr', o_timeNsec);
+timestampPtr = libpointer('uint64Ptr', o_timestamp);
+
+%query current posix time and timestamp
+[ReturnStatus, o_timeSec, o_timeNsec, o_timestamp] = calllib('RSA_API', 'REFTIME_GetCurrentTime', secPtr, nsecPtr, timestampPtr);
+
+% report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'REFTIME_GetCurrentTime');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>GetIntervalSinceRefTimeSet</Name>
+               <Location>reftime</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function [sec] = GetIntervalSinceRefTimeSet(obj)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%create pointer parameter
+sec = 0;
+secPtr = libpointer('doublePtr', sec);
+
+%query number of seconds since internal RSA API time and timestamp were set
+[ReturnStatus, sec] = calllib('RSA_API', 'REFTIME_GetIntervalSinceRefTimeSet', secPtr);
+
+% report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'REFTIME_GetIntervalSinceRefTimeSet');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>GetReferenceTime</Name>
+               <Location>reftime</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function [refTimeSec, refTimeNsec, refTimestamp] = GetReferenceTime(obj)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%create pointer parameters
+refTimeSec = 0;
+refTimeNsec = 0;
+refTimestamp = 0;
+secPtr = libpointer('int64Ptr', refTimeSec);
+nsecPtr = libpointer('uint64Ptr', refTimeNsec);
+timestampPtr = libpointer('uint64Ptr', refTimestamp);
+
+%query posix time and timestamp based on user defined settings
+[ReturnStatus, refTimeSec, refTimeNsec, refTimestamp] = calllib('RSA_API', 'REFTIME_GetReferenceTime', secPtr, nsecPtr, timestampPtr);
+
+% report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'REFTIME_GetReferenceTime');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>GetTimeFromTimestamp</Name>
+               <Location>reftime</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function [o_timeSec, o_timeNsec] = GetTimeFromTimestamp(obj, i_timestamp)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%create pointer parameters
+o_timeSec = 0;
+o_timeNsec = 0;
+secPtr = libpointer('int64Ptr', o_timeSec);
+nsecPtr = libpointer('uint64Ptr', o_timeNsec);
+
+%query posix time from timestamp
+[ReturnStatus, o_timeSec, o_timeNsec] = calllib('RSA_API', 'REFTIME_GetTimeFromTimestamp', i_timestamp, secPtr, nsecPtr);
+
+% report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'REFTIME_GetTimeFromTimestamp');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>GetTimestampFromTime</Name>
+               <Location>reftime</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function [o_timestamp] = GetTimestampFromTime(obj, i_timeSec, i_timeNsec)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%create pointer parameter
+o_timestamp = 0;
+timestampPtr = libpointer('uint64Ptr', o_timestamp);
+
+%query timestamp from posix time
+[ReturnStatus, o_timestamp] = calllib('RSA_API', 'REFTIME_GetTimestampFromTime', i_timeSec, i_timeNsec,timestampPtr);
+
+% report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'REFTIME_GetTimestampFromTime');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>GetTimestampRate</Name>
+               <Location>reftime</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function [o_refTimestampRate] = GetTimestampRate(obj)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%create pointer parameter
+o_refTimestampRate = 0;
+ratePtr = libpointer('uint64Ptr', o_refTimestampRate);
+
+%query internal clock rate
+[ReturnStatus, o_refTimestampRate] = calllib('RSA_API', 'REFTIME_GetTimestampRate', ratePtr);
+
+% report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'REFTIME_GetTimestampRate');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>SetReferenceTime</Name>
+               <Location>reftime</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function SetReferenceTime(obj, refTimeSec, retTimeNsec, refTimestamp)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%set internal reference time
+[ReturnStatus] = calllib('RSA_API', 'REFTIME_SetReferenceTime', refTimeSec, retTimeNsec, refTimestamp);
+
+% report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'REFTIME_SetReferenceTime');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+         </MethodInfo>
+      </Group>
+      <Group>
+         <Name>spectrum</Name>
+         <Description/>
+         <Command/>
+         <Size>1</Size>
+         <Mappings>
+            <ChannelMap Command="Spectrum1" Index="1"/>
+         </Mappings>
+         <PropertyInfo>
+            <Property>
+               <Name>Enable</Name>
+               <Location>spectrum</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <GetMCode>function propertyValue = getProperty(obj, propertyName)
+% Return a property value.
+%   This function is called to return the device or group object property
+%   value. If the property is a group property, OBJ is the group object. If
+%   the property is a base device property, OBJ is the device object.
+
+%create pointer parameter
+boolean = '';
+booleanPtr = libpointer('voidPtr', [int8(boolean) 0]);
+
+%query status of enable
+[ReturnStatus, propertyValue] = calllib('RSA_API', 'SPECTRUM_GetEnable', booleanPtr);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'SPECTRUM_GetEnable');</GetMCode>
+                  <SetMCode>function set(obj, propertyName, propertyValue)
+% Set a property value.
+%   This function is called to set the device or group object property
+%   value. If the property is a group property, OBJ is the group object. If
+%   the property is a base device property, OBJ is the device object.
+
+%set status of enable
+ReturnStatus = calllib('RSA_API', 'SPECTRUM_SetEnable', propertyValue);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'SPECTRUM_SetEnable');</SetMCode>
+               </Code>
+               <PermissibleType>
+                  <Type>Double</Type>
+                  <Constraint>enum</Constraint>
+                  <ConstraintValue>
+                     <Value>0.0</Value>
+                     <Value>1.0</Value>
+                  </ConstraintValue>
+               </PermissibleType>
+               <DefaultValue>0.0</DefaultValue>
+               <ReadOnly>never</ReadOnly>
+               <Description/>
+            </Property>
+         </PropertyInfo>
+         <MethodInfo>
+            <Method>
+               <Name>AcquireTrace</Name>
+               <Location>spectrum</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function AcquireTrace(obj)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%start data acquisition for trace
+ReturnStatus = calllib('RSA_API', 'SPECTRUM_AcquireTrace');
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'SPECTRUM_AcquireTrace');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>GetLimits</Name>
+               <Location>spectrum</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function limits = GetLimits(obj)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%create pointer parameter
+limits.maxSpan = 0;
+
+s = libpointer('Spectrum_Limits', limits);
+
+%query limits of spectrum
+[ReturnStatus, limits] = calllib('RSA_API', 'SPECTRUM_GetLimits', s);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'SPECTRUM_GetLimits');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>GetSettings</Name>
+               <Location>spectrum</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function settings = GetSettings(obj)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%create pointer parameter
+settings.span = 0;
+s = libpointer('Spectrum_Settings', settings);
+
+%query spectrum settings
+[ReturnStatus, settings] = calllib('RSA_API', 'SPECTRUM_GetSettings', s);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'SPECTRUM_GetSettings');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>GetTrace</Name>
+               <Location>spectrum</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function [traceData] = GetTrace(obj, trace, maxTracePoints)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%create pointer parameter
+traceData = zeros(1, maxTracePoints);
+outTracePoints = 0;
+
+traceDataPtr = libpointer('singlePtr', traceData);
+outTracePointsPtr = libpointer('int32Ptr', outTracePoints);
+
+%query trace data of spectrum
+[ReturnStatus, traceData] = calllib('RSA_API', 'SPECTRUM_GetTrace', trace, maxTracePoints, traceDataPtr, outTracePointsPtr);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'SPECTRUM_GetTrace');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>GetTraceInfo</Name>
+               <Location>spectrum</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function [traceInfo] = GetTraceInfo(obj)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%create pointer parameter
+traceInfo.timestamp = 0;
+traceInfo.acqDataStatus = 0;
+
+traceInfoPtr = libpointer('Spectrum_TraceInfo', traceInfo);
+
+%query trace info of spectrum
+[ReturnStatus, traceInfo] = calllib('RSA_API', 'SPECTRUM_GetTraceInfo', traceInfoPtr);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'SPECTRUM_GetTraceInfo');
+
+%create pointer parameters
+o_timeSec = 0;
+o_timeNsec = 0;
+secPtr = libpointer('int64Ptr', o_timeSec);
+nsecPtr = libpointer('uint64Ptr', o_timeNsec);
+
+%query posix time from timestamp
+[ReturnStatus, o_timeSec, o_timeNsec] = calllib('RSA_API', 'REFTIME_GetTimeFromTimestamp', traceInfo.timestamp, secPtr, nsecPtr);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'REFTIME_GetTimeFromTimestamp');
+
+%convert Unix time into date time format string
+traceInfo.unixTime = datestr(datetime(o_timeSec, 'ConvertFrom', 'posixtime'));</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>GetTraceType</Name>
+               <Location>spectrum</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function [enable, detector] = GetTraceType(obj, trace)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%create pointer parameter
+enable = 0;
+detector = 0;
+
+enablePtr = libpointer('bool', enable);
+detectorPtr = libpointer('SpectrumDetectors', detector);
+
+%query trace of spectrum
+[ReturnStatus, enable, detector] = calllib('RSA_API', 'SPECTRUM_GetTraceType', trace, enablePtr, detectorPtr);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'SPECTRUM_GetTraceType');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>SetDefault</Name>
+               <Location>spectrum</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function SetDefault(obj)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%set default values of spectrum
+ReturnStatus = calllib('RSA_API', 'SPECTRUM_SetDefault');
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'SPECTRUM_SetDefault');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>SetSettings</Name>
+               <Location>spectrum</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function SetSettings(obj, settings)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%set spectrum settings
+ReturnStatus = calllib('RSA_API', 'SPECTRUM_SetSettings', settings);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'SPECTRUM_SetSettings');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>SetTraceType</Name>
+               <Location>spectrum</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function SetTraceType(obj, trace, enable, detector)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%conversion of previous enumeration strings
+if strcmp(detector, 'SpectrumDetector_Max') | strcmp(detector, 'SpectrumDetector_PosPeak')
+    detector = 0;
+elseif strcmp(detector, 'SpectrumDetector_Min') | strcmp(detector, 'SpectrumDetector_NegPeak')
+    detector = 1;
+end
+   
+%set properties of trace
+ReturnStatus = calllib('RSA_API', 'SPECTRUM_SetTraceType', trace, enable, detector);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'SPECTRUM_SetTraceType');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+            <Method>
+               <Name>WaitForTraceReady</Name>
+               <Location>spectrum</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function [ready] = WaitForTraceReady(obj, timeoutMsec)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%create pointer parameter
+ready = 0;
+readyPtr = libpointer('bool', ready);
+
+%wait for trace
+[ReturnStatus, ready] = calllib('RSA_API', 'SPECTRUM_WaitForTraceReady', timeoutMsec, readyPtr);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'SPECTRUM_WaitForTraceReady');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+         </MethodInfo>
+      </Group>
+      <Group>
+         <Name>trigger</Name>
+         <Description/>
+         <Command/>
+         <Size>1</Size>
+         <Mappings>
+            <ChannelMap Command="Trigger1" Index="1"/>
+         </Mappings>
+         <PropertyInfo>
+            <Property>
+               <Name>IFPowerLevel</Name>
+               <Location>trigger</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <GetMCode>function propertyValue = getProperty(obj, propertyName)
+% Return a property value.
+%   This function is called to return the device or group object property
+%   value. If the property is a group property, OBJ is the group object. If
+%   the property is a base device property, OBJ is the device object.
+
+%create pointer parameter
+level = 0;
+levelPtr = libpointer('doublePtr', level);
+
+%query trigger IF power level
+[ReturnStatus, propertyValue] = calllib('RSA_API', 'TRIG_GetIFPowerTriggerLevel', levelPtr);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'TRIG_GetIFPowerTriggerLevel');</GetMCode>
+                  <SetMCode>function set(obj, propertyName, propertyValue)
+% Set a property value.
+%   This function is called to set the device or group object property
+%   value. If the property is a group property, OBJ is the group object. If
+%   the property is a base device property, OBJ is the device object.
+
+%set trigger IF power level
+ReturnStatus = calllib('RSA_API', 'TRIG_SetIFPowerTriggerLevel', propertyValue);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'TRIG_SetIFPowerTriggerLevel');</SetMCode>
+               </Code>
+               <PermissibleType>
+                  <Type>Double</Type>
+                  <Constraint>none</Constraint>
+               </PermissibleType>
+               <DefaultValue>0</DefaultValue>
+               <ReadOnly>never</ReadOnly>
+               <Description/>
+            </Property>
+            <Property>
+               <Name>Mode</Name>
+               <Location>trigger</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <GetMCode>function propertyValue = getProperty(obj, propertyName)
+% Return a property value.
+%   This function is called to return the device or group object property
+%   value. If the property is a group property, OBJ is the group object. If
+%   the property is a base device property, OBJ is the device object.
+
+%create pointer parameter
+mode = 0;
+modePtr = libpointer('TriggerMode', mode);
+
+%query trigger mode
+[ReturnStatus, propertyValue] = calllib('RSA_API', 'TRIG_GetTriggerMode', modePtr);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'TRIG_GetTriggerMode');</GetMCode>
+                  <SetMCode>function set(obj, propertyName, propertyValue)
+% Set a property value.
+%   This function is called to set the device or group object property
+%   value. If the property is a group property, OBJ is the group object. If
+%   the property is a base device property, OBJ is the device object.
+
+%set trigger mode
+ReturnStatus = calllib('RSA_API', 'TRIG_SetTriggerMode', propertyValue);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'TRIG_SetTriggerMode');</SetMCode>
+               </Code>
+               <PermissibleType>
+                  <Type>Double</Type>
+                  <Constraint>enum</Constraint>
+                  <ConstraintValue>
+                     <Value>0.0</Value>
+                     <Value>1.0</Value>
+                  </ConstraintValue>
+               </PermissibleType>
+               <PermissibleType>
+                  <Type>String</Type>
+                  <Constraint>none</Constraint>
+               </PermissibleType>
+               <DefaultValue>0</DefaultValue>
+               <ReadOnly>never</ReadOnly>
+               <Description/>
+            </Property>
+            <Property>
+               <Name>PositionPercentage</Name>
+               <Location>trigger</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <GetMCode>function propertyValue = getProperty(obj, propertyName)
+% Return a property value.
+%   This function is called to return the device or group object property
+%   value. If the property is a group property, OBJ is the group object. If
+%   the property is a base device property, OBJ is the device object.
+
+%create pointer parameter
+trigPosPercent = 0;
+trigPosPercentPtr = libpointer('doublePtr', trigPosPercent);
+
+%query trigger position
+[ReturnStatus, propertyValue] = calllib('RSA_API', 'TRIG_GetTriggerPositionPercent', trigPosPercentPtr);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'TRIG_GetTriggerPositionPercent');</GetMCode>
+                  <SetMCode>function set(obj, propertyName, propertyValue)
+% Set a property value.
+%   This function is called to set the device or group object property
+%   value. If the property is a group property, OBJ is the group object. If
+%   the property is a base device property, OBJ is the device object.
+
+%set trigger position
+ReturnStatus = calllib('RSA_API', 'TRIG_SetTriggerPositionPercent', propertyValue);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'TRIG_SetTriggerPositionPercent');</SetMCode>
+               </Code>
+               <PermissibleType>
+                  <Type>Double</Type>
+                  <Constraint>none</Constraint>
+               </PermissibleType>
+               <DefaultValue>0</DefaultValue>
+               <ReadOnly>never</ReadOnly>
+               <Description/>
+            </Property>
+            <Property>
+               <Name>Source</Name>
+               <Location>trigger</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <GetMCode>function propertyValue = getProperty(obj, propertyName)
+% Return a property value.
+%   This function is called to return the device or group object property
+%   value. If the property is a group property, OBJ is the group object. If
+%   the property is a base device property, OBJ is the device object.
+
+%create pointer parameter
+source = 0;
+sourcePtr = libpointer('TriggerSource', source);
+
+%query trigger source
+[ReturnStatus, propertyValue] = calllib('RSA_API', 'TRIG_GetTriggerSource', sourcePtr);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'TRIG_GetTriggerSource');</GetMCode>
+                  <SetMCode>function set(obj, propertyName, propertyValue)
+% Set a property value.
+%   This function is called to set the device or group object property
+%   value. If the property is a group property, OBJ is the group object. If
+%   the property is a base device property, OBJ is the device object.
+
+%set trigger source
+ReturnStatus = calllib('RSA_API', 'TRIG_SetTriggerSource', propertyValue);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'TRIG_SetTriggerSource');</SetMCode>
+               </Code>
+               <PermissibleType>
+                  <Type>Double</Type>
+                  <Constraint>enum</Constraint>
+                  <ConstraintValue>
+                     <Value>0.0</Value>
+                     <Value>1.0</Value>
+                  </ConstraintValue>
+               </PermissibleType>
+               <PermissibleType>
+                  <Type>String</Type>
+                  <Constraint>none</Constraint>
+               </PermissibleType>
+               <DefaultValue>0</DefaultValue>
+               <ReadOnly>never</ReadOnly>
+               <Description/>
+            </Property>
+            <Property>
+               <Name>Transition</Name>
+               <Location>trigger</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <GetMCode>function propertyValue = getProperty(obj, propertyName)
+% Return a property value.
+%   This function is called to return the device or group object property
+%   value. If the property is a group property, OBJ is the group object. If
+%   the property is a base device property, OBJ is the device object.
+
+%create pointer parameter
+transition = 0;
+transitionPtr = libpointer('TriggerTransition', transition);
+
+%query trigger transition
+[ReturnStatus, propertyValue] = calllib('RSA_API', 'TRIG_GetTriggerTransition', transitionPtr);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'TRIG_GetTriggerTransition');</GetMCode>
+                  <SetMCode>function set(obj, propertyName, propertyValue)
+% Set a property value.
+%   This function is called to set the device or group object property
+%   value. If the property is a group property, OBJ is the group object. If
+%   the property is a base device property, OBJ is the device object.
+
+%set trigger transition
+ReturnStatus = calllib('RSA_API', 'TRIG_SetTriggerTransition', propertyValue);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'TRIG_SetTriggerTransition');</SetMCode>
+               </Code>
+               <PermissibleType>
+                  <Type>Double</Type>
+                  <Constraint>enum</Constraint>
+                  <ConstraintValue>
+                     <Value>0.0</Value>
+                     <Value>1.0</Value>
+                     <Value>2.0</Value>
+                  </ConstraintValue>
+               </PermissibleType>
+               <PermissibleType>
+                  <Type>String</Type>
+                  <Constraint>none</Constraint>
+               </PermissibleType>
+               <DefaultValue>0</DefaultValue>
+               <ReadOnly>never</ReadOnly>
+               <Description/>
+            </Property>
+         </PropertyInfo>
+         <MethodInfo>
+            <Method>
+               <Name>ForceTrigger</Name>
+               <Location>trigger</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function ForceTrigger(obj)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%force trigger
+ReturnStatus = calllib('RSA_API', 'TRIG_ForceTrigger');
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'TRIG_ForceTrigger');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+         </MethodInfo>
+      </Group>
+      <Group>
+         <Name>trkgen</Name>
+         <Description/>
+         <Command/>
+         <Size>1</Size>
+         <Mappings>
+            <ChannelMap Command="TRKGEN1" Index="1"/>
+         </Mappings>
+         <PropertyInfo>
+            <Property>
+               <Name>Enable</Name>
+               <Location>trkgen</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <GetMCode>function propertyValue = getProperty(obj, propertyName)
+% Return a property value.
+%   This function is called to return the device or group object property
+%   value. If the property is a group property, OBJ is the group object. If
+%   the property is a base device property, OBJ is the device object.
+
+%create pointer parameter
+enabled = '';
+enabledPtr = libpointer('voidPtr', [int8(enabled) 0]);
+
+%query status of tracking generator enable
+[ReturnStatus, propertyValue] = calllib('RSA_API', 'TRKGEN_GetEnable', enabledPtr);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'TRKGEN_GetEnable');</GetMCode>
+                  <SetMCode>function set(obj, propertyName, propertyValue)
+% Set a property value.
+%   This function is called to set the device or group object property
+%   value. If the property is a group property, OBJ is the group object. If
+%   the property is a base device property, OBJ is the device object.
+
+%set status of tracking generator enable
+ReturnStatus = calllib('RSA_API', 'TRKGEN_SetEnable', propertyValue);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'TRKGEN_SetEnable');</SetMCode>
+               </Code>
+               <PermissibleType>
+                  <Type>Double</Type>
+                  <Constraint>enum</Constraint>
+                  <ConstraintValue>
+                     <Value>0.0</Value>
+                     <Value>1.0</Value>
+                  </ConstraintValue>
+               </PermissibleType>
+               <DefaultValue>0.0</DefaultValue>
+               <ReadOnly>never</ReadOnly>
+               <Description/>
+            </Property>
+            <Property>
+               <Name>OutputLevel</Name>
+               <Location>trkgen</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <GetMCode>function propertyValue = getProperty(obj, propertyName)
+% Return a property value.
+%   This function is called to return the device or group object property
+%   value. If the property is a group property, OBJ is the group object. If
+%   the property is a base device property, OBJ is the device object.
+
+%create pointer parameter
+level = 0;
+levelPtr = libpointer('doublePtr', level);
+
+%query output level
+[ReturnStatus, propertyValue] = calllib('RSA_API', 'TRKGEN_GetOutputLevel', levelPtr);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'TRKGEN_GetOutputLevel');</GetMCode>
+                  <SetMCode>function set(obj, propertyName, propertyValue)
+% Set a property value.
+%   This function is called to set the device or group object property
+%   value. If the property is a group property, OBJ is the group object. If
+%   the property is a base device property, OBJ is the device object.
+
+%set output level
+ReturnStatus = calllib('RSA_API', 'TRKGEN_SetOutputLevel', propertyValue);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'TRKGEN_SetOutputLevel');</SetMCode>
+               </Code>
+               <PermissibleType>
+                  <Type>Double</Type>
+                  <Constraint>none</Constraint>
+               </PermissibleType>
+               <DefaultValue>0</DefaultValue>
+               <ReadOnly>never</ReadOnly>
+               <Description/>
+            </Property>
+         </PropertyInfo>
+         <MethodInfo>
+            <Method>
+               <Name>GetHWInstalled</Name>
+               <Location>trkgen</Location>
+               <CapabilityGroup>Base</CapabilityGroup>
+               <Type>MCode</Type>
+               <Code>
+                  <MCode>function [installed] = GetHWInstalled(obj)
+% For group functions, OBJ is the group object. For
+% base device functions, OBJ is the device object.
+
+%create pointer parameter
+installed = '';
+installedPtr = libpointer('voidPtr', [int8(installed) 0]);
+
+%query if tracking generator hardware is installed
+[ReturnStatus, installed] = calllib('RSA_API', 'TRKGEN_GetHwInstalled', installedPtr);
+
+%report error
+invoke(obj.Parent, 'ReportError', ReturnStatus, 'TRKGEN_GetHwInstalled');</MCode>
+               </Code>
+               <Description/>
+            </Method>
+         </MethodInfo>
+      </Group>
+   </GroupInfo>
+</MATLABInstrumentDriver>
