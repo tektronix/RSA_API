@@ -1,5 +1,8 @@
 # Python Example Code
 
+You can download the latest verion (3.11.0047) of the RSA_API here:
+https://www.tek.com/model/rsa306-software/rsa-application-programming-interface-api-64-bit-windows-v3110047
+
 The RSA API allows anyone to write scripts, lightweight applications, or plugins that directly control and acquire data from Tektronix USB RSAs without needing to run SignalVu-PC.
 This repository contains complete RSA API usage examples for Python, including configuring the RSA hardware, capturing and plotting data, and streaming IF and IQ data to disk.
 
