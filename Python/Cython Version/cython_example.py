@@ -232,9 +232,9 @@ def peak_power_detector(freq, trace):
 def main():
     # uncomment the example you'd like to run
     spectrum_example()
-    block_iq_example()
-    dpx_example()
-0
+    # block_iq_example()
+    # dpx_example()
+
 
 if __name__ == '__main__':
     main()

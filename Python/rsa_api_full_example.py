@@ -2,11 +2,10 @@
 Tektronix RSA_API Example
 Author: Morgan Allison
 Date created: 6/15
-Date edited: 5/17
+Date edited: 9/17
 Windows 7 64-bit
-RSA API version 3.9.0029
-Python 3.6.0 64-bit (Anaconda 4.3.0)
-NumPy 1.11.3, MatPlotLib 2.0.0
+Python 3.6.1 64-bit (Anaconda 4.4.0)
+NumPy 1.13.1, MatPlotLib 2.0.2
 Download Anaconda: http://continuum.io/downloads
 Anaconda includes NumPy and MatPlotLib
 Download the RSA_API: http://www.tek.com/model/rsa306-software
@@ -22,6 +21,10 @@ from time import sleep
 import numpy as np
 import matplotlib.pyplot as plt
 from RSA_API import *
+
+from matplotlib import __version__ as __mversion__
+print('Matplotlib Version:', __mversion__)
+print('Numpy Version:', np.__version__)
 
 
 # C:\Tektronix\RSA_API\lib\x64 needs to be added to the
