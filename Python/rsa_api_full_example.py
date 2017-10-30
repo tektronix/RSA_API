@@ -4,6 +4,7 @@ Author: Morgan Allison
 Date created: 6/15
 Date edited: 9/17
 Windows 7 64-bit
+RSA API version 3.11.0047
 Python 3.6.1 64-bit (Anaconda 4.4.0)
 NumPy 1.13.1, MatPlotLib 2.0.2
 Download Anaconda: http://continuum.io/downloads

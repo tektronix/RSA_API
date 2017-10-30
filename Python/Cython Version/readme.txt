@@ -2,12 +2,12 @@ Tektronix RSA_API for Python using Cython
 
 
 Prerequisites:
-1. Windows 7 64 bit (it will probably work on 8 and 10 as well, but I haven't
-tested it)
-2. Python 3.6.x (tested on Python 3.6.0), NumPy 1.11.3, Matplotlib 2.0.0.
+1. Windows 7 64 bit (it will probably work on 8 and 10 as well, but it
+hasn't been tested).
+2. Python 3.6.x (tested on Python 3.6.1), NumPy 1.13.1, Matplotlib 2.0.0.
 Installing Anaconda is the easiest way to do this if you don't already have
 Python 3 (https://www.continuum.io/downloads).
-3. RSA_API version 3.9.0029 or later (http://www.tek.com/model/rsa306-software)
+3. RSA_API version 3.11.0047 or later (http://www.tek.com/model/rsa306-software)
     a. Make sure to add C:\Tektronix\RSA_API\lib\x64 to the system PATH.
     Failure to do this has wasted a lot of my time in the past, don't let it
      happen to you

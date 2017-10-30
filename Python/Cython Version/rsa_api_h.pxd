@@ -195,7 +195,7 @@ cdef extern from 'RSA_API.h':
 
     ReturnStatus DEVICE_Search(int* numDevicesFound, int deviceIDs[], const char deviceSerial[20][100], const char deviceType[20][20])
     # DEVICE_SearchW not imported
-    #
+
     # DEVICE_Search() usage
     # cdef int numDevicesFound = 0
     # cdef int* deviceIDs
@@ -206,7 +206,7 @@ cdef extern from 'RSA_API.h':
     # print('Number of devices: {}'.format(numDevicesFound))
     # print('Device serial numbers: {}'.format(deviceSerial[0].decode()))
     # print('Device type: {}'.format(deviceType[0].decode()))
-
+    #
     # THERE IS A PROBLEM WITH CONVERTING POINTERS TO PYTHON OBJECTS/VICE VERSA
     # ReturnStatus DEVICE_SearchInt(int* numDevicesFound, int* deviceIDs[], const char** deviceSerial[], const char** deviceType[])
     # DEVICE_SearchIntW not imported
@@ -260,16 +260,51 @@ cdef extern from 'RSA_API.h':
     ReturnStatus CONFIG_SetCenterFreq(double cf)
     ReturnStatus CONFIG_GetCenterFreq(double* cf)
 
-    ReturnStatus CONFIG_SetExternalRefEnable(bint exRefEn)
-    ReturnStatus CONFIG_GetExternalRefEnable(bint* exRefEn)
-    ReturnStatus CONFIG_GetExternalRefFrequency(double* extFreq)
-
     ReturnStatus CONFIG_GetAutoAttenuationEnable(bint* enable)
     ReturnStatus CONFIG_SetAutoAttenuationEnable(bint enable)
     ReturnStatus CONFIG_GetRFPreampEnable(bint* enable)
     ReturnStatus CONFIG_SetRFPreampEnable(bint enable)
     ReturnStatus CONFIG_GetRFAttenuator(double* value)
     ReturnStatus CONFIG_SetRFAttenuator(double value)
+
+    ReturnStatus CONFIG_SetExternalRefEnable(bint exRefEn)
+    ReturnStatus CONFIG_GetExternalRefEnable(bint* exRefEn)
+    ReturnStatus CONFIG_GetExternalRefFrequency(double* extFreq)
+
+    # FREQREF_SOURCE enum defined in rsa_api.pyx
+
+    # ReturnStatus CONFIG_SetFrequencyReferenceSource(FREQREF_SOURCE src)
+    # ReturnStatus CONFIG_GetFrequencyReferenceSource(FREQREF_SOURCE* src)
+    ReturnStatus CONFIG_SetFrequencyReferenceSource(int src)
+    ReturnStatus CONFIG_GetFrequencyReferenceSource(int* src)
+
+    # GFR_MODE enum defined in rsa_api.pyx
+
+    # ReturnStatus CONFIG_SetModeGnssFreqRefCorrection(GFR_MODE mode)
+    # ReturnStatus CONFIG_GetModeGnssFreqRefCorrection(GFR_MODE* mode)
+    ReturnStatus CONFIG_SetModeGnssFreqRefCorrection(int mode)
+    ReturnStatus CONFIG_GetModeGnssFreqRefCorrection(int* mode)
+
+    # GFR_STATE enum defined in rsa_api.pyx
+    # GFR_QUALITY enum defined in rsa_api.pyx
+
+    # ReturnStatus CONFIG_GetStatusGnssFreqRefCorrection(GFR_STATE* state, GFR_QUALITY* quality)
+    ReturnStatus CONFIG_GetStatusGnssFreqRefCorrection(int* state, int* quality)
+    
+    ReturnStatus CONFIG_SetEnableGnssTimeRefAlign(bint enable)
+    ReturnStatus CONFIG_GetEnableGnssTimeRefAlign(bint* enable)
+    ReturnStatus CONFIG_GetStatusGnssTimeRefAlign(bint* aligned);
+
+    ReturnStatus CONFIG_SetFreqRefUserSetting(const char* i_usstr);
+    ReturnStatus CONFIG_GetFreqRefUserSetting(char* o_usstr);
+
+    # ctypedef struct FREQREF_USER_INFO:
+    #     bint isValid
+    #     uint32_t dacValue
+    #     char datetime[200]
+    #     double temperature
+    #
+    # ReturnStatus CONFIG_DecodeFreqRefUserSettingString(const char* i_usstr, FREQREF_USER_INFO* o_fui)
 
 
     ##########################################################
@@ -345,6 +380,11 @@ cdef extern from 'RSA_API.h':
 
     ReturnStatus REFTIME_SetReferenceTime(Py_ssize_t refTimeSec, uint64_t refTimeNsec, uint64_t refTimestamp)
     ReturnStatus REFTIME_GetReferenceTime(Py_ssize_t* refTimeSec, uint64_t* refTimeNsec, uint64_t* refTimestamp)
+    
+    # REFTIME_SRC enum defined in rsa_api.pyx
+    
+    # ReturnStatus REFTIME_GetReferenceTimeSource(REFTIME_SRC* source)
+    ReturnStatus REFTIME_GetReferenceTimeSource(int* source)
 
 
     ##########################################################
@@ -353,11 +393,12 @@ cdef extern from 'RSA_API.h':
 
     ReturnStatus IQBLK_GetMaxIQBandwidth(double* maxBandwidth)
     ReturnStatus IQBLK_GetMinIQBandwidth(double* minBandwidth)
-    ReturnStatus IQBLK_GetMaxIQRecordLength(int* maxSamples)
-
     ReturnStatus IQBLK_SetIQBandwidth(double iqBandwidth)
     ReturnStatus IQBLK_GetIQBandwidth(double* iqBandwidth)
+    
+    ReturnStatus IQBLK_GetMaxIQRecordLength(int* maxSamples)
     ReturnStatus IQBLK_GetIQSampleRate(double* iqSampleRate)
+
     ReturnStatus IQBLK_SetIQRecordLength(int recordLength)
     ReturnStatus IQBLK_GetIQRecordLength(int* recordLength)
 
@@ -368,6 +409,8 @@ cdef extern from 'RSA_API.h':
     ReturnStatus IQBLK_GetIQDataDeinterleaved(float* iData, float* qData, int* outLength, int reqLength)
     ReturnStatus IQBLK_GetIQDataCplx(Cplx32* iqData, int* outLength, int reqLength)
 
+    ReturnStatus IQBLK_FinishedIQData()
+    
     # IQBLK_STATUS enum defined in rsa_api.pyx
 
     ctypedef struct IQBLK_ACQINFO:
@@ -377,7 +420,6 @@ cdef extern from 'RSA_API.h':
         int acqStatus
 
     ReturnStatus IQBLK_GetIQAcqInfo(IQBLK_ACQINFO* acqInfo)
-
 
     ##########################################################
     # Spectrum Trace Acquisition
@@ -593,7 +635,7 @@ cdef extern from 'RSA_API.h':
     ReturnStatus AUDIO_Stop()
     ReturnStatus AUDIO_GetEnable(bint *enable)
 
-    # Get data from audio ooutput
+    # Get data from audio output
     # User must allocate data to inSize before calling
     # Actual data returned is in outSize and will not exceed inSize
     ReturnStatus AUDIO_GetData(int16_t* data, uint16_t inSize, uint16_t* outSize)
@@ -602,15 +644,24 @@ cdef extern from 'RSA_API.h':
     ###########################################################
     # IF(ADC) Data Streaming to disk
     ###########################################################
-
+    
+    # ctypedef enum IFSOUTDEST:
+    #     IFSOD_CLIENT = 0
+    #     IFSOD_FILE_R3F = 1
+    #     IFSOD_FILE_R3HA_DET = 3
+    #     IFSOD_FILE_MIDAS = 11
+    #     IFSOD_FILE_MIDAS_DET = 12
+    
     # ctypedef enum StreamingMode:
     #     StreamingModeRaw = 0
     #     StreamingModeFramed = 1
 
-    ReturnStatus IFSTREAM_SetEnable(bint enable)
-    ReturnStatus IFSTREAM_GetActiveStatus(bint* active)
+    # ReturnStatus IFSTREAM_SetOutputConfiguration(IFSOUTDEST dest)
+    ReturnStatus IFSTREAM_SetOutputConfiguration(int dest)
+
+    # Legacy, use IFSTREAM_SetOutputConfiguration
     # ReturnStatus IFSTREAM_SetDiskFileMode(StreamingMode mode)
-    ReturnStatus IFSTREAM_SetDiskFileMode(int mode)
+    # ReturnStatus IFSTREAM_SetDiskFileMode(int mode)
     ReturnStatus IFSTREAM_SetDiskFilePath(const char* path)
     ReturnStatus IFSTREAM_SetDiskFilenameBase(const char* base)
 
@@ -620,6 +671,27 @@ cdef extern from 'RSA_API.h':
     ReturnStatus IFSTREAM_SetDiskFileLength(int msec)
     ReturnStatus IFSTREAM_SetDiskFileCount(int count)
 
+    ReturnStatus IFSTREAM_GetAcqParameters(double* bwHz_act, double* srSps, double* cfAtIfHz)
+    ReturnStatus IFSTREAM_GetScalingParameters(double* scaleFactor, double* scaleFreq)
+    # Return to this later, float** type conversion causing fits
+    # ReturnStatus IFSTREAM_GetEQParameters(int* numPts, float** freq, float** ampl, float** phase)
+    ReturnStatus IFSTREAM_GetIFDataBufferSize(int* buffSize, int* numSamples)
+
+    ReturnStatus IFSTREAM_SetEnable(bint enable)
+    ReturnStatus IFSTREAM_GetActiveStatus(bint* active)
+
+    # IFSTRM_MAXTRIGGERS enum type defined in rsa_api.pyx
+    # IFSTRM_STATUS enum type defined in rsa_api.pyx
+    
+    ctypedef struct IFSTRMDATAINFO:
+        uint64_t timestamp
+        int triggerCount
+        int triggerIndices[32]
+        uint32_t acqStatus
+
+    ReturnStatus IFSTREAM_GetIFData(int16_t* data, int* datalen, IFSTRMDATAINFO* datainfo)
+    # Return to this later, float** type conversion causing fits
+    # ReturnStatus IFSTREAM_GetIFFrames(uint8_t** data, int* numBytes, int* numFrames)
 
     ###########################################################
     # IQ Data Streaming to Client or Disk
@@ -635,11 +707,14 @@ cdef extern from 'RSA_API.h':
     #     IQSOD_FILE_TIQ = 1
     #     IQSOD_FILE_SIQ = 2
     #     IQSOD_FILE_SIQ_SPLIT = 3
+    #     IQSOD_FILE_MIDAS = 11
+    #     IQSOD_FILE_MIDAS_DET = 12
     #
     # ctypedef enum IQSOUTDTYPE:
     #     IQSODT_SINGLE = 0
     #     IQSODT_INT32 = 1
     #     IQSODT_INT16 = 2
+    #     IQSODT_SINGLE_SCALE_INT32 = 3
 
     # ReturnStatus IQSTREAM_SetOutputConfiguration(IQSOUTDEST dest, IQSOUTDTYPE dtype)
     ReturnStatus IQSTREAM_SetOutputConfiguration(int dest, int dtype)
@@ -648,6 +723,7 @@ cdef extern from 'RSA_API.h':
 
     # ReturnStatus IQSTREAM_SetDiskFilenameBaseW(const wchar_t* filenameBaseW)
     ReturnStatus IQSTREAM_SetDiskFilenameBase(const char* filenameBase)
+    # ReturnStatus IQSTREAM_SetDiskFilenameBase(const Pu_UNICODE* filenameBase)
 
     # IQSSDFN enum type defined in rsa_api.pyx
 
@@ -668,6 +744,7 @@ cdef extern from 'RSA_API.h':
         double scaleFactor
         uint32_t acqStatus
 
+    ReturnStatus IQSTREAM_WaitForIQDataReady(int timeoutMsec, bint* ready)
     ReturnStatus IQSTREAM_GetIQData(void* iqdata, int* iqlen, IQSTRMIQINFO* iqinfo)
 
     ReturnStatus IQSTREAM_GetDiskFileWriteStatus(bint* isComplete, bint* isWriting)
@@ -738,6 +815,8 @@ cdef extern from 'RSA_API.h':
     ReturnStatus GNSS_GetNavMessageData(int* msgLen, const char** message)
     ReturnStatus GNSS_ClearNavMessageData()
     ReturnStatus GNSS_Get1PPSTimestamp(bint* isValid, uint64_t* timestamp1PPS)
+    ReturnStatus GNSS_GetStatusRxLock(bint* lock)
+
 
     ###########################################################
     # Power and Battery Status

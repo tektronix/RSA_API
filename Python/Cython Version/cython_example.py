@@ -18,6 +18,7 @@ from rsa_api import *
 from time import sleep
 import numpy as np
 import matplotlib.pyplot as plt
+# import pynmea2
 
 
 """################CLASSES AND FUNCTIONS################"""
@@ -222,6 +223,72 @@ def dpx_example():
     DEVICE_Disconnect_py()
 
 
+"""################GNSS EXAMPLE################"""
+def gnss_example():
+    print('\n\n########GNSS Example########')
+    search_connect()
+    gnss_setup(GNSS_SATSYS.GNSS_GPS_BEIDOU)
+    nmeaMessage = get_gnss_message()
+
+def gnss_setup(satSystem):
+    # check for GNSS hardware
+    if not GNSS_GetHwInstalled_py():
+        print(
+            'No GNSS hardware installed, ensure there is a 1PPS signal present at the trigger/synch input.')
+        input('Press ''ENTER'' to continue > ')
+        return False
+    else:
+        # send setup commands to RSA
+        GNSS_SetEnable_py(True)
+        GNSS_SetAntennaPower_py(True)
+        GNSS_SetSatSystem_py(satSystem)
+        enable = GNSS_GetEnable_py()
+        powered = GNSS_GetAntennaPower_py()
+        satSystem = GNSS_GetSatSystem_py()
+    
+    print('Waiting for GNSS lock.')
+    while not GNSS_GetStatusRxLock_py():
+        pass
+    print('GNSS locked.')
+    
+    return True
+
+
+def get_gnss_message():
+    numMessages = 10
+    gnssMessage = []
+    nmeaMessages = []
+
+    # grab a certain number of GNSS message strings
+    for i in range(numMessages):
+        message, msgLen = GNSS_GetNavMessageData_py()
+        # concatenate the new string
+        gnssMessage.append(message.decode('latin_1'))
+    # put all the continuous ascii text together
+    messageString = ''.join(map(str, gnssMessage))
+    # split message based on individual NMEA messages
+    indivMessages = messageString.split('$')
+    for i in range(len(indivMessages)):
+        if 'GNGGA' in indivMessages[i]:
+            print(indivMessages[i])
+            # try:
+            #     nmeaMessages.append(pynmea2.parse(indivMessages[i].rstrip()))
+            #     print('Latitude: {}'.format(nmeaMessages[-1].latitude))
+            #     print('Longitude: {}'.format(nmeaMessages[-1].longitude))
+            #     print('Current time (GMT): {}'.format(
+            #         nmeaMessages[-1].timestamp))
+            #     # return the first complete parsable message
+            #     return nmeaMessages[-1]
+            # # move on to the next message if there are problems with the first
+            # except pynmea2.nmea.ChecksumError:
+            #     print('Checksum Error, trying again.')
+            # except AttributeError:
+            #     print('Incomplete parsing, trying again.')
+            # except pynmea2.nmea.ParseError:
+            #     print('Unable to parse data, trying again.')
+    # print('GNGGA not found in NMEA message.')
+
+
 """################MISC################"""
 def peak_power_detector(freq, trace):
     peakPower = np.amax(trace)
@@ -231,9 +298,10 @@ def peak_power_detector(freq, trace):
 
 def main():
     # uncomment the example you'd like to run
-    spectrum_example()
+    # spectrum_example()
     # block_iq_example()
     # dpx_example()
+    gnss_example()
 
 
 if __name__ == '__main__':
