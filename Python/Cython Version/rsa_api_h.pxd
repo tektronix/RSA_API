@@ -740,7 +740,7 @@ cdef extern from 'RSA_API.h':
     ctypedef struct IQSTRMIQINFO:
         uint64_t timestamp
         int triggerCount
-        int* triggerIndices
+        int triggerIndices[100]
         double scaleFactor
         uint32_t acqStatus
 

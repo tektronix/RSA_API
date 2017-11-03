@@ -1249,14 +1249,6 @@ def IFSTREAM_GetIFData_py():
     return data, dataLen, dataInfo
 
 
-def SPECTRUM_GetTrace_py(trace=SpectrumTraces.SpectrumTrace1, tracePoints=801):
-    cdef int _tracePoints = tracePoints
-    cdef np.ndarray traceData = np.empty(shape=(tracePoints), dtype=np.float32,
-                                     order='c')
-    cdef int outTracePoints
-    err_check(SPECTRUM_GetTrace(trace, _tracePoints, <float *> traceData.data, &outTracePoints))
-    return np.asarray(traceData, dtype=np.float32)
-
 # Return to this later, float** type conversion causing fits
 # def IFSTREAM_GetIFFrames_py():
 #     cdef uint8_t** data
@@ -1360,13 +1352,25 @@ def IQSTREAM_WaitForIQDataReady_py(timeoutMsec=10):
     err_check(IQSTREAM_WaitForIQDataReady(_timeoutMsec, &ready))
     return ready
 
-# Can't be done with C pointers in Cython
-# def IQSTREAM_GetIQData_py():
-#     cdef void* iqData
-#     cdef int iqlen
-#     cdef IQSTRMIQINFO iqinfo
-#     err_check(IQSTREAM_GetIQData(iqData, &iqlen, &iqinfo))
-#     return iqData
+
+def IQSTREAM_GetIQData_py(inputBuffer, dType):
+    # cdef void* iqData
+    if dType not in [IQSOUTDTYPE.IQSODT_SINGLE, IQSOUTDTYPE.IQSODT_INT32,
+                     IQSOUTDTYPE.IQSODT_INT16,
+                     IQSOUTDTYPE.IQSODT_SINGLE_SCALE_INT32]:
+        raise RSAError('"dType" must be of type IQSOUTDTYPE')
+    if dType == IQSOUTDTYPE.IQSODT_INT16:
+        bufferDType = np.int16
+    elif dType == IQSOUTDTYPE.IQSODT_INT32:
+        bufferDType = np.int32
+    elif dType == IQSOUTDTYPE.IQSODT_SINGLE or dType == IQSOUTDTYPE.IQSODT_SINGLE_SCALE_INT32:
+        bufferDType = np.float32
+    
+    cdef np.ndarray iqData = np.empty(shape=(inputBuffer*2), dtype=bufferDType, order='c')
+    cdef int iqlen
+    cdef IQSTRMIQINFO iqinfo
+    err_check(IQSTREAM_GetIQData(<void*> iqData.data, &iqlen, &iqinfo))
+    return iqData, iqinfo
 
 
 # def IQSTREAM_GetDiskFileInfo_py():

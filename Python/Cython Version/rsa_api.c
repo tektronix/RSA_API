@@ -1583,6 +1583,9 @@ static CYTHON_INLINE PyObject* __Pyx_PyObject_GetSlice(
         PyObject** py_start, PyObject** py_stop, PyObject** py_slice,
         int has_cstart, int has_cstop, int wraparound);
 
+/* None.proto */
+static CYTHON_INLINE void __Pyx_RaiseUnboundLocalError(const char *varname);
+
 /* DictGetItem.proto */
 #if PY_MAJOR_VERSION >= 3 && !CYTHON_COMPILING_IN_PYPY
 static PyObject *__Pyx_PyDict_GetItem(PyObject *d, PyObject* key) {
@@ -1838,6 +1841,7 @@ static CYTHON_INLINE PyObject* __Pyx_PyInt_From_int16_t(int16_t value);
 static PyObject* __pyx_convert__to_py_DPX_FrameBuffer(DPX_FrameBuffer s);
 static PyObject* __pyx_convert__to_py_DPX_SogramSettingsStruct(DPX_SogramSettingsStruct s);
 static PyObject* __pyx_convert__to_py_IFSTRMDATAINFO(IFSTRMDATAINFO s);
+static PyObject* __pyx_convert__to_py_IQSTRMIQINFO(IQSTRMIQINFO s);
 /* CIntToPy.proto */
 static CYTHON_INLINE PyObject* __Pyx_PyInt_From_enum____pyx_t_7rsa_api_GNSS_SATSYS(enum __pyx_t_7rsa_api_GNSS_SATSYS value);
 
@@ -2145,12 +2149,15 @@ static const char __pyx_k_array[] = "array";
 static const char __pyx_k_atten[] = "atten";
 static const char __pyx_k_class[] = "__class__";
 static const char __pyx_k_count[] = "count";
+static const char __pyx_k_dType[] = "dType";
 static const char __pyx_k_dtype[] = "dtype";
 static const char __pyx_k_empty[] = "empty";
 static const char __pyx_k_fb_py[] = "fb_py";
 static const char __pyx_k_fspan[] = "fspan";
 static const char __pyx_k_iData[] = "iData";
 static const char __pyx_k_int16[] = "int16";
+static const char __pyx_k_int32[] = "int32";
+static const char __pyx_k_iqlen[] = "iqlen";
 static const char __pyx_k_log10[] = "log10";
 static const char __pyx_k_maxCF[] = "maxCF";
 static const char __pyx_k_minCF[] = "minCF";
@@ -2180,6 +2187,7 @@ static const char __pyx_k_exists[] = "exists";
 static const char __pyx_k_import[] = "__import__";
 static const char __pyx_k_inSize[] = "inSize";
 static const char __pyx_k_iqData[] = "iqData";
+static const char __pyx_k_iqinfo[] = "iqinfo";
 static const char __pyx_k_limits[] = "limits";
 static const char __pyx_k_maxRBW[] = "maxRBW";
 static const char __pyx_k_maxVBW[] = "maxVBW";
@@ -2356,12 +2364,14 @@ static const char __pyx_k_PickleError[] = "PickleError";
 static const char __pyx_k_REFTIME_SRC[] = "REFTIME_SRC";
 static const char __pyx_k_TriggerMode[] = "TriggerMode";
 static const char __pyx_k_bitmapWidth[] = "_bitmapWidth";
+static const char __pyx_k_bufferDType[] = "bufferDType";
 static const char __pyx_k_collections[] = "collections";
 static const char __pyx_k_decayFactor[] = "decayFactor";
 static const char __pyx_k_fftPerFrame[] = "fftPerFrame";
 static const char __pyx_k_fpgaVersion[] = "fpgaVersion";
 static const char __pyx_k_i_timeSec_2[] = "_i_timeSec";
 static const char __pyx_k_i_timestamp[] = "i_timestamp";
+static const char __pyx_k_inputBuffer[] = "inputBuffer";
 static const char __pyx_k_iqBandwidth[] = "iqBandwidth";
 static const char __pyx_k_lineIndex_2[] = "_lineIndex";
 static const char __pyx_k_o_timestamp[] = "o_timestamp";
@@ -2592,6 +2602,7 @@ static const char __pyx_k_IFSTREAM_GetIFData_py[] = "IFSTREAM_GetIFData_py";
 static const char __pyx_k_IFSTREAM_SetEnable_py[] = "IFSTREAM_SetEnable_py";
 static const char __pyx_k_IQBLK_GetIQAcqInfo_py[] = "IQBLK_GetIQAcqInfo_py";
 static const char __pyx_k_IQSTREAM_GetEnable_py[] = "IQSTREAM_GetEnable_py";
+static const char __pyx_k_IQSTREAM_GetIQData_py[] = "IQSTREAM_GetIQData_py";
 static const char __pyx_k_SPECTRUM_GetEnable_py[] = "SPECTRUM_GetEnable_py";
 static const char __pyx_k_SPECTRUM_GetLimits_py[] = "SPECTRUM_GetLimits_py";
 static const char __pyx_k_SPECTRUM_SetEnable_py[] = "SPECTRUM_SetEnable_py";
@@ -2750,6 +2761,7 @@ static const char __pyx_k_IQSTREAM_SetIQDataBufferSize_py[] = "IQSTREAM_SetIQDat
 static const char __pyx_k_IQSTREAM_SetOutputConfiguration[] = "IQSTREAM_SetOutputConfiguration_py";
 static const char __pyx_k_REFTIME_GetTimeFromTimestamp_py[] = "REFTIME_GetTimeFromTimestamp_py";
 static const char __pyx_k_REFTIME_GetTimestampFromTime_py[] = "REFTIME_GetTimestampFromTime_py";
+static const char __pyx_k_dType_must_be_of_type_IQSOUTDTY[] = "\"dType\" must be of type IQSOUTDTYPE";
 static const char __pyx_k_emulateRealTime_argument_must_b[] = "\"emulateRealTime\" argument must be of type \"bool\".";
 static const char __pyx_k_loopAtEndOfFile_argument_must_b[] = "\"loopAtEndOfFile\" argument must be of type \"bool\".";
 static const char __pyx_k_mode_must_be_of_type_TriggerMod[] = "\"mode\" must be of type \"TriggerMode\".";
@@ -3004,6 +3016,7 @@ static PyObject *__pyx_n_s_IQSTREAM_GetAcqParameters_py;
 static PyObject *__pyx_n_s_IQSTREAM_GetDiskFileWriteStatus;
 static PyObject *__pyx_n_s_IQSTREAM_GetEnable_py;
 static PyObject *__pyx_n_s_IQSTREAM_GetIQDataBufferSize_py;
+static PyObject *__pyx_n_s_IQSTREAM_GetIQData_py;
 static PyObject *__pyx_n_s_IQSTREAM_GetMaxAcqBandwidth_py;
 static PyObject *__pyx_n_s_IQSTREAM_GetMinAcqBandwidth_py;
 static PyObject *__pyx_n_s_IQSTREAM_SetAcqBandwidth_py;
@@ -3166,6 +3179,7 @@ static PyObject *__pyx_n_s_bitmapHeight;
 static PyObject *__pyx_n_s_bitmapWidth;
 static PyObject *__pyx_n_s_bitmapWidth_2;
 static PyObject *__pyx_n_s_buffSize;
+static PyObject *__pyx_n_s_bufferDType;
 static PyObject *__pyx_n_s_bwHz_act;
 static PyObject *__pyx_n_s_bwHz_req;
 static PyObject *__pyx_n_s_bwHz_req_2;
@@ -3181,6 +3195,8 @@ static PyObject *__pyx_n_s_collections;
 static PyObject *__pyx_n_s_complete;
 static PyObject *__pyx_n_s_count;
 static PyObject *__pyx_n_s_count_2;
+static PyObject *__pyx_n_s_dType;
+static PyObject *__pyx_kp_s_dType_must_be_of_type_IQSOUTDTY;
 static PyObject *__pyx_n_s_data;
 static PyObject *__pyx_n_s_dataInfo;
 static PyObject *__pyx_n_s_dataLen;
@@ -3264,12 +3280,16 @@ static PyObject *__pyx_n_s_inSize_2;
 static PyObject *__pyx_n_s_infinitePersistence;
 static PyObject *__pyx_n_s_infinitePersistence_2;
 static PyObject *__pyx_n_s_init;
+static PyObject *__pyx_n_s_inputBuffer;
 static PyObject *__pyx_n_s_installed;
 static PyObject *__pyx_n_s_int16;
+static PyObject *__pyx_n_s_int32;
 static PyObject *__pyx_n_s_iqBandwidth;
 static PyObject *__pyx_n_s_iqBandwidth_2;
 static PyObject *__pyx_n_s_iqData;
 static PyObject *__pyx_n_s_iqSampleRate;
+static PyObject *__pyx_n_s_iqinfo;
+static PyObject *__pyx_n_s_iqlen;
 static PyObject *__pyx_n_s_isComplete;
 static PyObject *__pyx_n_s_isValid;
 static PyObject *__pyx_n_s_isWriting;
@@ -3629,22 +3649,22 @@ static PyObject *__pyx_pf_7rsa_api_264IFSTREAM_GetIFDataBufferSize_py(CYTHON_UNU
 static PyObject *__pyx_pf_7rsa_api_266IFSTREAM_SetEnable_py(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_enable); /* proto */
 static PyObject *__pyx_pf_7rsa_api_268IFSTREAM_GetActiveStatus_py(CYTHON_UNUSED PyObject *__pyx_self); /* proto */
 static PyObject *__pyx_pf_7rsa_api_270IFSTREAM_GetIFData_py(CYTHON_UNUSED PyObject *__pyx_self); /* proto */
-static PyObject *__pyx_pf_7rsa_api_272SPECTRUM_GetTrace_py(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_trace, PyObject *__pyx_v_tracePoints); /* proto */
-static PyObject *__pyx_pf_7rsa_api_274IQSTREAM_GetMinAcqBandwidth_py(CYTHON_UNUSED PyObject *__pyx_self); /* proto */
-static PyObject *__pyx_pf_7rsa_api_276IQSTREAM_GetMaxAcqBandwidth_py(CYTHON_UNUSED PyObject *__pyx_self); /* proto */
-static PyObject *__pyx_pf_7rsa_api_278IQSTREAM_SetAcqBandwidth_py(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_bwHz_req); /* proto */
-static PyObject *__pyx_pf_7rsa_api_280IQSTREAM_GetAcqParameters_py(CYTHON_UNUSED PyObject *__pyx_self); /* proto */
-static PyObject *__pyx_pf_7rsa_api_282IQSTREAM_SetOutputConfiguration_py(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_dest, PyObject *__pyx_v_dtype); /* proto */
-static PyObject *__pyx_pf_7rsa_api_284IQSTREAM_SetIQDataBufferSize_py(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_reqSize); /* proto */
-static PyObject *__pyx_pf_7rsa_api_286IQSTREAM_GetIQDataBufferSize_py(CYTHON_UNUSED PyObject *__pyx_self); /* proto */
-static PyObject *__pyx_pf_7rsa_api_288IQSTREAM_SetDiskFilenameBase_py(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_filenameBase); /* proto */
-static PyObject *__pyx_pf_7rsa_api_290IQSTREAM_SetDiskFilenameSuffix_py(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_suffixCtl); /* proto */
-static PyObject *__pyx_pf_7rsa_api_292IQSTREAM_SetDiskFileLength_py(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_msec); /* proto */
-static PyObject *__pyx_pf_7rsa_api_294IQSTREAM_Start_py(CYTHON_UNUSED PyObject *__pyx_self); /* proto */
-static PyObject *__pyx_pf_7rsa_api_296IQSTREAM_GetEnable_py(CYTHON_UNUSED PyObject *__pyx_self); /* proto */
-static PyObject *__pyx_pf_7rsa_api_298IQSTREAM_GetDiskFileWriteStatus_py(CYTHON_UNUSED PyObject *__pyx_self); /* proto */
-static PyObject *__pyx_pf_7rsa_api_300IQSTREAM_Stop_py(CYTHON_UNUSED PyObject *__pyx_self); /* proto */
-static PyObject *__pyx_pf_7rsa_api_302IQSTREAM_WaitForIQDataReady_py(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_timeoutMsec); /* proto */
+static PyObject *__pyx_pf_7rsa_api_272IQSTREAM_GetMinAcqBandwidth_py(CYTHON_UNUSED PyObject *__pyx_self); /* proto */
+static PyObject *__pyx_pf_7rsa_api_274IQSTREAM_GetMaxAcqBandwidth_py(CYTHON_UNUSED PyObject *__pyx_self); /* proto */
+static PyObject *__pyx_pf_7rsa_api_276IQSTREAM_SetAcqBandwidth_py(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_bwHz_req); /* proto */
+static PyObject *__pyx_pf_7rsa_api_278IQSTREAM_GetAcqParameters_py(CYTHON_UNUSED PyObject *__pyx_self); /* proto */
+static PyObject *__pyx_pf_7rsa_api_280IQSTREAM_SetOutputConfiguration_py(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_dest, PyObject *__pyx_v_dtype); /* proto */
+static PyObject *__pyx_pf_7rsa_api_282IQSTREAM_SetIQDataBufferSize_py(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_reqSize); /* proto */
+static PyObject *__pyx_pf_7rsa_api_284IQSTREAM_GetIQDataBufferSize_py(CYTHON_UNUSED PyObject *__pyx_self); /* proto */
+static PyObject *__pyx_pf_7rsa_api_286IQSTREAM_SetDiskFilenameBase_py(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_filenameBase); /* proto */
+static PyObject *__pyx_pf_7rsa_api_288IQSTREAM_SetDiskFilenameSuffix_py(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_suffixCtl); /* proto */
+static PyObject *__pyx_pf_7rsa_api_290IQSTREAM_SetDiskFileLength_py(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_msec); /* proto */
+static PyObject *__pyx_pf_7rsa_api_292IQSTREAM_Start_py(CYTHON_UNUSED PyObject *__pyx_self); /* proto */
+static PyObject *__pyx_pf_7rsa_api_294IQSTREAM_GetEnable_py(CYTHON_UNUSED PyObject *__pyx_self); /* proto */
+static PyObject *__pyx_pf_7rsa_api_296IQSTREAM_GetDiskFileWriteStatus_py(CYTHON_UNUSED PyObject *__pyx_self); /* proto */
+static PyObject *__pyx_pf_7rsa_api_298IQSTREAM_Stop_py(CYTHON_UNUSED PyObject *__pyx_self); /* proto */
+static PyObject *__pyx_pf_7rsa_api_300IQSTREAM_WaitForIQDataReady_py(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_timeoutMsec); /* proto */
+static PyObject *__pyx_pf_7rsa_api_302IQSTREAM_GetIQData_py(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_inputBuffer, PyObject *__pyx_v_dType); /* proto */
 static PyObject *__pyx_pf_7rsa_api_304IQSTREAM_ClearAcqStatus_py(CYTHON_UNUSED PyObject *__pyx_self); /* proto */
 static PyObject *__pyx_pf_7rsa_api_306PLAYBACK_OpenDiskFile_py(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_fileName, PyObject *__pyx_v_startPercentage, PyObject *__pyx_v_stopPercentage, PyObject *__pyx_v_skipTimeBetweenFullAcquisitions, PyObject *__pyx_v_loopAtEndOfFile, PyObject *__pyx_v_emulateRealTime); /* proto */
 static PyObject *__pyx_pf_7rsa_api_308PLAYBACK_GetReplayComplete_py(CYTHON_UNUSED PyObject *__pyx_self); /* proto */
@@ -3724,7 +3744,6 @@ static PyObject *__pyx_k__27;
 static PyObject *__pyx_k__34;
 static PyObject *__pyx_k__35;
 static PyObject *__pyx_k__36;
-static PyObject *__pyx_k__37;
 static PyObject *__pyx_tuple_;
 static PyObject *__pyx_tuple__2;
 static PyObject *__pyx_tuple__3;
@@ -3742,6 +3761,7 @@ static PyObject *__pyx_tuple__30;
 static PyObject *__pyx_tuple__31;
 static PyObject *__pyx_tuple__32;
 static PyObject *__pyx_tuple__33;
+static PyObject *__pyx_tuple__37;
 static PyObject *__pyx_tuple__38;
 static PyObject *__pyx_tuple__39;
 static PyObject *__pyx_tuple__40;
@@ -3904,9 +3924,9 @@ static PyObject *__pyx_tuple__339;
 static PyObject *__pyx_tuple__341;
 static PyObject *__pyx_tuple__343;
 static PyObject *__pyx_tuple__345;
-static PyObject *__pyx_tuple__347;
+static PyObject *__pyx_tuple__348;
 static PyObject *__pyx_tuple__350;
-static PyObject *__pyx_tuple__352;
+static PyObject *__pyx_tuple__353;
 static PyObject *__pyx_tuple__355;
 static PyObject *__pyx_tuple__358;
 static PyObject *__pyx_tuple__360;
@@ -4073,10 +4093,10 @@ static PyObject *__pyx_codeobj__340;
 static PyObject *__pyx_codeobj__342;
 static PyObject *__pyx_codeobj__344;
 static PyObject *__pyx_codeobj__346;
-static PyObject *__pyx_codeobj__348;
+static PyObject *__pyx_codeobj__347;
 static PyObject *__pyx_codeobj__349;
 static PyObject *__pyx_codeobj__351;
-static PyObject *__pyx_codeobj__353;
+static PyObject *__pyx_codeobj__352;
 static PyObject *__pyx_codeobj__354;
 static PyObject *__pyx_codeobj__356;
 static PyObject *__pyx_codeobj__357;
@@ -26534,260 +26554,7 @@ static PyObject *__pyx_pf_7rsa_api_270IFSTREAM_GetIFData_py(CYTHON_UNUSED PyObje
   return __pyx_r;
 }
 
-/* "rsa_api.pyx":1252
- * 
- * 
- * def SPECTRUM_GetTrace_py(trace=SpectrumTraces.SpectrumTrace1, tracePoints=801):             # <<<<<<<<<<<<<<
- *     cdef int _tracePoints = tracePoints
- *     cdef np.ndarray traceData = np.empty(shape=(tracePoints), dtype=np.float32,
- */
-
-/* Python wrapper */
-static PyObject *__pyx_pw_7rsa_api_273SPECTRUM_GetTrace_py(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_7rsa_api_273SPECTRUM_GetTrace_py = {"SPECTRUM_GetTrace_py", (PyCFunction)__pyx_pw_7rsa_api_273SPECTRUM_GetTrace_py, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_7rsa_api_273SPECTRUM_GetTrace_py(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
-  PyObject *__pyx_v_trace = 0;
-  PyObject *__pyx_v_tracePoints = 0;
-  PyObject *__pyx_r = 0;
-  __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("SPECTRUM_GetTrace_py (wrapper)", 0);
-  {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_trace,&__pyx_n_s_tracePoints,0};
-    PyObject* values[2] = {0,0};
-    values[0] = __pyx_k__34;
-    values[1] = ((PyObject *)__pyx_int_801);
-    if (unlikely(__pyx_kwds)) {
-      Py_ssize_t kw_args;
-      const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
-      switch (pos_args) {
-        case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
-        CYTHON_FALLTHROUGH;
-        case  1: values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
-        CYTHON_FALLTHROUGH;
-        case  0: break;
-        default: goto __pyx_L5_argtuple_error;
-      }
-      kw_args = PyDict_Size(__pyx_kwds);
-      switch (pos_args) {
-        case  0:
-        if (kw_args > 0) {
-          PyObject* value = PyDict_GetItem(__pyx_kwds, __pyx_n_s_trace);
-          if (value) { values[0] = value; kw_args--; }
-        }
-        CYTHON_FALLTHROUGH;
-        case  1:
-        if (kw_args > 0) {
-          PyObject* value = PyDict_GetItem(__pyx_kwds, __pyx_n_s_tracePoints);
-          if (value) { values[1] = value; kw_args--; }
-        }
-      }
-      if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "SPECTRUM_GetTrace_py") < 0)) __PYX_ERR(0, 1252, __pyx_L3_error)
-      }
-    } else {
-      switch (PyTuple_GET_SIZE(__pyx_args)) {
-        case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
-        CYTHON_FALLTHROUGH;
-        case  1: values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
-        CYTHON_FALLTHROUGH;
-        case  0: break;
-        default: goto __pyx_L5_argtuple_error;
-      }
-    }
-    __pyx_v_trace = values[0];
-    __pyx_v_tracePoints = values[1];
-  }
-  goto __pyx_L4_argument_unpacking_done;
-  __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("SPECTRUM_GetTrace_py", 0, 0, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 1252, __pyx_L3_error)
-  __pyx_L3_error:;
-  __Pyx_AddTraceback("rsa_api.SPECTRUM_GetTrace_py", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __Pyx_RefNannyFinishContext();
-  return NULL;
-  __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_7rsa_api_272SPECTRUM_GetTrace_py(__pyx_self, __pyx_v_trace, __pyx_v_tracePoints);
-
-  /* function exit code */
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-static PyObject *__pyx_pf_7rsa_api_272SPECTRUM_GetTrace_py(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_trace, PyObject *__pyx_v_tracePoints) {
-  int __pyx_v__tracePoints;
-  PyArrayObject *__pyx_v_traceData = 0;
-  int __pyx_v_outTracePoints;
-  PyObject *__pyx_r = NULL;
-  __Pyx_RefNannyDeclarations
-  int __pyx_t_1;
-  PyObject *__pyx_t_2 = NULL;
-  PyObject *__pyx_t_3 = NULL;
-  PyObject *__pyx_t_4 = NULL;
-  PyObject *__pyx_t_5 = NULL;
-  PyObject *__pyx_t_6 = NULL;
-  __Pyx_RefNannySetupContext("SPECTRUM_GetTrace_py", 0);
-
-  /* "rsa_api.pyx":1253
- * 
- * def SPECTRUM_GetTrace_py(trace=SpectrumTraces.SpectrumTrace1, tracePoints=801):
- *     cdef int _tracePoints = tracePoints             # <<<<<<<<<<<<<<
- *     cdef np.ndarray traceData = np.empty(shape=(tracePoints), dtype=np.float32,
- *                                      order='c')
- */
-  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_tracePoints); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1253, __pyx_L1_error)
-  __pyx_v__tracePoints = __pyx_t_1;
-
-  /* "rsa_api.pyx":1254
- * def SPECTRUM_GetTrace_py(trace=SpectrumTraces.SpectrumTrace1, tracePoints=801):
- *     cdef int _tracePoints = tracePoints
- *     cdef np.ndarray traceData = np.empty(shape=(tracePoints), dtype=np.float32,             # <<<<<<<<<<<<<<
- *                                      order='c')
- *     cdef int outTracePoints
- */
-  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1254, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_empty); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1254, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyDict_NewPresized(3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1254, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_shape, __pyx_v_tracePoints) < 0) __PYX_ERR(0, 1254, __pyx_L1_error)
-  __pyx_t_4 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1254, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_float32); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1254, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_dtype, __pyx_t_5) < 0) __PYX_ERR(0, 1254, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_order, __pyx_n_s_c) < 0) __PYX_ERR(0, 1254, __pyx_L1_error)
-  __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_empty_tuple, __pyx_t_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1254, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (!(likely(((__pyx_t_5) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_5, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 1254, __pyx_L1_error)
-  __pyx_v_traceData = ((PyArrayObject *)__pyx_t_5);
-  __pyx_t_5 = 0;
-
-  /* "rsa_api.pyx":1257
- *                                      order='c')
- *     cdef int outTracePoints
- *     err_check(SPECTRUM_GetTrace(trace, _tracePoints, <float *> traceData.data, &outTracePoints))             # <<<<<<<<<<<<<<
- *     return np.asarray(traceData, dtype=np.float32)
- * 
- */
-  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_err_check); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1257, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_trace); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1257, __pyx_L1_error)
-  __pyx_t_3 = __Pyx_PyInt_From_ReturnStatus(SPECTRUM_GetTrace(__pyx_t_1, __pyx_v__tracePoints, ((float *)__pyx_v_traceData->data), (&__pyx_v_outTracePoints))); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1257, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = NULL;
-  if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
-    __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_2);
-    if (likely(__pyx_t_4)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
-      __Pyx_INCREF(__pyx_t_4);
-      __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_2, function);
-    }
-  }
-  if (!__pyx_t_4) {
-    __pyx_t_5 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1257, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __Pyx_GOTREF(__pyx_t_5);
-  } else {
-    #if CYTHON_FAST_PYCALL
-    if (PyFunction_Check(__pyx_t_2)) {
-      PyObject *__pyx_temp[2] = {__pyx_t_4, __pyx_t_3};
-      __pyx_t_5 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1257, __pyx_L1_error)
-      __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-      __Pyx_GOTREF(__pyx_t_5);
-      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    } else
-    #endif
-    #if CYTHON_FAST_PYCCALL
-    if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
-      PyObject *__pyx_temp[2] = {__pyx_t_4, __pyx_t_3};
-      __pyx_t_5 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1257, __pyx_L1_error)
-      __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-      __Pyx_GOTREF(__pyx_t_5);
-      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    } else
-    #endif
-    {
-      __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1257, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_6);
-      __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_4); __pyx_t_4 = NULL;
-      __Pyx_GIVEREF(__pyx_t_3);
-      PyTuple_SET_ITEM(__pyx_t_6, 0+1, __pyx_t_3);
-      __pyx_t_3 = 0;
-      __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_6, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1257, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_5);
-      __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    }
-  }
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-
-  /* "rsa_api.pyx":1258
- *     cdef int outTracePoints
- *     err_check(SPECTRUM_GetTrace(trace, _tracePoints, <float *> traceData.data, &outTracePoints))
- *     return np.asarray(traceData, dtype=np.float32)             # <<<<<<<<<<<<<<
- * 
- * # Return to this later, float** type conversion causing fits
- */
-  __Pyx_XDECREF(__pyx_r);
-  __pyx_t_5 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1258, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_asarray); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1258, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_t_5 = PyTuple_New(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1258, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  __Pyx_INCREF(((PyObject *)__pyx_v_traceData));
-  __Pyx_GIVEREF(((PyObject *)__pyx_v_traceData));
-  PyTuple_SET_ITEM(__pyx_t_5, 0, ((PyObject *)__pyx_v_traceData));
-  __pyx_t_6 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1258, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1258, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_float32); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1258, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_4);
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_dtype, __pyx_t_4) < 0) __PYX_ERR(0, 1258, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_5, __pyx_t_6); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1258, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_4);
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  __pyx_r = __pyx_t_4;
-  __pyx_t_4 = 0;
-  goto __pyx_L0;
-
-  /* "rsa_api.pyx":1252
- * 
- * 
- * def SPECTRUM_GetTrace_py(trace=SpectrumTraces.SpectrumTrace1, tracePoints=801):             # <<<<<<<<<<<<<<
- *     cdef int _tracePoints = tracePoints
- *     cdef np.ndarray traceData = np.empty(shape=(tracePoints), dtype=np.float32,
- */
-
-  /* function exit code */
-  __pyx_L1_error:;
-  __Pyx_XDECREF(__pyx_t_2);
-  __Pyx_XDECREF(__pyx_t_3);
-  __Pyx_XDECREF(__pyx_t_4);
-  __Pyx_XDECREF(__pyx_t_5);
-  __Pyx_XDECREF(__pyx_t_6);
-  __Pyx_AddTraceback("rsa_api.SPECTRUM_GetTrace_py", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __pyx_r = NULL;
-  __pyx_L0:;
-  __Pyx_XDECREF((PyObject *)__pyx_v_traceData);
-  __Pyx_XGIVEREF(__pyx_r);
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-/* "rsa_api.pyx":1273
+/* "rsa_api.pyx":1265
  * 
  * 
  * def IQSTREAM_GetMinAcqBandwidth_py():             # <<<<<<<<<<<<<<
@@ -26796,20 +26563,20 @@ static PyObject *__pyx_pf_7rsa_api_272SPECTRUM_GetTrace_py(CYTHON_UNUSED PyObjec
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_7rsa_api_275IQSTREAM_GetMinAcqBandwidth_py(PyObject *__pyx_self, CYTHON_UNUSED PyObject *unused); /*proto*/
-static PyMethodDef __pyx_mdef_7rsa_api_275IQSTREAM_GetMinAcqBandwidth_py = {"IQSTREAM_GetMinAcqBandwidth_py", (PyCFunction)__pyx_pw_7rsa_api_275IQSTREAM_GetMinAcqBandwidth_py, METH_NOARGS, 0};
-static PyObject *__pyx_pw_7rsa_api_275IQSTREAM_GetMinAcqBandwidth_py(PyObject *__pyx_self, CYTHON_UNUSED PyObject *unused) {
+static PyObject *__pyx_pw_7rsa_api_273IQSTREAM_GetMinAcqBandwidth_py(PyObject *__pyx_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static PyMethodDef __pyx_mdef_7rsa_api_273IQSTREAM_GetMinAcqBandwidth_py = {"IQSTREAM_GetMinAcqBandwidth_py", (PyCFunction)__pyx_pw_7rsa_api_273IQSTREAM_GetMinAcqBandwidth_py, METH_NOARGS, 0};
+static PyObject *__pyx_pw_7rsa_api_273IQSTREAM_GetMinAcqBandwidth_py(PyObject *__pyx_self, CYTHON_UNUSED PyObject *unused) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("IQSTREAM_GetMinAcqBandwidth_py (wrapper)", 0);
-  __pyx_r = __pyx_pf_7rsa_api_274IQSTREAM_GetMinAcqBandwidth_py(__pyx_self);
+  __pyx_r = __pyx_pf_7rsa_api_272IQSTREAM_GetMinAcqBandwidth_py(__pyx_self);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7rsa_api_274IQSTREAM_GetMinAcqBandwidth_py(CYTHON_UNUSED PyObject *__pyx_self) {
+static PyObject *__pyx_pf_7rsa_api_272IQSTREAM_GetMinAcqBandwidth_py(CYTHON_UNUSED PyObject *__pyx_self) {
   double __pyx_v_minBandwidthHz;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
@@ -26820,16 +26587,16 @@ static PyObject *__pyx_pf_7rsa_api_274IQSTREAM_GetMinAcqBandwidth_py(CYTHON_UNUS
   PyObject *__pyx_t_5 = NULL;
   __Pyx_RefNannySetupContext("IQSTREAM_GetMinAcqBandwidth_py", 0);
 
-  /* "rsa_api.pyx":1275
+  /* "rsa_api.pyx":1267
  * def IQSTREAM_GetMinAcqBandwidth_py():
  *     cdef double minBandwidthHz
  *     err_check(IQSTREAM_GetMinAcqBandwidth(&minBandwidthHz))             # <<<<<<<<<<<<<<
  *     return minBandwidthHz
  * 
  */
-  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_err_check); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1275, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_err_check); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1267, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyInt_From_ReturnStatus(IQSTREAM_GetMinAcqBandwidth((&__pyx_v_minBandwidthHz))); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1275, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyInt_From_ReturnStatus(IQSTREAM_GetMinAcqBandwidth((&__pyx_v_minBandwidthHz))); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1267, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_4 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
@@ -26842,14 +26609,14 @@ static PyObject *__pyx_pf_7rsa_api_274IQSTREAM_GetMinAcqBandwidth_py(CYTHON_UNUS
     }
   }
   if (!__pyx_t_4) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1275, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1267, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_GOTREF(__pyx_t_1);
   } else {
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_2)) {
       PyObject *__pyx_temp[2] = {__pyx_t_4, __pyx_t_3};
-      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1275, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1267, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -26858,20 +26625,20 @@ static PyObject *__pyx_pf_7rsa_api_274IQSTREAM_GetMinAcqBandwidth_py(CYTHON_UNUS
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
       PyObject *__pyx_temp[2] = {__pyx_t_4, __pyx_t_3};
-      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1275, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1267, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     } else
     #endif
     {
-      __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1275, __pyx_L1_error)
+      __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1267, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_4); __pyx_t_4 = NULL;
       __Pyx_GIVEREF(__pyx_t_3);
       PyTuple_SET_ITEM(__pyx_t_5, 0+1, __pyx_t_3);
       __pyx_t_3 = 0;
-      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1275, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1267, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     }
@@ -26879,7 +26646,7 @@ static PyObject *__pyx_pf_7rsa_api_274IQSTREAM_GetMinAcqBandwidth_py(CYTHON_UNUS
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "rsa_api.pyx":1276
+  /* "rsa_api.pyx":1268
  *     cdef double minBandwidthHz
  *     err_check(IQSTREAM_GetMinAcqBandwidth(&minBandwidthHz))
  *     return minBandwidthHz             # <<<<<<<<<<<<<<
@@ -26887,13 +26654,13 @@ static PyObject *__pyx_pf_7rsa_api_274IQSTREAM_GetMinAcqBandwidth_py(CYTHON_UNUS
  * 
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_minBandwidthHz); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1276, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_minBandwidthHz); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1268, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "rsa_api.pyx":1273
+  /* "rsa_api.pyx":1265
  * 
  * 
  * def IQSTREAM_GetMinAcqBandwidth_py():             # <<<<<<<<<<<<<<
@@ -26916,7 +26683,7 @@ static PyObject *__pyx_pf_7rsa_api_274IQSTREAM_GetMinAcqBandwidth_py(CYTHON_UNUS
   return __pyx_r;
 }
 
-/* "rsa_api.pyx":1279
+/* "rsa_api.pyx":1271
  * 
  * 
  * def IQSTREAM_GetMaxAcqBandwidth_py():             # <<<<<<<<<<<<<<
@@ -26925,20 +26692,20 @@ static PyObject *__pyx_pf_7rsa_api_274IQSTREAM_GetMinAcqBandwidth_py(CYTHON_UNUS
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_7rsa_api_277IQSTREAM_GetMaxAcqBandwidth_py(PyObject *__pyx_self, CYTHON_UNUSED PyObject *unused); /*proto*/
-static PyMethodDef __pyx_mdef_7rsa_api_277IQSTREAM_GetMaxAcqBandwidth_py = {"IQSTREAM_GetMaxAcqBandwidth_py", (PyCFunction)__pyx_pw_7rsa_api_277IQSTREAM_GetMaxAcqBandwidth_py, METH_NOARGS, 0};
-static PyObject *__pyx_pw_7rsa_api_277IQSTREAM_GetMaxAcqBandwidth_py(PyObject *__pyx_self, CYTHON_UNUSED PyObject *unused) {
+static PyObject *__pyx_pw_7rsa_api_275IQSTREAM_GetMaxAcqBandwidth_py(PyObject *__pyx_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static PyMethodDef __pyx_mdef_7rsa_api_275IQSTREAM_GetMaxAcqBandwidth_py = {"IQSTREAM_GetMaxAcqBandwidth_py", (PyCFunction)__pyx_pw_7rsa_api_275IQSTREAM_GetMaxAcqBandwidth_py, METH_NOARGS, 0};
+static PyObject *__pyx_pw_7rsa_api_275IQSTREAM_GetMaxAcqBandwidth_py(PyObject *__pyx_self, CYTHON_UNUSED PyObject *unused) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("IQSTREAM_GetMaxAcqBandwidth_py (wrapper)", 0);
-  __pyx_r = __pyx_pf_7rsa_api_276IQSTREAM_GetMaxAcqBandwidth_py(__pyx_self);
+  __pyx_r = __pyx_pf_7rsa_api_274IQSTREAM_GetMaxAcqBandwidth_py(__pyx_self);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7rsa_api_276IQSTREAM_GetMaxAcqBandwidth_py(CYTHON_UNUSED PyObject *__pyx_self) {
+static PyObject *__pyx_pf_7rsa_api_274IQSTREAM_GetMaxAcqBandwidth_py(CYTHON_UNUSED PyObject *__pyx_self) {
   double __pyx_v_maxBandwidthHz;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
@@ -26949,16 +26716,16 @@ static PyObject *__pyx_pf_7rsa_api_276IQSTREAM_GetMaxAcqBandwidth_py(CYTHON_UNUS
   PyObject *__pyx_t_5 = NULL;
   __Pyx_RefNannySetupContext("IQSTREAM_GetMaxAcqBandwidth_py", 0);
 
-  /* "rsa_api.pyx":1281
+  /* "rsa_api.pyx":1273
  * def IQSTREAM_GetMaxAcqBandwidth_py():
  *     cdef double maxBandwidthHz
  *     err_check(IQSTREAM_GetMaxAcqBandwidth(&maxBandwidthHz))             # <<<<<<<<<<<<<<
  *     return maxBandwidthHz
  * 
  */
-  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_err_check); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1281, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_err_check); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1273, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyInt_From_ReturnStatus(IQSTREAM_GetMaxAcqBandwidth((&__pyx_v_maxBandwidthHz))); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1281, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyInt_From_ReturnStatus(IQSTREAM_GetMaxAcqBandwidth((&__pyx_v_maxBandwidthHz))); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1273, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_4 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
@@ -26971,14 +26738,14 @@ static PyObject *__pyx_pf_7rsa_api_276IQSTREAM_GetMaxAcqBandwidth_py(CYTHON_UNUS
     }
   }
   if (!__pyx_t_4) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1281, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1273, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_GOTREF(__pyx_t_1);
   } else {
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_2)) {
       PyObject *__pyx_temp[2] = {__pyx_t_4, __pyx_t_3};
-      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1281, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1273, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -26987,20 +26754,20 @@ static PyObject *__pyx_pf_7rsa_api_276IQSTREAM_GetMaxAcqBandwidth_py(CYTHON_UNUS
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
       PyObject *__pyx_temp[2] = {__pyx_t_4, __pyx_t_3};
-      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1281, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1273, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     } else
     #endif
     {
-      __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1281, __pyx_L1_error)
+      __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1273, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_4); __pyx_t_4 = NULL;
       __Pyx_GIVEREF(__pyx_t_3);
       PyTuple_SET_ITEM(__pyx_t_5, 0+1, __pyx_t_3);
       __pyx_t_3 = 0;
-      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1281, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1273, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     }
@@ -27008,7 +26775,7 @@ static PyObject *__pyx_pf_7rsa_api_276IQSTREAM_GetMaxAcqBandwidth_py(CYTHON_UNUS
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "rsa_api.pyx":1282
+  /* "rsa_api.pyx":1274
  *     cdef double maxBandwidthHz
  *     err_check(IQSTREAM_GetMaxAcqBandwidth(&maxBandwidthHz))
  *     return maxBandwidthHz             # <<<<<<<<<<<<<<
@@ -27016,13 +26783,13 @@ static PyObject *__pyx_pf_7rsa_api_276IQSTREAM_GetMaxAcqBandwidth_py(CYTHON_UNUS
  * 
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_maxBandwidthHz); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1282, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_maxBandwidthHz); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1274, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "rsa_api.pyx":1279
+  /* "rsa_api.pyx":1271
  * 
  * 
  * def IQSTREAM_GetMaxAcqBandwidth_py():             # <<<<<<<<<<<<<<
@@ -27045,7 +26812,7 @@ static PyObject *__pyx_pf_7rsa_api_276IQSTREAM_GetMaxAcqBandwidth_py(CYTHON_UNUS
   return __pyx_r;
 }
 
-/* "rsa_api.pyx":1285
+/* "rsa_api.pyx":1277
  * 
  * 
  * def IQSTREAM_SetAcqBandwidth_py(bwHz_req):             # <<<<<<<<<<<<<<
@@ -27054,20 +26821,20 @@ static PyObject *__pyx_pf_7rsa_api_276IQSTREAM_GetMaxAcqBandwidth_py(CYTHON_UNUS
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_7rsa_api_279IQSTREAM_SetAcqBandwidth_py(PyObject *__pyx_self, PyObject *__pyx_v_bwHz_req); /*proto*/
-static PyMethodDef __pyx_mdef_7rsa_api_279IQSTREAM_SetAcqBandwidth_py = {"IQSTREAM_SetAcqBandwidth_py", (PyCFunction)__pyx_pw_7rsa_api_279IQSTREAM_SetAcqBandwidth_py, METH_O, 0};
-static PyObject *__pyx_pw_7rsa_api_279IQSTREAM_SetAcqBandwidth_py(PyObject *__pyx_self, PyObject *__pyx_v_bwHz_req) {
+static PyObject *__pyx_pw_7rsa_api_277IQSTREAM_SetAcqBandwidth_py(PyObject *__pyx_self, PyObject *__pyx_v_bwHz_req); /*proto*/
+static PyMethodDef __pyx_mdef_7rsa_api_277IQSTREAM_SetAcqBandwidth_py = {"IQSTREAM_SetAcqBandwidth_py", (PyCFunction)__pyx_pw_7rsa_api_277IQSTREAM_SetAcqBandwidth_py, METH_O, 0};
+static PyObject *__pyx_pw_7rsa_api_277IQSTREAM_SetAcqBandwidth_py(PyObject *__pyx_self, PyObject *__pyx_v_bwHz_req) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("IQSTREAM_SetAcqBandwidth_py (wrapper)", 0);
-  __pyx_r = __pyx_pf_7rsa_api_278IQSTREAM_SetAcqBandwidth_py(__pyx_self, ((PyObject *)__pyx_v_bwHz_req));
+  __pyx_r = __pyx_pf_7rsa_api_276IQSTREAM_SetAcqBandwidth_py(__pyx_self, ((PyObject *)__pyx_v_bwHz_req));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7rsa_api_278IQSTREAM_SetAcqBandwidth_py(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_bwHz_req) {
+static PyObject *__pyx_pf_7rsa_api_276IQSTREAM_SetAcqBandwidth_py(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_bwHz_req) {
   double __pyx_v__bwHz_req;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
@@ -27079,26 +26846,26 @@ static PyObject *__pyx_pf_7rsa_api_278IQSTREAM_SetAcqBandwidth_py(CYTHON_UNUSED 
   PyObject *__pyx_t_6 = NULL;
   __Pyx_RefNannySetupContext("IQSTREAM_SetAcqBandwidth_py", 0);
 
-  /* "rsa_api.pyx":1286
+  /* "rsa_api.pyx":1278
  * 
  * def IQSTREAM_SetAcqBandwidth_py(bwHz_req):
  *     cdef double _bwHz_req = bwHz_req             # <<<<<<<<<<<<<<
  *     err_check(IQSTREAM_SetAcqBandwidth(_bwHz_req))
  * 
  */
-  __pyx_t_1 = __pyx_PyFloat_AsDouble(__pyx_v_bwHz_req); if (unlikely((__pyx_t_1 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 1286, __pyx_L1_error)
+  __pyx_t_1 = __pyx_PyFloat_AsDouble(__pyx_v_bwHz_req); if (unlikely((__pyx_t_1 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 1278, __pyx_L1_error)
   __pyx_v__bwHz_req = __pyx_t_1;
 
-  /* "rsa_api.pyx":1287
+  /* "rsa_api.pyx":1279
  * def IQSTREAM_SetAcqBandwidth_py(bwHz_req):
  *     cdef double _bwHz_req = bwHz_req
  *     err_check(IQSTREAM_SetAcqBandwidth(_bwHz_req))             # <<<<<<<<<<<<<<
  * 
  * 
  */
-  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_err_check); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1287, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_err_check); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1279, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_PyInt_From_ReturnStatus(IQSTREAM_SetAcqBandwidth(__pyx_v__bwHz_req)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1287, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyInt_From_ReturnStatus(IQSTREAM_SetAcqBandwidth(__pyx_v__bwHz_req)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1279, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __pyx_t_5 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
@@ -27111,14 +26878,14 @@ static PyObject *__pyx_pf_7rsa_api_278IQSTREAM_SetAcqBandwidth_py(CYTHON_UNUSED 
     }
   }
   if (!__pyx_t_5) {
-    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1287, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1279, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_GOTREF(__pyx_t_2);
   } else {
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_3)) {
       PyObject *__pyx_temp[2] = {__pyx_t_5, __pyx_t_4};
-      __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1287, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1279, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
@@ -27127,20 +26894,20 @@ static PyObject *__pyx_pf_7rsa_api_278IQSTREAM_SetAcqBandwidth_py(CYTHON_UNUSED 
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_3)) {
       PyObject *__pyx_temp[2] = {__pyx_t_5, __pyx_t_4};
-      __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1287, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1279, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     } else
     #endif
     {
-      __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1287, __pyx_L1_error)
+      __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1279, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_5); __pyx_t_5 = NULL;
       __Pyx_GIVEREF(__pyx_t_4);
       PyTuple_SET_ITEM(__pyx_t_6, 0+1, __pyx_t_4);
       __pyx_t_4 = 0;
-      __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_6, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1287, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_6, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1279, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     }
@@ -27148,7 +26915,7 @@ static PyObject *__pyx_pf_7rsa_api_278IQSTREAM_SetAcqBandwidth_py(CYTHON_UNUSED 
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "rsa_api.pyx":1285
+  /* "rsa_api.pyx":1277
  * 
  * 
  * def IQSTREAM_SetAcqBandwidth_py(bwHz_req):             # <<<<<<<<<<<<<<
@@ -27173,7 +26940,7 @@ static PyObject *__pyx_pf_7rsa_api_278IQSTREAM_SetAcqBandwidth_py(CYTHON_UNUSED 
   return __pyx_r;
 }
 
-/* "rsa_api.pyx":1291
+/* "rsa_api.pyx":1283
  * 
  * # This MUST be sent before IQSTREAM_Start() or the resulting file will be empty
  * def IQSTREAM_GetAcqParameters_py():             # <<<<<<<<<<<<<<
@@ -27182,20 +26949,20 @@ static PyObject *__pyx_pf_7rsa_api_278IQSTREAM_SetAcqBandwidth_py(CYTHON_UNUSED 
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_7rsa_api_281IQSTREAM_GetAcqParameters_py(PyObject *__pyx_self, CYTHON_UNUSED PyObject *unused); /*proto*/
-static PyMethodDef __pyx_mdef_7rsa_api_281IQSTREAM_GetAcqParameters_py = {"IQSTREAM_GetAcqParameters_py", (PyCFunction)__pyx_pw_7rsa_api_281IQSTREAM_GetAcqParameters_py, METH_NOARGS, 0};
-static PyObject *__pyx_pw_7rsa_api_281IQSTREAM_GetAcqParameters_py(PyObject *__pyx_self, CYTHON_UNUSED PyObject *unused) {
+static PyObject *__pyx_pw_7rsa_api_279IQSTREAM_GetAcqParameters_py(PyObject *__pyx_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static PyMethodDef __pyx_mdef_7rsa_api_279IQSTREAM_GetAcqParameters_py = {"IQSTREAM_GetAcqParameters_py", (PyCFunction)__pyx_pw_7rsa_api_279IQSTREAM_GetAcqParameters_py, METH_NOARGS, 0};
+static PyObject *__pyx_pw_7rsa_api_279IQSTREAM_GetAcqParameters_py(PyObject *__pyx_self, CYTHON_UNUSED PyObject *unused) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("IQSTREAM_GetAcqParameters_py (wrapper)", 0);
-  __pyx_r = __pyx_pf_7rsa_api_280IQSTREAM_GetAcqParameters_py(__pyx_self);
+  __pyx_r = __pyx_pf_7rsa_api_278IQSTREAM_GetAcqParameters_py(__pyx_self);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7rsa_api_280IQSTREAM_GetAcqParameters_py(CYTHON_UNUSED PyObject *__pyx_self) {
+static PyObject *__pyx_pf_7rsa_api_278IQSTREAM_GetAcqParameters_py(CYTHON_UNUSED PyObject *__pyx_self) {
   double __pyx_v_bwHz_act;
   double __pyx_v_srSps;
   PyObject *__pyx_r = NULL;
@@ -27207,16 +26974,16 @@ static PyObject *__pyx_pf_7rsa_api_280IQSTREAM_GetAcqParameters_py(CYTHON_UNUSED
   PyObject *__pyx_t_5 = NULL;
   __Pyx_RefNannySetupContext("IQSTREAM_GetAcqParameters_py", 0);
 
-  /* "rsa_api.pyx":1294
+  /* "rsa_api.pyx":1286
  *     cdef double bwHz_act
  *     cdef double srSps
  *     err_check(IQSTREAM_GetAcqParameters(&bwHz_act, &srSps))             # <<<<<<<<<<<<<<
  *     return bwHz_act, srSps
  * 
  */
-  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_err_check); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1294, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_err_check); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1286, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyInt_From_ReturnStatus(IQSTREAM_GetAcqParameters((&__pyx_v_bwHz_act), (&__pyx_v_srSps))); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1294, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyInt_From_ReturnStatus(IQSTREAM_GetAcqParameters((&__pyx_v_bwHz_act), (&__pyx_v_srSps))); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1286, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_4 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
@@ -27229,14 +26996,14 @@ static PyObject *__pyx_pf_7rsa_api_280IQSTREAM_GetAcqParameters_py(CYTHON_UNUSED
     }
   }
   if (!__pyx_t_4) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1294, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1286, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_GOTREF(__pyx_t_1);
   } else {
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_2)) {
       PyObject *__pyx_temp[2] = {__pyx_t_4, __pyx_t_3};
-      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1294, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1286, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -27245,20 +27012,20 @@ static PyObject *__pyx_pf_7rsa_api_280IQSTREAM_GetAcqParameters_py(CYTHON_UNUSED
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
       PyObject *__pyx_temp[2] = {__pyx_t_4, __pyx_t_3};
-      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1294, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1286, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     } else
     #endif
     {
-      __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1294, __pyx_L1_error)
+      __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1286, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_4); __pyx_t_4 = NULL;
       __Pyx_GIVEREF(__pyx_t_3);
       PyTuple_SET_ITEM(__pyx_t_5, 0+1, __pyx_t_3);
       __pyx_t_3 = 0;
-      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1294, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1286, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     }
@@ -27266,7 +27033,7 @@ static PyObject *__pyx_pf_7rsa_api_280IQSTREAM_GetAcqParameters_py(CYTHON_UNUSED
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "rsa_api.pyx":1295
+  /* "rsa_api.pyx":1287
  *     cdef double srSps
  *     err_check(IQSTREAM_GetAcqParameters(&bwHz_act, &srSps))
  *     return bwHz_act, srSps             # <<<<<<<<<<<<<<
@@ -27274,11 +27041,11 @@ static PyObject *__pyx_pf_7rsa_api_280IQSTREAM_GetAcqParameters_py(CYTHON_UNUSED
  * 
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_bwHz_act); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1295, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_bwHz_act); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1287, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyFloat_FromDouble(__pyx_v_srSps); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1295, __pyx_L1_error)
+  __pyx_t_2 = PyFloat_FromDouble(__pyx_v_srSps); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1287, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_5 = PyTuple_New(2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1295, __pyx_L1_error)
+  __pyx_t_5 = PyTuple_New(2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1287, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_1);
@@ -27290,7 +27057,7 @@ static PyObject *__pyx_pf_7rsa_api_280IQSTREAM_GetAcqParameters_py(CYTHON_UNUSED
   __pyx_t_5 = 0;
   goto __pyx_L0;
 
-  /* "rsa_api.pyx":1291
+  /* "rsa_api.pyx":1283
  * 
  * # This MUST be sent before IQSTREAM_Start() or the resulting file will be empty
  * def IQSTREAM_GetAcqParameters_py():             # <<<<<<<<<<<<<<
@@ -27313,7 +27080,7 @@ static PyObject *__pyx_pf_7rsa_api_280IQSTREAM_GetAcqParameters_py(CYTHON_UNUSED
   return __pyx_r;
 }
 
-/* "rsa_api.pyx":1298
+/* "rsa_api.pyx":1290
  * 
  * 
  * def IQSTREAM_SetOutputConfiguration_py(dest=IQSOUTDEST.IQSOD_FILE_SIQ,             # <<<<<<<<<<<<<<
@@ -27322,9 +27089,9 @@ static PyObject *__pyx_pf_7rsa_api_280IQSTREAM_GetAcqParameters_py(CYTHON_UNUSED
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_7rsa_api_283IQSTREAM_SetOutputConfiguration_py(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_7rsa_api_283IQSTREAM_SetOutputConfiguration_py = {"IQSTREAM_SetOutputConfiguration_py", (PyCFunction)__pyx_pw_7rsa_api_283IQSTREAM_SetOutputConfiguration_py, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_7rsa_api_283IQSTREAM_SetOutputConfiguration_py(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_7rsa_api_281IQSTREAM_SetOutputConfiguration_py(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_7rsa_api_281IQSTREAM_SetOutputConfiguration_py = {"IQSTREAM_SetOutputConfiguration_py", (PyCFunction)__pyx_pw_7rsa_api_281IQSTREAM_SetOutputConfiguration_py, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_7rsa_api_281IQSTREAM_SetOutputConfiguration_py(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_dest = 0;
   PyObject *__pyx_v_dtype = 0;
   PyObject *__pyx_r = 0;
@@ -27333,8 +27100,8 @@ static PyObject *__pyx_pw_7rsa_api_283IQSTREAM_SetOutputConfiguration_py(PyObjec
   {
     static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_dest,&__pyx_n_s_dtype,0};
     PyObject* values[2] = {0,0};
-    values[0] = __pyx_k__35;
-    values[1] = __pyx_k__36;
+    values[0] = __pyx_k__34;
+    values[1] = __pyx_k__35;
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
       const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
@@ -27361,7 +27128,7 @@ static PyObject *__pyx_pw_7rsa_api_283IQSTREAM_SetOutputConfiguration_py(PyObjec
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "IQSTREAM_SetOutputConfiguration_py") < 0)) __PYX_ERR(0, 1298, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "IQSTREAM_SetOutputConfiguration_py") < 0)) __PYX_ERR(0, 1290, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -27378,20 +27145,20 @@ static PyObject *__pyx_pw_7rsa_api_283IQSTREAM_SetOutputConfiguration_py(PyObjec
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("IQSTREAM_SetOutputConfiguration_py", 0, 0, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 1298, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("IQSTREAM_SetOutputConfiguration_py", 0, 0, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 1290, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("rsa_api.IQSTREAM_SetOutputConfiguration_py", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_7rsa_api_282IQSTREAM_SetOutputConfiguration_py(__pyx_self, __pyx_v_dest, __pyx_v_dtype);
+  __pyx_r = __pyx_pf_7rsa_api_280IQSTREAM_SetOutputConfiguration_py(__pyx_self, __pyx_v_dest, __pyx_v_dtype);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7rsa_api_282IQSTREAM_SetOutputConfiguration_py(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_dest, PyObject *__pyx_v_dtype) {
+static PyObject *__pyx_pf_7rsa_api_280IQSTREAM_SetOutputConfiguration_py(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_dest, PyObject *__pyx_v_dtype) {
   enum __pyx_t_7rsa_api_IQSOUTDEST __pyx_v__dest;
   enum __pyx_t_7rsa_api_IQSOUTDTYPE __pyx_v__dtype;
   PyObject *__pyx_r = NULL;
@@ -27405,36 +27172,36 @@ static PyObject *__pyx_pf_7rsa_api_282IQSTREAM_SetOutputConfiguration_py(CYTHON_
   PyObject *__pyx_t_7 = NULL;
   __Pyx_RefNannySetupContext("IQSTREAM_SetOutputConfiguration_py", 0);
 
-  /* "rsa_api.pyx":1300
+  /* "rsa_api.pyx":1292
  * def IQSTREAM_SetOutputConfiguration_py(dest=IQSOUTDEST.IQSOD_FILE_SIQ,
  *                                        dtype=IQSOUTDTYPE.IQSODT_INT16):
  *     cdef IQSOUTDEST _dest = dest             # <<<<<<<<<<<<<<
  *     cdef IQSOUTDTYPE _dtype = dtype
  *     err_check(IQSTREAM_SetOutputConfiguration(_dest, _dtype))
  */
-  __pyx_t_1 = ((enum __pyx_t_7rsa_api_IQSOUTDEST)__Pyx_PyInt_As_enum____pyx_t_7rsa_api_IQSOUTDEST(__pyx_v_dest)); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 1300, __pyx_L1_error)
+  __pyx_t_1 = ((enum __pyx_t_7rsa_api_IQSOUTDEST)__Pyx_PyInt_As_enum____pyx_t_7rsa_api_IQSOUTDEST(__pyx_v_dest)); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 1292, __pyx_L1_error)
   __pyx_v__dest = __pyx_t_1;
 
-  /* "rsa_api.pyx":1301
+  /* "rsa_api.pyx":1293
  *                                        dtype=IQSOUTDTYPE.IQSODT_INT16):
  *     cdef IQSOUTDEST _dest = dest
  *     cdef IQSOUTDTYPE _dtype = dtype             # <<<<<<<<<<<<<<
  *     err_check(IQSTREAM_SetOutputConfiguration(_dest, _dtype))
  * 
  */
-  __pyx_t_2 = ((enum __pyx_t_7rsa_api_IQSOUTDTYPE)__Pyx_PyInt_As_enum____pyx_t_7rsa_api_IQSOUTDTYPE(__pyx_v_dtype)); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 1301, __pyx_L1_error)
+  __pyx_t_2 = ((enum __pyx_t_7rsa_api_IQSOUTDTYPE)__Pyx_PyInt_As_enum____pyx_t_7rsa_api_IQSOUTDTYPE(__pyx_v_dtype)); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 1293, __pyx_L1_error)
   __pyx_v__dtype = __pyx_t_2;
 
-  /* "rsa_api.pyx":1302
+  /* "rsa_api.pyx":1294
  *     cdef IQSOUTDEST _dest = dest
  *     cdef IQSOUTDTYPE _dtype = dtype
  *     err_check(IQSTREAM_SetOutputConfiguration(_dest, _dtype))             # <<<<<<<<<<<<<<
  * 
  * 
  */
-  __pyx_t_4 = __Pyx_GetModuleGlobalName(__pyx_n_s_err_check); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1302, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_GetModuleGlobalName(__pyx_n_s_err_check); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1294, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_5 = __Pyx_PyInt_From_ReturnStatus(IQSTREAM_SetOutputConfiguration(__pyx_v__dest, __pyx_v__dtype)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1302, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyInt_From_ReturnStatus(IQSTREAM_SetOutputConfiguration(__pyx_v__dest, __pyx_v__dtype)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1294, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __pyx_t_6 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_4))) {
@@ -27447,14 +27214,14 @@ static PyObject *__pyx_pf_7rsa_api_282IQSTREAM_SetOutputConfiguration_py(CYTHON_
     }
   }
   if (!__pyx_t_6) {
-    __pyx_t_3 = __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_5); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1302, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_5); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1294, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_GOTREF(__pyx_t_3);
   } else {
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_4)) {
       PyObject *__pyx_temp[2] = {__pyx_t_6, __pyx_t_5};
-      __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_4, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1302, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_4, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1294, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
@@ -27463,20 +27230,20 @@ static PyObject *__pyx_pf_7rsa_api_282IQSTREAM_SetOutputConfiguration_py(CYTHON_
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_4)) {
       PyObject *__pyx_temp[2] = {__pyx_t_6, __pyx_t_5};
-      __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_4, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1302, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_4, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1294, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     } else
     #endif
     {
-      __pyx_t_7 = PyTuple_New(1+1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1302, __pyx_L1_error)
+      __pyx_t_7 = PyTuple_New(1+1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1294, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
       __Pyx_GIVEREF(__pyx_t_6); PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_6); __pyx_t_6 = NULL;
       __Pyx_GIVEREF(__pyx_t_5);
       PyTuple_SET_ITEM(__pyx_t_7, 0+1, __pyx_t_5);
       __pyx_t_5 = 0;
-      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_7, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1302, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_7, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1294, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     }
@@ -27484,7 +27251,7 @@ static PyObject *__pyx_pf_7rsa_api_282IQSTREAM_SetOutputConfiguration_py(CYTHON_
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "rsa_api.pyx":1298
+  /* "rsa_api.pyx":1290
  * 
  * 
  * def IQSTREAM_SetOutputConfiguration_py(dest=IQSOUTDEST.IQSOD_FILE_SIQ,             # <<<<<<<<<<<<<<
@@ -27509,7 +27276,7 @@ static PyObject *__pyx_pf_7rsa_api_282IQSTREAM_SetOutputConfiguration_py(CYTHON_
   return __pyx_r;
 }
 
-/* "rsa_api.pyx":1305
+/* "rsa_api.pyx":1297
  * 
  * 
  * def IQSTREAM_SetIQDataBufferSize_py(reqSize):             # <<<<<<<<<<<<<<
@@ -27518,20 +27285,20 @@ static PyObject *__pyx_pf_7rsa_api_282IQSTREAM_SetOutputConfiguration_py(CYTHON_
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_7rsa_api_285IQSTREAM_SetIQDataBufferSize_py(PyObject *__pyx_self, PyObject *__pyx_v_reqSize); /*proto*/
-static PyMethodDef __pyx_mdef_7rsa_api_285IQSTREAM_SetIQDataBufferSize_py = {"IQSTREAM_SetIQDataBufferSize_py", (PyCFunction)__pyx_pw_7rsa_api_285IQSTREAM_SetIQDataBufferSize_py, METH_O, 0};
-static PyObject *__pyx_pw_7rsa_api_285IQSTREAM_SetIQDataBufferSize_py(PyObject *__pyx_self, PyObject *__pyx_v_reqSize) {
+static PyObject *__pyx_pw_7rsa_api_283IQSTREAM_SetIQDataBufferSize_py(PyObject *__pyx_self, PyObject *__pyx_v_reqSize); /*proto*/
+static PyMethodDef __pyx_mdef_7rsa_api_283IQSTREAM_SetIQDataBufferSize_py = {"IQSTREAM_SetIQDataBufferSize_py", (PyCFunction)__pyx_pw_7rsa_api_283IQSTREAM_SetIQDataBufferSize_py, METH_O, 0};
+static PyObject *__pyx_pw_7rsa_api_283IQSTREAM_SetIQDataBufferSize_py(PyObject *__pyx_self, PyObject *__pyx_v_reqSize) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("IQSTREAM_SetIQDataBufferSize_py (wrapper)", 0);
-  __pyx_r = __pyx_pf_7rsa_api_284IQSTREAM_SetIQDataBufferSize_py(__pyx_self, ((PyObject *)__pyx_v_reqSize));
+  __pyx_r = __pyx_pf_7rsa_api_282IQSTREAM_SetIQDataBufferSize_py(__pyx_self, ((PyObject *)__pyx_v_reqSize));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7rsa_api_284IQSTREAM_SetIQDataBufferSize_py(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_reqSize) {
+static PyObject *__pyx_pf_7rsa_api_282IQSTREAM_SetIQDataBufferSize_py(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_reqSize) {
   int __pyx_v__reqSize;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
@@ -27543,26 +27310,26 @@ static PyObject *__pyx_pf_7rsa_api_284IQSTREAM_SetIQDataBufferSize_py(CYTHON_UNU
   PyObject *__pyx_t_6 = NULL;
   __Pyx_RefNannySetupContext("IQSTREAM_SetIQDataBufferSize_py", 0);
 
-  /* "rsa_api.pyx":1306
+  /* "rsa_api.pyx":1298
  * 
  * def IQSTREAM_SetIQDataBufferSize_py(reqSize):
  *     cdef int _reqSize = reqSize             # <<<<<<<<<<<<<<
  *     err_check(IQSTREAM_SetIQDataBufferSize(_reqSize))
  * 
  */
-  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_reqSize); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1306, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_reqSize); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1298, __pyx_L1_error)
   __pyx_v__reqSize = __pyx_t_1;
 
-  /* "rsa_api.pyx":1307
+  /* "rsa_api.pyx":1299
  * def IQSTREAM_SetIQDataBufferSize_py(reqSize):
  *     cdef int _reqSize = reqSize
  *     err_check(IQSTREAM_SetIQDataBufferSize(_reqSize))             # <<<<<<<<<<<<<<
  * 
  * 
  */
-  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_err_check); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1307, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_err_check); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1299, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_PyInt_From_ReturnStatus(IQSTREAM_SetIQDataBufferSize(__pyx_v__reqSize)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1307, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyInt_From_ReturnStatus(IQSTREAM_SetIQDataBufferSize(__pyx_v__reqSize)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1299, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __pyx_t_5 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
@@ -27575,14 +27342,14 @@ static PyObject *__pyx_pf_7rsa_api_284IQSTREAM_SetIQDataBufferSize_py(CYTHON_UNU
     }
   }
   if (!__pyx_t_5) {
-    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1307, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1299, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_GOTREF(__pyx_t_2);
   } else {
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_3)) {
       PyObject *__pyx_temp[2] = {__pyx_t_5, __pyx_t_4};
-      __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1307, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1299, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
@@ -27591,20 +27358,20 @@ static PyObject *__pyx_pf_7rsa_api_284IQSTREAM_SetIQDataBufferSize_py(CYTHON_UNU
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_3)) {
       PyObject *__pyx_temp[2] = {__pyx_t_5, __pyx_t_4};
-      __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1307, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1299, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     } else
     #endif
     {
-      __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1307, __pyx_L1_error)
+      __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1299, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_5); __pyx_t_5 = NULL;
       __Pyx_GIVEREF(__pyx_t_4);
       PyTuple_SET_ITEM(__pyx_t_6, 0+1, __pyx_t_4);
       __pyx_t_4 = 0;
-      __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_6, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1307, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_6, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1299, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     }
@@ -27612,7 +27379,7 @@ static PyObject *__pyx_pf_7rsa_api_284IQSTREAM_SetIQDataBufferSize_py(CYTHON_UNU
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "rsa_api.pyx":1305
+  /* "rsa_api.pyx":1297
  * 
  * 
  * def IQSTREAM_SetIQDataBufferSize_py(reqSize):             # <<<<<<<<<<<<<<
@@ -27637,7 +27404,7 @@ static PyObject *__pyx_pf_7rsa_api_284IQSTREAM_SetIQDataBufferSize_py(CYTHON_UNU
   return __pyx_r;
 }
 
-/* "rsa_api.pyx":1310
+/* "rsa_api.pyx":1302
  * 
  * 
  * def IQSTREAM_GetIQDataBufferSize_py():             # <<<<<<<<<<<<<<
@@ -27646,20 +27413,20 @@ static PyObject *__pyx_pf_7rsa_api_284IQSTREAM_SetIQDataBufferSize_py(CYTHON_UNU
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_7rsa_api_287IQSTREAM_GetIQDataBufferSize_py(PyObject *__pyx_self, CYTHON_UNUSED PyObject *unused); /*proto*/
-static PyMethodDef __pyx_mdef_7rsa_api_287IQSTREAM_GetIQDataBufferSize_py = {"IQSTREAM_GetIQDataBufferSize_py", (PyCFunction)__pyx_pw_7rsa_api_287IQSTREAM_GetIQDataBufferSize_py, METH_NOARGS, 0};
-static PyObject *__pyx_pw_7rsa_api_287IQSTREAM_GetIQDataBufferSize_py(PyObject *__pyx_self, CYTHON_UNUSED PyObject *unused) {
+static PyObject *__pyx_pw_7rsa_api_285IQSTREAM_GetIQDataBufferSize_py(PyObject *__pyx_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static PyMethodDef __pyx_mdef_7rsa_api_285IQSTREAM_GetIQDataBufferSize_py = {"IQSTREAM_GetIQDataBufferSize_py", (PyCFunction)__pyx_pw_7rsa_api_285IQSTREAM_GetIQDataBufferSize_py, METH_NOARGS, 0};
+static PyObject *__pyx_pw_7rsa_api_285IQSTREAM_GetIQDataBufferSize_py(PyObject *__pyx_self, CYTHON_UNUSED PyObject *unused) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("IQSTREAM_GetIQDataBufferSize_py (wrapper)", 0);
-  __pyx_r = __pyx_pf_7rsa_api_286IQSTREAM_GetIQDataBufferSize_py(__pyx_self);
+  __pyx_r = __pyx_pf_7rsa_api_284IQSTREAM_GetIQDataBufferSize_py(__pyx_self);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7rsa_api_286IQSTREAM_GetIQDataBufferSize_py(CYTHON_UNUSED PyObject *__pyx_self) {
+static PyObject *__pyx_pf_7rsa_api_284IQSTREAM_GetIQDataBufferSize_py(CYTHON_UNUSED PyObject *__pyx_self) {
   int __pyx_v_maxSize;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
@@ -27670,16 +27437,16 @@ static PyObject *__pyx_pf_7rsa_api_286IQSTREAM_GetIQDataBufferSize_py(CYTHON_UNU
   PyObject *__pyx_t_5 = NULL;
   __Pyx_RefNannySetupContext("IQSTREAM_GetIQDataBufferSize_py", 0);
 
-  /* "rsa_api.pyx":1312
+  /* "rsa_api.pyx":1304
  * def IQSTREAM_GetIQDataBufferSize_py():
  *     cdef int maxSize
  *     err_check(IQSTREAM_GetIQDataBufferSize(&maxSize))             # <<<<<<<<<<<<<<
  *     return maxSize
  * 
  */
-  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_err_check); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1312, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_err_check); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1304, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyInt_From_ReturnStatus(IQSTREAM_GetIQDataBufferSize((&__pyx_v_maxSize))); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1312, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyInt_From_ReturnStatus(IQSTREAM_GetIQDataBufferSize((&__pyx_v_maxSize))); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1304, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_4 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
@@ -27692,14 +27459,14 @@ static PyObject *__pyx_pf_7rsa_api_286IQSTREAM_GetIQDataBufferSize_py(CYTHON_UNU
     }
   }
   if (!__pyx_t_4) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1312, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1304, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_GOTREF(__pyx_t_1);
   } else {
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_2)) {
       PyObject *__pyx_temp[2] = {__pyx_t_4, __pyx_t_3};
-      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1312, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1304, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -27708,20 +27475,20 @@ static PyObject *__pyx_pf_7rsa_api_286IQSTREAM_GetIQDataBufferSize_py(CYTHON_UNU
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
       PyObject *__pyx_temp[2] = {__pyx_t_4, __pyx_t_3};
-      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1312, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1304, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     } else
     #endif
     {
-      __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1312, __pyx_L1_error)
+      __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1304, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_4); __pyx_t_4 = NULL;
       __Pyx_GIVEREF(__pyx_t_3);
       PyTuple_SET_ITEM(__pyx_t_5, 0+1, __pyx_t_3);
       __pyx_t_3 = 0;
-      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1312, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1304, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     }
@@ -27729,7 +27496,7 @@ static PyObject *__pyx_pf_7rsa_api_286IQSTREAM_GetIQDataBufferSize_py(CYTHON_UNU
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "rsa_api.pyx":1313
+  /* "rsa_api.pyx":1305
  *     cdef int maxSize
  *     err_check(IQSTREAM_GetIQDataBufferSize(&maxSize))
  *     return maxSize             # <<<<<<<<<<<<<<
@@ -27737,13 +27504,13 @@ static PyObject *__pyx_pf_7rsa_api_286IQSTREAM_GetIQDataBufferSize_py(CYTHON_UNU
  * 
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_maxSize); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1313, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_maxSize); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1305, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "rsa_api.pyx":1310
+  /* "rsa_api.pyx":1302
  * 
  * 
  * def IQSTREAM_GetIQDataBufferSize_py():             # <<<<<<<<<<<<<<
@@ -27766,7 +27533,7 @@ static PyObject *__pyx_pf_7rsa_api_286IQSTREAM_GetIQDataBufferSize_py(CYTHON_UNU
   return __pyx_r;
 }
 
-/* "rsa_api.pyx":1316
+/* "rsa_api.pyx":1308
  * 
  * 
  * def IQSTREAM_SetDiskFilenameBase_py(filenameBase):             # <<<<<<<<<<<<<<
@@ -27775,20 +27542,20 @@ static PyObject *__pyx_pf_7rsa_api_286IQSTREAM_GetIQDataBufferSize_py(CYTHON_UNU
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_7rsa_api_289IQSTREAM_SetDiskFilenameBase_py(PyObject *__pyx_self, PyObject *__pyx_v_filenameBase); /*proto*/
-static PyMethodDef __pyx_mdef_7rsa_api_289IQSTREAM_SetDiskFilenameBase_py = {"IQSTREAM_SetDiskFilenameBase_py", (PyCFunction)__pyx_pw_7rsa_api_289IQSTREAM_SetDiskFilenameBase_py, METH_O, 0};
-static PyObject *__pyx_pw_7rsa_api_289IQSTREAM_SetDiskFilenameBase_py(PyObject *__pyx_self, PyObject *__pyx_v_filenameBase) {
+static PyObject *__pyx_pw_7rsa_api_287IQSTREAM_SetDiskFilenameBase_py(PyObject *__pyx_self, PyObject *__pyx_v_filenameBase); /*proto*/
+static PyMethodDef __pyx_mdef_7rsa_api_287IQSTREAM_SetDiskFilenameBase_py = {"IQSTREAM_SetDiskFilenameBase_py", (PyCFunction)__pyx_pw_7rsa_api_287IQSTREAM_SetDiskFilenameBase_py, METH_O, 0};
+static PyObject *__pyx_pw_7rsa_api_287IQSTREAM_SetDiskFilenameBase_py(PyObject *__pyx_self, PyObject *__pyx_v_filenameBase) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("IQSTREAM_SetDiskFilenameBase_py (wrapper)", 0);
-  __pyx_r = __pyx_pf_7rsa_api_288IQSTREAM_SetDiskFilenameBase_py(__pyx_self, ((PyObject *)__pyx_v_filenameBase));
+  __pyx_r = __pyx_pf_7rsa_api_286IQSTREAM_SetDiskFilenameBase_py(__pyx_self, ((PyObject *)__pyx_v_filenameBase));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7rsa_api_288IQSTREAM_SetDiskFilenameBase_py(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_filenameBase) {
+static PyObject *__pyx_pf_7rsa_api_286IQSTREAM_SetDiskFilenameBase_py(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_filenameBase) {
   char *__pyx_v__filenameBase;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
@@ -27800,26 +27567,26 @@ static PyObject *__pyx_pf_7rsa_api_288IQSTREAM_SetDiskFilenameBase_py(CYTHON_UNU
   PyObject *__pyx_t_6 = NULL;
   __Pyx_RefNannySetupContext("IQSTREAM_SetDiskFilenameBase_py", 0);
 
-  /* "rsa_api.pyx":1317
+  /* "rsa_api.pyx":1309
  * 
  * def IQSTREAM_SetDiskFilenameBase_py(filenameBase):
  *     cdef char* _filenameBase = filenameBase             # <<<<<<<<<<<<<<
  *     err_check(IQSTREAM_SetDiskFilenameBase(_filenameBase))
  * 
  */
-  __pyx_t_1 = __Pyx_PyObject_AsWritableString(__pyx_v_filenameBase); if (unlikely((!__pyx_t_1) && PyErr_Occurred())) __PYX_ERR(0, 1317, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_AsWritableString(__pyx_v_filenameBase); if (unlikely((!__pyx_t_1) && PyErr_Occurred())) __PYX_ERR(0, 1309, __pyx_L1_error)
   __pyx_v__filenameBase = __pyx_t_1;
 
-  /* "rsa_api.pyx":1318
+  /* "rsa_api.pyx":1310
  * def IQSTREAM_SetDiskFilenameBase_py(filenameBase):
  *     cdef char* _filenameBase = filenameBase
  *     err_check(IQSTREAM_SetDiskFilenameBase(_filenameBase))             # <<<<<<<<<<<<<<
  * 
  * 
  */
-  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_err_check); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1318, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_err_check); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1310, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_PyInt_From_ReturnStatus(IQSTREAM_SetDiskFilenameBase(__pyx_v__filenameBase)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1318, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyInt_From_ReturnStatus(IQSTREAM_SetDiskFilenameBase(__pyx_v__filenameBase)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1310, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __pyx_t_5 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
@@ -27832,14 +27599,14 @@ static PyObject *__pyx_pf_7rsa_api_288IQSTREAM_SetDiskFilenameBase_py(CYTHON_UNU
     }
   }
   if (!__pyx_t_5) {
-    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1318, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1310, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_GOTREF(__pyx_t_2);
   } else {
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_3)) {
       PyObject *__pyx_temp[2] = {__pyx_t_5, __pyx_t_4};
-      __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1318, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1310, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
@@ -27848,20 +27615,20 @@ static PyObject *__pyx_pf_7rsa_api_288IQSTREAM_SetDiskFilenameBase_py(CYTHON_UNU
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_3)) {
       PyObject *__pyx_temp[2] = {__pyx_t_5, __pyx_t_4};
-      __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1318, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1310, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     } else
     #endif
     {
-      __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1318, __pyx_L1_error)
+      __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1310, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_5); __pyx_t_5 = NULL;
       __Pyx_GIVEREF(__pyx_t_4);
       PyTuple_SET_ITEM(__pyx_t_6, 0+1, __pyx_t_4);
       __pyx_t_4 = 0;
-      __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_6, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1318, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_6, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1310, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     }
@@ -27869,7 +27636,7 @@ static PyObject *__pyx_pf_7rsa_api_288IQSTREAM_SetDiskFilenameBase_py(CYTHON_UNU
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "rsa_api.pyx":1316
+  /* "rsa_api.pyx":1308
  * 
  * 
  * def IQSTREAM_SetDiskFilenameBase_py(filenameBase):             # <<<<<<<<<<<<<<
@@ -27894,7 +27661,7 @@ static PyObject *__pyx_pf_7rsa_api_288IQSTREAM_SetDiskFilenameBase_py(CYTHON_UNU
   return __pyx_r;
 }
 
-/* "rsa_api.pyx":1321
+/* "rsa_api.pyx":1313
  * 
  * 
  * def IQSTREAM_SetDiskFilenameSuffix_py(suffixCtl=IQSSDFN_SUFFIX_NONE):             # <<<<<<<<<<<<<<
@@ -27903,9 +27670,9 @@ static PyObject *__pyx_pf_7rsa_api_288IQSTREAM_SetDiskFilenameBase_py(CYTHON_UNU
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_7rsa_api_291IQSTREAM_SetDiskFilenameSuffix_py(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_7rsa_api_291IQSTREAM_SetDiskFilenameSuffix_py = {"IQSTREAM_SetDiskFilenameSuffix_py", (PyCFunction)__pyx_pw_7rsa_api_291IQSTREAM_SetDiskFilenameSuffix_py, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_7rsa_api_291IQSTREAM_SetDiskFilenameSuffix_py(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_7rsa_api_289IQSTREAM_SetDiskFilenameSuffix_py(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_7rsa_api_289IQSTREAM_SetDiskFilenameSuffix_py = {"IQSTREAM_SetDiskFilenameSuffix_py", (PyCFunction)__pyx_pw_7rsa_api_289IQSTREAM_SetDiskFilenameSuffix_py, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_7rsa_api_289IQSTREAM_SetDiskFilenameSuffix_py(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_suffixCtl = 0;
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
@@ -27913,7 +27680,7 @@ static PyObject *__pyx_pw_7rsa_api_291IQSTREAM_SetDiskFilenameSuffix_py(PyObject
   {
     static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_suffixCtl,0};
     PyObject* values[1] = {0};
-    values[0] = __pyx_k__37;
+    values[0] = __pyx_k__36;
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
       const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
@@ -27932,7 +27699,7 @@ static PyObject *__pyx_pw_7rsa_api_291IQSTREAM_SetDiskFilenameSuffix_py(PyObject
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "IQSTREAM_SetDiskFilenameSuffix_py") < 0)) __PYX_ERR(0, 1321, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "IQSTREAM_SetDiskFilenameSuffix_py") < 0)) __PYX_ERR(0, 1313, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -27946,20 +27713,20 @@ static PyObject *__pyx_pw_7rsa_api_291IQSTREAM_SetDiskFilenameSuffix_py(PyObject
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("IQSTREAM_SetDiskFilenameSuffix_py", 0, 0, 1, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 1321, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("IQSTREAM_SetDiskFilenameSuffix_py", 0, 0, 1, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 1313, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("rsa_api.IQSTREAM_SetDiskFilenameSuffix_py", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_7rsa_api_290IQSTREAM_SetDiskFilenameSuffix_py(__pyx_self, __pyx_v_suffixCtl);
+  __pyx_r = __pyx_pf_7rsa_api_288IQSTREAM_SetDiskFilenameSuffix_py(__pyx_self, __pyx_v_suffixCtl);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7rsa_api_290IQSTREAM_SetDiskFilenameSuffix_py(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_suffixCtl) {
+static PyObject *__pyx_pf_7rsa_api_288IQSTREAM_SetDiskFilenameSuffix_py(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_suffixCtl) {
   int __pyx_v__suffixCtl;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
@@ -27973,7 +27740,7 @@ static PyObject *__pyx_pf_7rsa_api_290IQSTREAM_SetDiskFilenameSuffix_py(CYTHON_U
   PyObject *__pyx_t_8 = NULL;
   __Pyx_RefNannySetupContext("IQSTREAM_SetDiskFilenameSuffix_py", 0);
 
-  /* "rsa_api.pyx":1322
+  /* "rsa_api.pyx":1314
  * 
  * def IQSTREAM_SetDiskFilenameSuffix_py(suffixCtl=IQSSDFN_SUFFIX_NONE):
  *     if suffixCtl not in [IQSSDFN_SUFFIX_INCRINDEX_MIN, IQSSDFN_SUFFIX_TIMESTAMP,             # <<<<<<<<<<<<<<
@@ -27982,22 +27749,22 @@ static PyObject *__pyx_pf_7rsa_api_290IQSTREAM_SetDiskFilenameSuffix_py(CYTHON_U
  */
   __Pyx_INCREF(__pyx_v_suffixCtl);
   __pyx_t_1 = __pyx_v_suffixCtl;
-  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_IQSSDFN_SUFFIX_INCRINDEX_MIN); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1322, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_IQSSDFN_SUFFIX_INCRINDEX_MIN); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1314, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = PyObject_RichCompare(__pyx_t_1, __pyx_t_3, Py_NE); __Pyx_XGOTREF(__pyx_t_4); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1322, __pyx_L1_error)
+  __pyx_t_4 = PyObject_RichCompare(__pyx_t_1, __pyx_t_3, Py_NE); __Pyx_XGOTREF(__pyx_t_4); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1314, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 1322, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 1314, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   if (__pyx_t_5) {
   } else {
     __pyx_t_2 = __pyx_t_5;
     goto __pyx_L4_bool_binop_done;
   }
-  __pyx_t_4 = __Pyx_GetModuleGlobalName(__pyx_n_s_IQSSDFN_SUFFIX_TIMESTAMP); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1322, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_GetModuleGlobalName(__pyx_n_s_IQSSDFN_SUFFIX_TIMESTAMP); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1314, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_3 = PyObject_RichCompare(__pyx_t_1, __pyx_t_4, Py_NE); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1322, __pyx_L1_error)
+  __pyx_t_3 = PyObject_RichCompare(__pyx_t_1, __pyx_t_4, Py_NE); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1314, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 1322, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 1314, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   if (__pyx_t_5) {
   } else {
@@ -28005,26 +27772,26 @@ static PyObject *__pyx_pf_7rsa_api_290IQSTREAM_SetDiskFilenameSuffix_py(CYTHON_U
     goto __pyx_L4_bool_binop_done;
   }
 
-  /* "rsa_api.pyx":1323
+  /* "rsa_api.pyx":1315
  * def IQSTREAM_SetDiskFilenameSuffix_py(suffixCtl=IQSSDFN_SUFFIX_NONE):
  *     if suffixCtl not in [IQSSDFN_SUFFIX_INCRINDEX_MIN, IQSSDFN_SUFFIX_TIMESTAMP,
  *                      IQSSDFN_SUFFIX_NONE]:             # <<<<<<<<<<<<<<
  *         raise RSAError('Parameter out of range.')
  *     cdef int _suffixCtl = suffixCtl
  */
-  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_IQSSDFN_SUFFIX_NONE); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1323, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_IQSSDFN_SUFFIX_NONE); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1315, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = PyObject_RichCompare(__pyx_t_1, __pyx_t_3, Py_NE); __Pyx_XGOTREF(__pyx_t_4); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1322, __pyx_L1_error)
+  __pyx_t_4 = PyObject_RichCompare(__pyx_t_1, __pyx_t_3, Py_NE); __Pyx_XGOTREF(__pyx_t_4); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1314, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "rsa_api.pyx":1322
+  /* "rsa_api.pyx":1314
  * 
  * def IQSTREAM_SetDiskFilenameSuffix_py(suffixCtl=IQSSDFN_SUFFIX_NONE):
  *     if suffixCtl not in [IQSSDFN_SUFFIX_INCRINDEX_MIN, IQSSDFN_SUFFIX_TIMESTAMP,             # <<<<<<<<<<<<<<
  *                      IQSSDFN_SUFFIX_NONE]:
  *         raise RSAError('Parameter out of range.')
  */
-  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 1322, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 1314, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __pyx_t_2 = __pyx_t_5;
   __pyx_L4_bool_binop_done:;
@@ -28032,23 +27799,23 @@ static PyObject *__pyx_pf_7rsa_api_290IQSTREAM_SetDiskFilenameSuffix_py(CYTHON_U
   __pyx_t_5 = (__pyx_t_2 != 0);
   if (__pyx_t_5) {
 
-    /* "rsa_api.pyx":1324
+    /* "rsa_api.pyx":1316
  *     if suffixCtl not in [IQSSDFN_SUFFIX_INCRINDEX_MIN, IQSSDFN_SUFFIX_TIMESTAMP,
  *                      IQSSDFN_SUFFIX_NONE]:
  *         raise RSAError('Parameter out of range.')             # <<<<<<<<<<<<<<
  *     cdef int _suffixCtl = suffixCtl
  *     err_check(IQSTREAM_SetDiskFilenameSuffix(_suffixCtl))
  */
-    __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_RSAError); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1324, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_RSAError); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1316, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__38, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1324, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__37, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1316, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_Raise(__pyx_t_4, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __PYX_ERR(0, 1324, __pyx_L1_error)
+    __PYX_ERR(0, 1316, __pyx_L1_error)
 
-    /* "rsa_api.pyx":1322
+    /* "rsa_api.pyx":1314
  * 
  * def IQSTREAM_SetDiskFilenameSuffix_py(suffixCtl=IQSSDFN_SUFFIX_NONE):
  *     if suffixCtl not in [IQSSDFN_SUFFIX_INCRINDEX_MIN, IQSSDFN_SUFFIX_TIMESTAMP,             # <<<<<<<<<<<<<<
@@ -28057,26 +27824,26 @@ static PyObject *__pyx_pf_7rsa_api_290IQSTREAM_SetDiskFilenameSuffix_py(CYTHON_U
  */
   }
 
-  /* "rsa_api.pyx":1325
+  /* "rsa_api.pyx":1317
  *                      IQSSDFN_SUFFIX_NONE]:
  *         raise RSAError('Parameter out of range.')
  *     cdef int _suffixCtl = suffixCtl             # <<<<<<<<<<<<<<
  *     err_check(IQSTREAM_SetDiskFilenameSuffix(_suffixCtl))
  * 
  */
-  __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_v_suffixCtl); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1325, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_v_suffixCtl); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1317, __pyx_L1_error)
   __pyx_v__suffixCtl = __pyx_t_6;
 
-  /* "rsa_api.pyx":1326
+  /* "rsa_api.pyx":1318
  *         raise RSAError('Parameter out of range.')
  *     cdef int _suffixCtl = suffixCtl
  *     err_check(IQSTREAM_SetDiskFilenameSuffix(_suffixCtl))             # <<<<<<<<<<<<<<
  * 
  * 
  */
-  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_err_check); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1326, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_err_check); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1318, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyInt_From_ReturnStatus(IQSTREAM_SetDiskFilenameSuffix(__pyx_v__suffixCtl)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1326, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyInt_From_ReturnStatus(IQSTREAM_SetDiskFilenameSuffix(__pyx_v__suffixCtl)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1318, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_7 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_1))) {
@@ -28089,14 +27856,14 @@ static PyObject *__pyx_pf_7rsa_api_290IQSTREAM_SetDiskFilenameSuffix_py(CYTHON_U
     }
   }
   if (!__pyx_t_7) {
-    __pyx_t_4 = __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1326, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1318, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_GOTREF(__pyx_t_4);
   } else {
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_1)) {
       PyObject *__pyx_temp[2] = {__pyx_t_7, __pyx_t_3};
-      __pyx_t_4 = __Pyx_PyFunction_FastCall(__pyx_t_1, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1326, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyFunction_FastCall(__pyx_t_1, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1318, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -28105,20 +27872,20 @@ static PyObject *__pyx_pf_7rsa_api_290IQSTREAM_SetDiskFilenameSuffix_py(CYTHON_U
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_1)) {
       PyObject *__pyx_temp[2] = {__pyx_t_7, __pyx_t_3};
-      __pyx_t_4 = __Pyx_PyCFunction_FastCall(__pyx_t_1, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1326, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyCFunction_FastCall(__pyx_t_1, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1318, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     } else
     #endif
     {
-      __pyx_t_8 = PyTuple_New(1+1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1326, __pyx_L1_error)
+      __pyx_t_8 = PyTuple_New(1+1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1318, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
       __Pyx_GIVEREF(__pyx_t_7); PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_t_7); __pyx_t_7 = NULL;
       __Pyx_GIVEREF(__pyx_t_3);
       PyTuple_SET_ITEM(__pyx_t_8, 0+1, __pyx_t_3);
       __pyx_t_3 = 0;
-      __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_8, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1326, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_8, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1318, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     }
@@ -28126,7 +27893,7 @@ static PyObject *__pyx_pf_7rsa_api_290IQSTREAM_SetDiskFilenameSuffix_py(CYTHON_U
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "rsa_api.pyx":1321
+  /* "rsa_api.pyx":1313
  * 
  * 
  * def IQSTREAM_SetDiskFilenameSuffix_py(suffixCtl=IQSSDFN_SUFFIX_NONE):             # <<<<<<<<<<<<<<
@@ -28151,7 +27918,7 @@ static PyObject *__pyx_pf_7rsa_api_290IQSTREAM_SetDiskFilenameSuffix_py(CYTHON_U
   return __pyx_r;
 }
 
-/* "rsa_api.pyx":1329
+/* "rsa_api.pyx":1321
  * 
  * 
  * def IQSTREAM_SetDiskFileLength_py(msec):             # <<<<<<<<<<<<<<
@@ -28160,20 +27927,20 @@ static PyObject *__pyx_pf_7rsa_api_290IQSTREAM_SetDiskFilenameSuffix_py(CYTHON_U
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_7rsa_api_293IQSTREAM_SetDiskFileLength_py(PyObject *__pyx_self, PyObject *__pyx_v_msec); /*proto*/
-static PyMethodDef __pyx_mdef_7rsa_api_293IQSTREAM_SetDiskFileLength_py = {"IQSTREAM_SetDiskFileLength_py", (PyCFunction)__pyx_pw_7rsa_api_293IQSTREAM_SetDiskFileLength_py, METH_O, 0};
-static PyObject *__pyx_pw_7rsa_api_293IQSTREAM_SetDiskFileLength_py(PyObject *__pyx_self, PyObject *__pyx_v_msec) {
+static PyObject *__pyx_pw_7rsa_api_291IQSTREAM_SetDiskFileLength_py(PyObject *__pyx_self, PyObject *__pyx_v_msec); /*proto*/
+static PyMethodDef __pyx_mdef_7rsa_api_291IQSTREAM_SetDiskFileLength_py = {"IQSTREAM_SetDiskFileLength_py", (PyCFunction)__pyx_pw_7rsa_api_291IQSTREAM_SetDiskFileLength_py, METH_O, 0};
+static PyObject *__pyx_pw_7rsa_api_291IQSTREAM_SetDiskFileLength_py(PyObject *__pyx_self, PyObject *__pyx_v_msec) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("IQSTREAM_SetDiskFileLength_py (wrapper)", 0);
-  __pyx_r = __pyx_pf_7rsa_api_292IQSTREAM_SetDiskFileLength_py(__pyx_self, ((PyObject *)__pyx_v_msec));
+  __pyx_r = __pyx_pf_7rsa_api_290IQSTREAM_SetDiskFileLength_py(__pyx_self, ((PyObject *)__pyx_v_msec));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7rsa_api_292IQSTREAM_SetDiskFileLength_py(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_msec) {
+static PyObject *__pyx_pf_7rsa_api_290IQSTREAM_SetDiskFileLength_py(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_msec) {
   int __pyx_v__msec;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
@@ -28186,35 +27953,35 @@ static PyObject *__pyx_pf_7rsa_api_292IQSTREAM_SetDiskFileLength_py(CYTHON_UNUSE
   PyObject *__pyx_t_7 = NULL;
   __Pyx_RefNannySetupContext("IQSTREAM_SetDiskFileLength_py", 0);
 
-  /* "rsa_api.pyx":1330
+  /* "rsa_api.pyx":1322
  * 
  * def IQSTREAM_SetDiskFileLength_py(msec):
  *     if msec < 0:             # <<<<<<<<<<<<<<
  *         raise RSAError('Parameter out of range.')
  *     cdef int _msec = msec
  */
-  __pyx_t_1 = PyObject_RichCompare(__pyx_v_msec, __pyx_int_0, Py_LT); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1330, __pyx_L1_error)
-  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 1330, __pyx_L1_error)
+  __pyx_t_1 = PyObject_RichCompare(__pyx_v_msec, __pyx_int_0, Py_LT); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1322, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 1322, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   if (__pyx_t_2) {
 
-    /* "rsa_api.pyx":1331
+    /* "rsa_api.pyx":1323
  * def IQSTREAM_SetDiskFileLength_py(msec):
  *     if msec < 0:
  *         raise RSAError('Parameter out of range.')             # <<<<<<<<<<<<<<
  *     cdef int _msec = msec
  *     err_check(IQSTREAM_SetDiskFileLength(_msec))
  */
-    __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_RSAError); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1331, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_RSAError); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1323, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__39, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1331, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__38, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1323, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_Raise(__pyx_t_3, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __PYX_ERR(0, 1331, __pyx_L1_error)
+    __PYX_ERR(0, 1323, __pyx_L1_error)
 
-    /* "rsa_api.pyx":1330
+    /* "rsa_api.pyx":1322
  * 
  * def IQSTREAM_SetDiskFileLength_py(msec):
  *     if msec < 0:             # <<<<<<<<<<<<<<
@@ -28223,26 +27990,26 @@ static PyObject *__pyx_pf_7rsa_api_292IQSTREAM_SetDiskFileLength_py(CYTHON_UNUSE
  */
   }
 
-  /* "rsa_api.pyx":1332
+  /* "rsa_api.pyx":1324
  *     if msec < 0:
  *         raise RSAError('Parameter out of range.')
  *     cdef int _msec = msec             # <<<<<<<<<<<<<<
  *     err_check(IQSTREAM_SetDiskFileLength(_msec))
  * 
  */
-  __pyx_t_4 = __Pyx_PyInt_As_int(__pyx_v_msec); if (unlikely((__pyx_t_4 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1332, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyInt_As_int(__pyx_v_msec); if (unlikely((__pyx_t_4 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1324, __pyx_L1_error)
   __pyx_v__msec = __pyx_t_4;
 
-  /* "rsa_api.pyx":1333
+  /* "rsa_api.pyx":1325
  *         raise RSAError('Parameter out of range.')
  *     cdef int _msec = msec
  *     err_check(IQSTREAM_SetDiskFileLength(_msec))             # <<<<<<<<<<<<<<
  * 
  * 
  */
-  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_err_check); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1333, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_err_check); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1325, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_5 = __Pyx_PyInt_From_ReturnStatus(IQSTREAM_SetDiskFileLength(__pyx_v__msec)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1333, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyInt_From_ReturnStatus(IQSTREAM_SetDiskFileLength(__pyx_v__msec)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1325, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __pyx_t_6 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_1))) {
@@ -28255,14 +28022,14 @@ static PyObject *__pyx_pf_7rsa_api_292IQSTREAM_SetDiskFileLength_py(CYTHON_UNUSE
     }
   }
   if (!__pyx_t_6) {
-    __pyx_t_3 = __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_t_5); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1333, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_t_5); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1325, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_GOTREF(__pyx_t_3);
   } else {
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_1)) {
       PyObject *__pyx_temp[2] = {__pyx_t_6, __pyx_t_5};
-      __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_1, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1333, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_1, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1325, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
@@ -28271,20 +28038,20 @@ static PyObject *__pyx_pf_7rsa_api_292IQSTREAM_SetDiskFileLength_py(CYTHON_UNUSE
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_1)) {
       PyObject *__pyx_temp[2] = {__pyx_t_6, __pyx_t_5};
-      __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_1, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1333, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_1, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1325, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     } else
     #endif
     {
-      __pyx_t_7 = PyTuple_New(1+1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1333, __pyx_L1_error)
+      __pyx_t_7 = PyTuple_New(1+1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1325, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
       __Pyx_GIVEREF(__pyx_t_6); PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_6); __pyx_t_6 = NULL;
       __Pyx_GIVEREF(__pyx_t_5);
       PyTuple_SET_ITEM(__pyx_t_7, 0+1, __pyx_t_5);
       __pyx_t_5 = 0;
-      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_7, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1333, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_7, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1325, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     }
@@ -28292,7 +28059,7 @@ static PyObject *__pyx_pf_7rsa_api_292IQSTREAM_SetDiskFileLength_py(CYTHON_UNUSE
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "rsa_api.pyx":1329
+  /* "rsa_api.pyx":1321
  * 
  * 
  * def IQSTREAM_SetDiskFileLength_py(msec):             # <<<<<<<<<<<<<<
@@ -28317,7 +28084,7 @@ static PyObject *__pyx_pf_7rsa_api_292IQSTREAM_SetDiskFileLength_py(CYTHON_UNUSE
   return __pyx_r;
 }
 
-/* "rsa_api.pyx":1336
+/* "rsa_api.pyx":1328
  * 
  * 
  * def IQSTREAM_Start_py():             # <<<<<<<<<<<<<<
@@ -28326,20 +28093,20 @@ static PyObject *__pyx_pf_7rsa_api_292IQSTREAM_SetDiskFileLength_py(CYTHON_UNUSE
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_7rsa_api_295IQSTREAM_Start_py(PyObject *__pyx_self, CYTHON_UNUSED PyObject *unused); /*proto*/
-static PyMethodDef __pyx_mdef_7rsa_api_295IQSTREAM_Start_py = {"IQSTREAM_Start_py", (PyCFunction)__pyx_pw_7rsa_api_295IQSTREAM_Start_py, METH_NOARGS, 0};
-static PyObject *__pyx_pw_7rsa_api_295IQSTREAM_Start_py(PyObject *__pyx_self, CYTHON_UNUSED PyObject *unused) {
+static PyObject *__pyx_pw_7rsa_api_293IQSTREAM_Start_py(PyObject *__pyx_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static PyMethodDef __pyx_mdef_7rsa_api_293IQSTREAM_Start_py = {"IQSTREAM_Start_py", (PyCFunction)__pyx_pw_7rsa_api_293IQSTREAM_Start_py, METH_NOARGS, 0};
+static PyObject *__pyx_pw_7rsa_api_293IQSTREAM_Start_py(PyObject *__pyx_self, CYTHON_UNUSED PyObject *unused) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("IQSTREAM_Start_py (wrapper)", 0);
-  __pyx_r = __pyx_pf_7rsa_api_294IQSTREAM_Start_py(__pyx_self);
+  __pyx_r = __pyx_pf_7rsa_api_292IQSTREAM_Start_py(__pyx_self);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7rsa_api_294IQSTREAM_Start_py(CYTHON_UNUSED PyObject *__pyx_self) {
+static PyObject *__pyx_pf_7rsa_api_292IQSTREAM_Start_py(CYTHON_UNUSED PyObject *__pyx_self) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -28349,16 +28116,16 @@ static PyObject *__pyx_pf_7rsa_api_294IQSTREAM_Start_py(CYTHON_UNUSED PyObject *
   PyObject *__pyx_t_5 = NULL;
   __Pyx_RefNannySetupContext("IQSTREAM_Start_py", 0);
 
-  /* "rsa_api.pyx":1337
+  /* "rsa_api.pyx":1329
  * 
  * def IQSTREAM_Start_py():
  *     err_check(IQSTREAM_Start())             # <<<<<<<<<<<<<<
  * 
  * 
  */
-  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_err_check); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1337, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_err_check); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1329, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyInt_From_ReturnStatus(IQSTREAM_Start()); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1337, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyInt_From_ReturnStatus(IQSTREAM_Start()); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1329, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_4 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
@@ -28371,14 +28138,14 @@ static PyObject *__pyx_pf_7rsa_api_294IQSTREAM_Start_py(CYTHON_UNUSED PyObject *
     }
   }
   if (!__pyx_t_4) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1337, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1329, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_GOTREF(__pyx_t_1);
   } else {
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_2)) {
       PyObject *__pyx_temp[2] = {__pyx_t_4, __pyx_t_3};
-      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1337, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1329, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -28387,20 +28154,20 @@ static PyObject *__pyx_pf_7rsa_api_294IQSTREAM_Start_py(CYTHON_UNUSED PyObject *
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
       PyObject *__pyx_temp[2] = {__pyx_t_4, __pyx_t_3};
-      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1337, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1329, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     } else
     #endif
     {
-      __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1337, __pyx_L1_error)
+      __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1329, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_4); __pyx_t_4 = NULL;
       __Pyx_GIVEREF(__pyx_t_3);
       PyTuple_SET_ITEM(__pyx_t_5, 0+1, __pyx_t_3);
       __pyx_t_3 = 0;
-      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1337, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1329, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     }
@@ -28408,7 +28175,7 @@ static PyObject *__pyx_pf_7rsa_api_294IQSTREAM_Start_py(CYTHON_UNUSED PyObject *
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "rsa_api.pyx":1336
+  /* "rsa_api.pyx":1328
  * 
  * 
  * def IQSTREAM_Start_py():             # <<<<<<<<<<<<<<
@@ -28433,7 +28200,7 @@ static PyObject *__pyx_pf_7rsa_api_294IQSTREAM_Start_py(CYTHON_UNUSED PyObject *
   return __pyx_r;
 }
 
-/* "rsa_api.pyx":1340
+/* "rsa_api.pyx":1332
  * 
  * 
  * def IQSTREAM_GetEnable_py():             # <<<<<<<<<<<<<<
@@ -28442,20 +28209,20 @@ static PyObject *__pyx_pf_7rsa_api_294IQSTREAM_Start_py(CYTHON_UNUSED PyObject *
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_7rsa_api_297IQSTREAM_GetEnable_py(PyObject *__pyx_self, CYTHON_UNUSED PyObject *unused); /*proto*/
-static PyMethodDef __pyx_mdef_7rsa_api_297IQSTREAM_GetEnable_py = {"IQSTREAM_GetEnable_py", (PyCFunction)__pyx_pw_7rsa_api_297IQSTREAM_GetEnable_py, METH_NOARGS, 0};
-static PyObject *__pyx_pw_7rsa_api_297IQSTREAM_GetEnable_py(PyObject *__pyx_self, CYTHON_UNUSED PyObject *unused) {
+static PyObject *__pyx_pw_7rsa_api_295IQSTREAM_GetEnable_py(PyObject *__pyx_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static PyMethodDef __pyx_mdef_7rsa_api_295IQSTREAM_GetEnable_py = {"IQSTREAM_GetEnable_py", (PyCFunction)__pyx_pw_7rsa_api_295IQSTREAM_GetEnable_py, METH_NOARGS, 0};
+static PyObject *__pyx_pw_7rsa_api_295IQSTREAM_GetEnable_py(PyObject *__pyx_self, CYTHON_UNUSED PyObject *unused) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("IQSTREAM_GetEnable_py (wrapper)", 0);
-  __pyx_r = __pyx_pf_7rsa_api_296IQSTREAM_GetEnable_py(__pyx_self);
+  __pyx_r = __pyx_pf_7rsa_api_294IQSTREAM_GetEnable_py(__pyx_self);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7rsa_api_296IQSTREAM_GetEnable_py(CYTHON_UNUSED PyObject *__pyx_self) {
+static PyObject *__pyx_pf_7rsa_api_294IQSTREAM_GetEnable_py(CYTHON_UNUSED PyObject *__pyx_self) {
   int __pyx_v_enable;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
@@ -28466,16 +28233,16 @@ static PyObject *__pyx_pf_7rsa_api_296IQSTREAM_GetEnable_py(CYTHON_UNUSED PyObje
   PyObject *__pyx_t_5 = NULL;
   __Pyx_RefNannySetupContext("IQSTREAM_GetEnable_py", 0);
 
-  /* "rsa_api.pyx":1342
+  /* "rsa_api.pyx":1334
  * def IQSTREAM_GetEnable_py():
  *     cdef bint enable
  *     err_check(IQSTREAM_GetEnable(&enable))             # <<<<<<<<<<<<<<
  *     return enable
  * 
  */
-  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_err_check); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1342, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_err_check); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1334, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyInt_From_ReturnStatus(IQSTREAM_GetEnable((&__pyx_v_enable))); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1342, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyInt_From_ReturnStatus(IQSTREAM_GetEnable((&__pyx_v_enable))); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1334, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_4 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
@@ -28488,14 +28255,14 @@ static PyObject *__pyx_pf_7rsa_api_296IQSTREAM_GetEnable_py(CYTHON_UNUSED PyObje
     }
   }
   if (!__pyx_t_4) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1342, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1334, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_GOTREF(__pyx_t_1);
   } else {
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_2)) {
       PyObject *__pyx_temp[2] = {__pyx_t_4, __pyx_t_3};
-      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1342, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1334, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -28504,20 +28271,20 @@ static PyObject *__pyx_pf_7rsa_api_296IQSTREAM_GetEnable_py(CYTHON_UNUSED PyObje
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
       PyObject *__pyx_temp[2] = {__pyx_t_4, __pyx_t_3};
-      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1342, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1334, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     } else
     #endif
     {
-      __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1342, __pyx_L1_error)
+      __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1334, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_4); __pyx_t_4 = NULL;
       __Pyx_GIVEREF(__pyx_t_3);
       PyTuple_SET_ITEM(__pyx_t_5, 0+1, __pyx_t_3);
       __pyx_t_3 = 0;
-      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1342, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1334, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     }
@@ -28525,7 +28292,7 @@ static PyObject *__pyx_pf_7rsa_api_296IQSTREAM_GetEnable_py(CYTHON_UNUSED PyObje
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "rsa_api.pyx":1343
+  /* "rsa_api.pyx":1335
  *     cdef bint enable
  *     err_check(IQSTREAM_GetEnable(&enable))
  *     return enable             # <<<<<<<<<<<<<<
@@ -28533,13 +28300,13 @@ static PyObject *__pyx_pf_7rsa_api_296IQSTREAM_GetEnable_py(CYTHON_UNUSED PyObje
  * 
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyBool_FromLong(__pyx_v_enable); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1343, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyBool_FromLong(__pyx_v_enable); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1335, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "rsa_api.pyx":1340
+  /* "rsa_api.pyx":1332
  * 
  * 
  * def IQSTREAM_GetEnable_py():             # <<<<<<<<<<<<<<
@@ -28562,7 +28329,7 @@ static PyObject *__pyx_pf_7rsa_api_296IQSTREAM_GetEnable_py(CYTHON_UNUSED PyObje
   return __pyx_r;
 }
 
-/* "rsa_api.pyx":1346
+/* "rsa_api.pyx":1338
  * 
  * 
  * def IQSTREAM_GetDiskFileWriteStatus_py():             # <<<<<<<<<<<<<<
@@ -28571,20 +28338,20 @@ static PyObject *__pyx_pf_7rsa_api_296IQSTREAM_GetEnable_py(CYTHON_UNUSED PyObje
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_7rsa_api_299IQSTREAM_GetDiskFileWriteStatus_py(PyObject *__pyx_self, CYTHON_UNUSED PyObject *unused); /*proto*/
-static PyMethodDef __pyx_mdef_7rsa_api_299IQSTREAM_GetDiskFileWriteStatus_py = {"IQSTREAM_GetDiskFileWriteStatus_py", (PyCFunction)__pyx_pw_7rsa_api_299IQSTREAM_GetDiskFileWriteStatus_py, METH_NOARGS, 0};
-static PyObject *__pyx_pw_7rsa_api_299IQSTREAM_GetDiskFileWriteStatus_py(PyObject *__pyx_self, CYTHON_UNUSED PyObject *unused) {
+static PyObject *__pyx_pw_7rsa_api_297IQSTREAM_GetDiskFileWriteStatus_py(PyObject *__pyx_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static PyMethodDef __pyx_mdef_7rsa_api_297IQSTREAM_GetDiskFileWriteStatus_py = {"IQSTREAM_GetDiskFileWriteStatus_py", (PyCFunction)__pyx_pw_7rsa_api_297IQSTREAM_GetDiskFileWriteStatus_py, METH_NOARGS, 0};
+static PyObject *__pyx_pw_7rsa_api_297IQSTREAM_GetDiskFileWriteStatus_py(PyObject *__pyx_self, CYTHON_UNUSED PyObject *unused) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("IQSTREAM_GetDiskFileWriteStatus_py (wrapper)", 0);
-  __pyx_r = __pyx_pf_7rsa_api_298IQSTREAM_GetDiskFileWriteStatus_py(__pyx_self);
+  __pyx_r = __pyx_pf_7rsa_api_296IQSTREAM_GetDiskFileWriteStatus_py(__pyx_self);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7rsa_api_298IQSTREAM_GetDiskFileWriteStatus_py(CYTHON_UNUSED PyObject *__pyx_self) {
+static PyObject *__pyx_pf_7rsa_api_296IQSTREAM_GetDiskFileWriteStatus_py(CYTHON_UNUSED PyObject *__pyx_self) {
   int __pyx_v_isComplete;
   int __pyx_v_isWriting;
   PyObject *__pyx_r = NULL;
@@ -28596,16 +28363,16 @@ static PyObject *__pyx_pf_7rsa_api_298IQSTREAM_GetDiskFileWriteStatus_py(CYTHON_
   PyObject *__pyx_t_5 = NULL;
   __Pyx_RefNannySetupContext("IQSTREAM_GetDiskFileWriteStatus_py", 0);
 
-  /* "rsa_api.pyx":1349
+  /* "rsa_api.pyx":1341
  *     cdef bint isComplete
  *     cdef bint isWriting
  *     err_check(IQSTREAM_GetDiskFileWriteStatus(&isComplete, &isWriting))             # <<<<<<<<<<<<<<
  *     return isComplete, isWriting
  * 
  */
-  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_err_check); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1349, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_err_check); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1341, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyInt_From_ReturnStatus(IQSTREAM_GetDiskFileWriteStatus((&__pyx_v_isComplete), (&__pyx_v_isWriting))); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1349, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyInt_From_ReturnStatus(IQSTREAM_GetDiskFileWriteStatus((&__pyx_v_isComplete), (&__pyx_v_isWriting))); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1341, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_4 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
@@ -28618,14 +28385,14 @@ static PyObject *__pyx_pf_7rsa_api_298IQSTREAM_GetDiskFileWriteStatus_py(CYTHON_
     }
   }
   if (!__pyx_t_4) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1349, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1341, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_GOTREF(__pyx_t_1);
   } else {
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_2)) {
       PyObject *__pyx_temp[2] = {__pyx_t_4, __pyx_t_3};
-      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1349, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1341, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -28634,20 +28401,20 @@ static PyObject *__pyx_pf_7rsa_api_298IQSTREAM_GetDiskFileWriteStatus_py(CYTHON_
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
       PyObject *__pyx_temp[2] = {__pyx_t_4, __pyx_t_3};
-      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1349, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1341, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     } else
     #endif
     {
-      __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1349, __pyx_L1_error)
+      __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1341, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_4); __pyx_t_4 = NULL;
       __Pyx_GIVEREF(__pyx_t_3);
       PyTuple_SET_ITEM(__pyx_t_5, 0+1, __pyx_t_3);
       __pyx_t_3 = 0;
-      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1349, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1341, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     }
@@ -28655,7 +28422,7 @@ static PyObject *__pyx_pf_7rsa_api_298IQSTREAM_GetDiskFileWriteStatus_py(CYTHON_
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "rsa_api.pyx":1350
+  /* "rsa_api.pyx":1342
  *     cdef bint isWriting
  *     err_check(IQSTREAM_GetDiskFileWriteStatus(&isComplete, &isWriting))
  *     return isComplete, isWriting             # <<<<<<<<<<<<<<
@@ -28663,11 +28430,11 @@ static PyObject *__pyx_pf_7rsa_api_298IQSTREAM_GetDiskFileWriteStatus_py(CYTHON_
  * 
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyBool_FromLong(__pyx_v_isComplete); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1350, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyBool_FromLong(__pyx_v_isComplete); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1342, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyBool_FromLong(__pyx_v_isWriting); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1350, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyBool_FromLong(__pyx_v_isWriting); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1342, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_5 = PyTuple_New(2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1350, __pyx_L1_error)
+  __pyx_t_5 = PyTuple_New(2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1342, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_1);
@@ -28679,7 +28446,7 @@ static PyObject *__pyx_pf_7rsa_api_298IQSTREAM_GetDiskFileWriteStatus_py(CYTHON_
   __pyx_t_5 = 0;
   goto __pyx_L0;
 
-  /* "rsa_api.pyx":1346
+  /* "rsa_api.pyx":1338
  * 
  * 
  * def IQSTREAM_GetDiskFileWriteStatus_py():             # <<<<<<<<<<<<<<
@@ -28702,7 +28469,7 @@ static PyObject *__pyx_pf_7rsa_api_298IQSTREAM_GetDiskFileWriteStatus_py(CYTHON_
   return __pyx_r;
 }
 
-/* "rsa_api.pyx":1353
+/* "rsa_api.pyx":1345
  * 
  * 
  * def IQSTREAM_Stop_py():             # <<<<<<<<<<<<<<
@@ -28711,20 +28478,20 @@ static PyObject *__pyx_pf_7rsa_api_298IQSTREAM_GetDiskFileWriteStatus_py(CYTHON_
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_7rsa_api_301IQSTREAM_Stop_py(PyObject *__pyx_self, CYTHON_UNUSED PyObject *unused); /*proto*/
-static PyMethodDef __pyx_mdef_7rsa_api_301IQSTREAM_Stop_py = {"IQSTREAM_Stop_py", (PyCFunction)__pyx_pw_7rsa_api_301IQSTREAM_Stop_py, METH_NOARGS, 0};
-static PyObject *__pyx_pw_7rsa_api_301IQSTREAM_Stop_py(PyObject *__pyx_self, CYTHON_UNUSED PyObject *unused) {
+static PyObject *__pyx_pw_7rsa_api_299IQSTREAM_Stop_py(PyObject *__pyx_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static PyMethodDef __pyx_mdef_7rsa_api_299IQSTREAM_Stop_py = {"IQSTREAM_Stop_py", (PyCFunction)__pyx_pw_7rsa_api_299IQSTREAM_Stop_py, METH_NOARGS, 0};
+static PyObject *__pyx_pw_7rsa_api_299IQSTREAM_Stop_py(PyObject *__pyx_self, CYTHON_UNUSED PyObject *unused) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("IQSTREAM_Stop_py (wrapper)", 0);
-  __pyx_r = __pyx_pf_7rsa_api_300IQSTREAM_Stop_py(__pyx_self);
+  __pyx_r = __pyx_pf_7rsa_api_298IQSTREAM_Stop_py(__pyx_self);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7rsa_api_300IQSTREAM_Stop_py(CYTHON_UNUSED PyObject *__pyx_self) {
+static PyObject *__pyx_pf_7rsa_api_298IQSTREAM_Stop_py(CYTHON_UNUSED PyObject *__pyx_self) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -28734,16 +28501,16 @@ static PyObject *__pyx_pf_7rsa_api_300IQSTREAM_Stop_py(CYTHON_UNUSED PyObject *_
   PyObject *__pyx_t_5 = NULL;
   __Pyx_RefNannySetupContext("IQSTREAM_Stop_py", 0);
 
-  /* "rsa_api.pyx":1354
+  /* "rsa_api.pyx":1346
  * 
  * def IQSTREAM_Stop_py():
  *     err_check(IQSTREAM_Stop())             # <<<<<<<<<<<<<<
  * 
  * 
  */
-  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_err_check); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1354, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_err_check); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1346, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyInt_From_ReturnStatus(IQSTREAM_Stop()); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1354, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyInt_From_ReturnStatus(IQSTREAM_Stop()); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1346, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_4 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
@@ -28756,14 +28523,14 @@ static PyObject *__pyx_pf_7rsa_api_300IQSTREAM_Stop_py(CYTHON_UNUSED PyObject *_
     }
   }
   if (!__pyx_t_4) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1354, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1346, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_GOTREF(__pyx_t_1);
   } else {
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_2)) {
       PyObject *__pyx_temp[2] = {__pyx_t_4, __pyx_t_3};
-      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1354, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1346, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -28772,20 +28539,20 @@ static PyObject *__pyx_pf_7rsa_api_300IQSTREAM_Stop_py(CYTHON_UNUSED PyObject *_
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
       PyObject *__pyx_temp[2] = {__pyx_t_4, __pyx_t_3};
-      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1354, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1346, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     } else
     #endif
     {
-      __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1354, __pyx_L1_error)
+      __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1346, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_4); __pyx_t_4 = NULL;
       __Pyx_GIVEREF(__pyx_t_3);
       PyTuple_SET_ITEM(__pyx_t_5, 0+1, __pyx_t_3);
       __pyx_t_3 = 0;
-      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1354, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1346, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     }
@@ -28793,7 +28560,7 @@ static PyObject *__pyx_pf_7rsa_api_300IQSTREAM_Stop_py(CYTHON_UNUSED PyObject *_
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "rsa_api.pyx":1353
+  /* "rsa_api.pyx":1345
  * 
  * 
  * def IQSTREAM_Stop_py():             # <<<<<<<<<<<<<<
@@ -28818,7 +28585,7 @@ static PyObject *__pyx_pf_7rsa_api_300IQSTREAM_Stop_py(CYTHON_UNUSED PyObject *_
   return __pyx_r;
 }
 
-/* "rsa_api.pyx":1357
+/* "rsa_api.pyx":1349
  * 
  * 
  * def IQSTREAM_WaitForIQDataReady_py(timeoutMsec=10):             # <<<<<<<<<<<<<<
@@ -28827,9 +28594,9 @@ static PyObject *__pyx_pf_7rsa_api_300IQSTREAM_Stop_py(CYTHON_UNUSED PyObject *_
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_7rsa_api_303IQSTREAM_WaitForIQDataReady_py(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_7rsa_api_303IQSTREAM_WaitForIQDataReady_py = {"IQSTREAM_WaitForIQDataReady_py", (PyCFunction)__pyx_pw_7rsa_api_303IQSTREAM_WaitForIQDataReady_py, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_7rsa_api_303IQSTREAM_WaitForIQDataReady_py(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_7rsa_api_301IQSTREAM_WaitForIQDataReady_py(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_7rsa_api_301IQSTREAM_WaitForIQDataReady_py = {"IQSTREAM_WaitForIQDataReady_py", (PyCFunction)__pyx_pw_7rsa_api_301IQSTREAM_WaitForIQDataReady_py, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_7rsa_api_301IQSTREAM_WaitForIQDataReady_py(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_timeoutMsec = 0;
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
@@ -28856,7 +28623,7 @@ static PyObject *__pyx_pw_7rsa_api_303IQSTREAM_WaitForIQDataReady_py(PyObject *_
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "IQSTREAM_WaitForIQDataReady_py") < 0)) __PYX_ERR(0, 1357, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "IQSTREAM_WaitForIQDataReady_py") < 0)) __PYX_ERR(0, 1349, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -28870,20 +28637,20 @@ static PyObject *__pyx_pw_7rsa_api_303IQSTREAM_WaitForIQDataReady_py(PyObject *_
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("IQSTREAM_WaitForIQDataReady_py", 0, 0, 1, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 1357, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("IQSTREAM_WaitForIQDataReady_py", 0, 0, 1, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 1349, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("rsa_api.IQSTREAM_WaitForIQDataReady_py", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_7rsa_api_302IQSTREAM_WaitForIQDataReady_py(__pyx_self, __pyx_v_timeoutMsec);
+  __pyx_r = __pyx_pf_7rsa_api_300IQSTREAM_WaitForIQDataReady_py(__pyx_self, __pyx_v_timeoutMsec);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7rsa_api_302IQSTREAM_WaitForIQDataReady_py(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_timeoutMsec) {
+static PyObject *__pyx_pf_7rsa_api_300IQSTREAM_WaitForIQDataReady_py(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_timeoutMsec) {
   int __pyx_v__timeoutMsec;
   int __pyx_v_ready;
   PyObject *__pyx_r = NULL;
@@ -28896,26 +28663,26 @@ static PyObject *__pyx_pf_7rsa_api_302IQSTREAM_WaitForIQDataReady_py(CYTHON_UNUS
   PyObject *__pyx_t_6 = NULL;
   __Pyx_RefNannySetupContext("IQSTREAM_WaitForIQDataReady_py", 0);
 
-  /* "rsa_api.pyx":1358
+  /* "rsa_api.pyx":1350
  * 
  * def IQSTREAM_WaitForIQDataReady_py(timeoutMsec=10):
  *     cdef int _timeoutMsec = timeoutMsec             # <<<<<<<<<<<<<<
  *     cdef bint ready
  *     err_check(IQSTREAM_WaitForIQDataReady(_timeoutMsec, &ready))
  */
-  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_timeoutMsec); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1358, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_timeoutMsec); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1350, __pyx_L1_error)
   __pyx_v__timeoutMsec = __pyx_t_1;
 
-  /* "rsa_api.pyx":1360
+  /* "rsa_api.pyx":1352
  *     cdef int _timeoutMsec = timeoutMsec
  *     cdef bint ready
  *     err_check(IQSTREAM_WaitForIQDataReady(_timeoutMsec, &ready))             # <<<<<<<<<<<<<<
  *     return ready
  * 
  */
-  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_err_check); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1360, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_err_check); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1352, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_PyInt_From_ReturnStatus(IQSTREAM_WaitForIQDataReady(__pyx_v__timeoutMsec, (&__pyx_v_ready))); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1360, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyInt_From_ReturnStatus(IQSTREAM_WaitForIQDataReady(__pyx_v__timeoutMsec, (&__pyx_v_ready))); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1352, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __pyx_t_5 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
@@ -28928,14 +28695,14 @@ static PyObject *__pyx_pf_7rsa_api_302IQSTREAM_WaitForIQDataReady_py(CYTHON_UNUS
     }
   }
   if (!__pyx_t_5) {
-    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1360, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1352, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_GOTREF(__pyx_t_2);
   } else {
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_3)) {
       PyObject *__pyx_temp[2] = {__pyx_t_5, __pyx_t_4};
-      __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1360, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1352, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
@@ -28944,20 +28711,20 @@ static PyObject *__pyx_pf_7rsa_api_302IQSTREAM_WaitForIQDataReady_py(CYTHON_UNUS
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_3)) {
       PyObject *__pyx_temp[2] = {__pyx_t_5, __pyx_t_4};
-      __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1360, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1352, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     } else
     #endif
     {
-      __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1360, __pyx_L1_error)
+      __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1352, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_5); __pyx_t_5 = NULL;
       __Pyx_GIVEREF(__pyx_t_4);
       PyTuple_SET_ITEM(__pyx_t_6, 0+1, __pyx_t_4);
       __pyx_t_4 = 0;
-      __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_6, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1360, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_6, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1352, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     }
@@ -28965,21 +28732,21 @@ static PyObject *__pyx_pf_7rsa_api_302IQSTREAM_WaitForIQDataReady_py(CYTHON_UNUS
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "rsa_api.pyx":1361
+  /* "rsa_api.pyx":1353
  *     cdef bint ready
  *     err_check(IQSTREAM_WaitForIQDataReady(_timeoutMsec, &ready))
  *     return ready             # <<<<<<<<<<<<<<
  * 
- * # Can't be done with C pointers in Cython
+ * 
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_2 = __Pyx_PyBool_FromLong(__pyx_v_ready); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1361, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyBool_FromLong(__pyx_v_ready); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1353, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_r = __pyx_t_2;
   __pyx_t_2 = 0;
   goto __pyx_L0;
 
-  /* "rsa_api.pyx":1357
+  /* "rsa_api.pyx":1349
  * 
  * 
  * def IQSTREAM_WaitForIQDataReady_py(timeoutMsec=10):             # <<<<<<<<<<<<<<
@@ -29002,7 +28769,472 @@ static PyObject *__pyx_pf_7rsa_api_302IQSTREAM_WaitForIQDataReady_py(CYTHON_UNUS
   return __pyx_r;
 }
 
-/* "rsa_api.pyx":1378
+/* "rsa_api.pyx":1356
+ * 
+ * 
+ * def IQSTREAM_GetIQData_py(inputBuffer, dType):             # <<<<<<<<<<<<<<
+ *     # cdef void* iqData
+ *     if dType not in [IQSOUTDTYPE.IQSODT_SINGLE, IQSOUTDTYPE.IQSODT_INT32,
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_7rsa_api_303IQSTREAM_GetIQData_py(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_7rsa_api_303IQSTREAM_GetIQData_py = {"IQSTREAM_GetIQData_py", (PyCFunction)__pyx_pw_7rsa_api_303IQSTREAM_GetIQData_py, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_7rsa_api_303IQSTREAM_GetIQData_py(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+  PyObject *__pyx_v_inputBuffer = 0;
+  PyObject *__pyx_v_dType = 0;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("IQSTREAM_GetIQData_py (wrapper)", 0);
+  {
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_inputBuffer,&__pyx_n_s_dType,0};
+    PyObject* values[2] = {0,0};
+    if (unlikely(__pyx_kwds)) {
+      Py_ssize_t kw_args;
+      const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
+      switch (pos_args) {
+        case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+        CYTHON_FALLTHROUGH;
+        case  1: values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+        CYTHON_FALLTHROUGH;
+        case  0: break;
+        default: goto __pyx_L5_argtuple_error;
+      }
+      kw_args = PyDict_Size(__pyx_kwds);
+      switch (pos_args) {
+        case  0:
+        if (likely((values[0] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_inputBuffer)) != 0)) kw_args--;
+        else goto __pyx_L5_argtuple_error;
+        CYTHON_FALLTHROUGH;
+        case  1:
+        if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_dType)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("IQSTREAM_GetIQData_py", 1, 2, 2, 1); __PYX_ERR(0, 1356, __pyx_L3_error)
+        }
+      }
+      if (unlikely(kw_args > 0)) {
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "IQSTREAM_GetIQData_py") < 0)) __PYX_ERR(0, 1356, __pyx_L3_error)
+      }
+    } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
+      goto __pyx_L5_argtuple_error;
+    } else {
+      values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+      values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+    }
+    __pyx_v_inputBuffer = values[0];
+    __pyx_v_dType = values[1];
+  }
+  goto __pyx_L4_argument_unpacking_done;
+  __pyx_L5_argtuple_error:;
+  __Pyx_RaiseArgtupleInvalid("IQSTREAM_GetIQData_py", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 1356, __pyx_L3_error)
+  __pyx_L3_error:;
+  __Pyx_AddTraceback("rsa_api.IQSTREAM_GetIQData_py", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_RefNannyFinishContext();
+  return NULL;
+  __pyx_L4_argument_unpacking_done:;
+  __pyx_r = __pyx_pf_7rsa_api_302IQSTREAM_GetIQData_py(__pyx_self, __pyx_v_inputBuffer, __pyx_v_dType);
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_7rsa_api_302IQSTREAM_GetIQData_py(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_inputBuffer, PyObject *__pyx_v_dType) {
+  PyObject *__pyx_v_bufferDType = NULL;
+  PyArrayObject *__pyx_v_iqData = 0;
+  int __pyx_v_iqlen;
+  IQSTRMIQINFO __pyx_v_iqinfo;
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  int __pyx_t_2;
+  PyObject *__pyx_t_3 = NULL;
+  PyObject *__pyx_t_4 = NULL;
+  int __pyx_t_5;
+  PyObject *__pyx_t_6 = NULL;
+  PyObject *__pyx_t_7 = NULL;
+  __Pyx_RefNannySetupContext("IQSTREAM_GetIQData_py", 0);
+
+  /* "rsa_api.pyx":1358
+ * def IQSTREAM_GetIQData_py(inputBuffer, dType):
+ *     # cdef void* iqData
+ *     if dType not in [IQSOUTDTYPE.IQSODT_SINGLE, IQSOUTDTYPE.IQSODT_INT32,             # <<<<<<<<<<<<<<
+ *                      IQSOUTDTYPE.IQSODT_INT16,
+ *                      IQSOUTDTYPE.IQSODT_SINGLE_SCALE_INT32]:
+ */
+  __Pyx_INCREF(__pyx_v_dType);
+  __pyx_t_1 = __pyx_v_dType;
+  __pyx_t_3 = __Pyx_PyInt_From_enum____pyx_t_7rsa_api_IQSOUTDTYPE(__pyx_e_7rsa_api_IQSODT_SINGLE); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1358, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_4 = PyObject_RichCompare(__pyx_t_1, __pyx_t_3, Py_NE); __Pyx_XGOTREF(__pyx_t_4); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1358, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 1358, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  if (__pyx_t_5) {
+  } else {
+    __pyx_t_2 = __pyx_t_5;
+    goto __pyx_L4_bool_binop_done;
+  }
+  __pyx_t_4 = __Pyx_PyInt_From_enum____pyx_t_7rsa_api_IQSOUTDTYPE(__pyx_e_7rsa_api_IQSODT_INT32); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1358, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __pyx_t_3 = PyObject_RichCompare(__pyx_t_1, __pyx_t_4, Py_NE); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1358, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 1358, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  if (__pyx_t_5) {
+  } else {
+    __pyx_t_2 = __pyx_t_5;
+    goto __pyx_L4_bool_binop_done;
+  }
+
+  /* "rsa_api.pyx":1359
+ *     # cdef void* iqData
+ *     if dType not in [IQSOUTDTYPE.IQSODT_SINGLE, IQSOUTDTYPE.IQSODT_INT32,
+ *                      IQSOUTDTYPE.IQSODT_INT16,             # <<<<<<<<<<<<<<
+ *                      IQSOUTDTYPE.IQSODT_SINGLE_SCALE_INT32]:
+ *         raise RSAError('"dType" must be of type IQSOUTDTYPE')
+ */
+  __pyx_t_3 = __Pyx_PyInt_From_enum____pyx_t_7rsa_api_IQSOUTDTYPE(__pyx_e_7rsa_api_IQSODT_INT16); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1359, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_4 = PyObject_RichCompare(__pyx_t_1, __pyx_t_3, Py_NE); __Pyx_XGOTREF(__pyx_t_4); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1358, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+
+  /* "rsa_api.pyx":1358
+ * def IQSTREAM_GetIQData_py(inputBuffer, dType):
+ *     # cdef void* iqData
+ *     if dType not in [IQSOUTDTYPE.IQSODT_SINGLE, IQSOUTDTYPE.IQSODT_INT32,             # <<<<<<<<<<<<<<
+ *                      IQSOUTDTYPE.IQSODT_INT16,
+ *                      IQSOUTDTYPE.IQSODT_SINGLE_SCALE_INT32]:
+ */
+  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 1358, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  if (__pyx_t_5) {
+  } else {
+    __pyx_t_2 = __pyx_t_5;
+    goto __pyx_L4_bool_binop_done;
+  }
+
+  /* "rsa_api.pyx":1360
+ *     if dType not in [IQSOUTDTYPE.IQSODT_SINGLE, IQSOUTDTYPE.IQSODT_INT32,
+ *                      IQSOUTDTYPE.IQSODT_INT16,
+ *                      IQSOUTDTYPE.IQSODT_SINGLE_SCALE_INT32]:             # <<<<<<<<<<<<<<
+ *         raise RSAError('"dType" must be of type IQSOUTDTYPE')
+ *     if dType == IQSOUTDTYPE.IQSODT_INT16:
+ */
+  __pyx_t_4 = __Pyx_PyInt_From_enum____pyx_t_7rsa_api_IQSOUTDTYPE(__pyx_e_7rsa_api_IQSODT_SINGLE_SCALE_INT32); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1360, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __pyx_t_3 = PyObject_RichCompare(__pyx_t_1, __pyx_t_4, Py_NE); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1358, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+
+  /* "rsa_api.pyx":1358
+ * def IQSTREAM_GetIQData_py(inputBuffer, dType):
+ *     # cdef void* iqData
+ *     if dType not in [IQSOUTDTYPE.IQSODT_SINGLE, IQSOUTDTYPE.IQSODT_INT32,             # <<<<<<<<<<<<<<
+ *                      IQSOUTDTYPE.IQSODT_INT16,
+ *                      IQSOUTDTYPE.IQSODT_SINGLE_SCALE_INT32]:
+ */
+  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 1358, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_2 = __pyx_t_5;
+  __pyx_L4_bool_binop_done:;
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_5 = (__pyx_t_2 != 0);
+  if (__pyx_t_5) {
+
+    /* "rsa_api.pyx":1361
+ *                      IQSOUTDTYPE.IQSODT_INT16,
+ *                      IQSOUTDTYPE.IQSODT_SINGLE_SCALE_INT32]:
+ *         raise RSAError('"dType" must be of type IQSOUTDTYPE')             # <<<<<<<<<<<<<<
+ *     if dType == IQSOUTDTYPE.IQSODT_INT16:
+ *         bufferDType = np.int16
+ */
+    __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_RSAError); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1361, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__39, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1361, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+    __Pyx_Raise(__pyx_t_3, 0, 0, 0);
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __PYX_ERR(0, 1361, __pyx_L1_error)
+
+    /* "rsa_api.pyx":1358
+ * def IQSTREAM_GetIQData_py(inputBuffer, dType):
+ *     # cdef void* iqData
+ *     if dType not in [IQSOUTDTYPE.IQSODT_SINGLE, IQSOUTDTYPE.IQSODT_INT32,             # <<<<<<<<<<<<<<
+ *                      IQSOUTDTYPE.IQSODT_INT16,
+ *                      IQSOUTDTYPE.IQSODT_SINGLE_SCALE_INT32]:
+ */
+  }
+
+  /* "rsa_api.pyx":1362
+ *                      IQSOUTDTYPE.IQSODT_SINGLE_SCALE_INT32]:
+ *         raise RSAError('"dType" must be of type IQSOUTDTYPE')
+ *     if dType == IQSOUTDTYPE.IQSODT_INT16:             # <<<<<<<<<<<<<<
+ *         bufferDType = np.int16
+ *     elif dType == IQSOUTDTYPE.IQSODT_INT32:
+ */
+  __pyx_t_3 = __Pyx_PyInt_From_enum____pyx_t_7rsa_api_IQSOUTDTYPE(__pyx_e_7rsa_api_IQSODT_INT16); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1362, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_1 = PyObject_RichCompare(__pyx_v_dType, __pyx_t_3, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1362, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 1362, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  if (__pyx_t_5) {
+
+    /* "rsa_api.pyx":1363
+ *         raise RSAError('"dType" must be of type IQSOUTDTYPE')
+ *     if dType == IQSOUTDTYPE.IQSODT_INT16:
+ *         bufferDType = np.int16             # <<<<<<<<<<<<<<
+ *     elif dType == IQSOUTDTYPE.IQSODT_INT32:
+ *         bufferDType = np.int32
+ */
+    __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1363, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_int16); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1363, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+    __pyx_v_bufferDType = __pyx_t_3;
+    __pyx_t_3 = 0;
+
+    /* "rsa_api.pyx":1362
+ *                      IQSOUTDTYPE.IQSODT_SINGLE_SCALE_INT32]:
+ *         raise RSAError('"dType" must be of type IQSOUTDTYPE')
+ *     if dType == IQSOUTDTYPE.IQSODT_INT16:             # <<<<<<<<<<<<<<
+ *         bufferDType = np.int16
+ *     elif dType == IQSOUTDTYPE.IQSODT_INT32:
+ */
+    goto __pyx_L8;
+  }
+
+  /* "rsa_api.pyx":1364
+ *     if dType == IQSOUTDTYPE.IQSODT_INT16:
+ *         bufferDType = np.int16
+ *     elif dType == IQSOUTDTYPE.IQSODT_INT32:             # <<<<<<<<<<<<<<
+ *         bufferDType = np.int32
+ *     elif dType == IQSOUTDTYPE.IQSODT_SINGLE or dType == IQSOUTDTYPE.IQSODT_SINGLE_SCALE_INT32:
+ */
+  __pyx_t_3 = __Pyx_PyInt_From_enum____pyx_t_7rsa_api_IQSOUTDTYPE(__pyx_e_7rsa_api_IQSODT_INT32); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1364, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_1 = PyObject_RichCompare(__pyx_v_dType, __pyx_t_3, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1364, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 1364, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  if (__pyx_t_5) {
+
+    /* "rsa_api.pyx":1365
+ *         bufferDType = np.int16
+ *     elif dType == IQSOUTDTYPE.IQSODT_INT32:
+ *         bufferDType = np.int32             # <<<<<<<<<<<<<<
+ *     elif dType == IQSOUTDTYPE.IQSODT_SINGLE or dType == IQSOUTDTYPE.IQSODT_SINGLE_SCALE_INT32:
+ *         bufferDType = np.float32
+ */
+    __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1365, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_int32); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1365, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+    __pyx_v_bufferDType = __pyx_t_3;
+    __pyx_t_3 = 0;
+
+    /* "rsa_api.pyx":1364
+ *     if dType == IQSOUTDTYPE.IQSODT_INT16:
+ *         bufferDType = np.int16
+ *     elif dType == IQSOUTDTYPE.IQSODT_INT32:             # <<<<<<<<<<<<<<
+ *         bufferDType = np.int32
+ *     elif dType == IQSOUTDTYPE.IQSODT_SINGLE or dType == IQSOUTDTYPE.IQSODT_SINGLE_SCALE_INT32:
+ */
+    goto __pyx_L8;
+  }
+
+  /* "rsa_api.pyx":1366
+ *     elif dType == IQSOUTDTYPE.IQSODT_INT32:
+ *         bufferDType = np.int32
+ *     elif dType == IQSOUTDTYPE.IQSODT_SINGLE or dType == IQSOUTDTYPE.IQSODT_SINGLE_SCALE_INT32:             # <<<<<<<<<<<<<<
+ *         bufferDType = np.float32
+ * 
+ */
+  __pyx_t_3 = __Pyx_PyInt_From_enum____pyx_t_7rsa_api_IQSOUTDTYPE(__pyx_e_7rsa_api_IQSODT_SINGLE); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1366, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_1 = PyObject_RichCompare(__pyx_v_dType, __pyx_t_3, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1366, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 1366, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  if (!__pyx_t_2) {
+  } else {
+    __pyx_t_5 = __pyx_t_2;
+    goto __pyx_L9_bool_binop_done;
+  }
+  __pyx_t_1 = __Pyx_PyInt_From_enum____pyx_t_7rsa_api_IQSOUTDTYPE(__pyx_e_7rsa_api_IQSODT_SINGLE_SCALE_INT32); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1366, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_3 = PyObject_RichCompare(__pyx_v_dType, __pyx_t_1, Py_EQ); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1366, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 1366, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_5 = __pyx_t_2;
+  __pyx_L9_bool_binop_done:;
+  if (__pyx_t_5) {
+
+    /* "rsa_api.pyx":1367
+ *         bufferDType = np.int32
+ *     elif dType == IQSOUTDTYPE.IQSODT_SINGLE or dType == IQSOUTDTYPE.IQSODT_SINGLE_SCALE_INT32:
+ *         bufferDType = np.float32             # <<<<<<<<<<<<<<
+ * 
+ *     cdef np.ndarray iqData = np.empty(shape=(inputBuffer*2), dtype=bufferDType, order='c')
+ */
+    __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1367, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_float32); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1367, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __pyx_v_bufferDType = __pyx_t_1;
+    __pyx_t_1 = 0;
+
+    /* "rsa_api.pyx":1366
+ *     elif dType == IQSOUTDTYPE.IQSODT_INT32:
+ *         bufferDType = np.int32
+ *     elif dType == IQSOUTDTYPE.IQSODT_SINGLE or dType == IQSOUTDTYPE.IQSODT_SINGLE_SCALE_INT32:             # <<<<<<<<<<<<<<
+ *         bufferDType = np.float32
+ * 
+ */
+  }
+  __pyx_L8:;
+
+  /* "rsa_api.pyx":1369
+ *         bufferDType = np.float32
+ * 
+ *     cdef np.ndarray iqData = np.empty(shape=(inputBuffer*2), dtype=bufferDType, order='c')             # <<<<<<<<<<<<<<
+ *     cdef int iqlen
+ *     cdef IQSTRMIQINFO iqinfo
+ */
+  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1369, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_empty); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1369, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1369, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_4 = PyNumber_Multiply(__pyx_v_inputBuffer, __pyx_int_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1369, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_shape, __pyx_t_4) < 0) __PYX_ERR(0, 1369, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  if (unlikely(!__pyx_v_bufferDType)) { __Pyx_RaiseUnboundLocalError("bufferDType"); __PYX_ERR(0, 1369, __pyx_L1_error) }
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_dtype, __pyx_v_bufferDType) < 0) __PYX_ERR(0, 1369, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_order, __pyx_n_s_c) < 0) __PYX_ERR(0, 1369, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_empty_tuple, __pyx_t_1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1369, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  if (!(likely(((__pyx_t_4) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_4, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 1369, __pyx_L1_error)
+  __pyx_v_iqData = ((PyArrayObject *)__pyx_t_4);
+  __pyx_t_4 = 0;
+
+  /* "rsa_api.pyx":1372
+ *     cdef int iqlen
+ *     cdef IQSTRMIQINFO iqinfo
+ *     err_check(IQSTREAM_GetIQData(<void*> iqData.data, &iqlen, &iqinfo))             # <<<<<<<<<<<<<<
+ *     return iqData, iqinfo
+ * 
+ */
+  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_err_check); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1372, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_3 = __Pyx_PyInt_From_ReturnStatus(IQSTREAM_GetIQData(((void *)__pyx_v_iqData->data), (&__pyx_v_iqlen), (&__pyx_v_iqinfo))); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1372, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_6 = NULL;
+  if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_1))) {
+    __pyx_t_6 = PyMethod_GET_SELF(__pyx_t_1);
+    if (likely(__pyx_t_6)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_1);
+      __Pyx_INCREF(__pyx_t_6);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_1, function);
+    }
+  }
+  if (!__pyx_t_6) {
+    __pyx_t_4 = __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1372, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __Pyx_GOTREF(__pyx_t_4);
+  } else {
+    #if CYTHON_FAST_PYCALL
+    if (PyFunction_Check(__pyx_t_1)) {
+      PyObject *__pyx_temp[2] = {__pyx_t_6, __pyx_t_3};
+      __pyx_t_4 = __Pyx_PyFunction_FastCall(__pyx_t_1, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1372, __pyx_L1_error)
+      __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
+      __Pyx_GOTREF(__pyx_t_4);
+      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    } else
+    #endif
+    #if CYTHON_FAST_PYCCALL
+    if (__Pyx_PyFastCFunction_Check(__pyx_t_1)) {
+      PyObject *__pyx_temp[2] = {__pyx_t_6, __pyx_t_3};
+      __pyx_t_4 = __Pyx_PyCFunction_FastCall(__pyx_t_1, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1372, __pyx_L1_error)
+      __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
+      __Pyx_GOTREF(__pyx_t_4);
+      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    } else
+    #endif
+    {
+      __pyx_t_7 = PyTuple_New(1+1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1372, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_7);
+      __Pyx_GIVEREF(__pyx_t_6); PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_6); __pyx_t_6 = NULL;
+      __Pyx_GIVEREF(__pyx_t_3);
+      PyTuple_SET_ITEM(__pyx_t_7, 0+1, __pyx_t_3);
+      __pyx_t_3 = 0;
+      __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_7, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1372, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_4);
+      __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+    }
+  }
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+
+  /* "rsa_api.pyx":1373
+ *     cdef IQSTRMIQINFO iqinfo
+ *     err_check(IQSTREAM_GetIQData(<void*> iqData.data, &iqlen, &iqinfo))
+ *     return iqData, iqinfo             # <<<<<<<<<<<<<<
+ * 
+ * 
+ */
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_t_4 = __pyx_convert__to_py_IQSTRMIQINFO(__pyx_v_iqinfo); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1373, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1373, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_INCREF(((PyObject *)__pyx_v_iqData));
+  __Pyx_GIVEREF(((PyObject *)__pyx_v_iqData));
+  PyTuple_SET_ITEM(__pyx_t_1, 0, ((PyObject *)__pyx_v_iqData));
+  __Pyx_GIVEREF(__pyx_t_4);
+  PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_t_4);
+  __pyx_t_4 = 0;
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
+  goto __pyx_L0;
+
+  /* "rsa_api.pyx":1356
+ * 
+ * 
+ * def IQSTREAM_GetIQData_py(inputBuffer, dType):             # <<<<<<<<<<<<<<
+ *     # cdef void* iqData
+ *     if dType not in [IQSOUTDTYPE.IQSODT_SINGLE, IQSOUTDTYPE.IQSODT_INT32,
+ */
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_XDECREF(__pyx_t_4);
+  __Pyx_XDECREF(__pyx_t_6);
+  __Pyx_XDECREF(__pyx_t_7);
+  __Pyx_AddTraceback("rsa_api.IQSTREAM_GetIQData_py", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XDECREF(__pyx_v_bufferDType);
+  __Pyx_XDECREF((PyObject *)__pyx_v_iqData);
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "rsa_api.pyx":1382
  * 
  * 
  * def IQSTREAM_ClearAcqStatus_py():             # <<<<<<<<<<<<<<
@@ -29029,7 +29261,7 @@ static PyObject *__pyx_pf_7rsa_api_304IQSTREAM_ClearAcqStatus_py(CYTHON_UNUSED P
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("IQSTREAM_ClearAcqStatus_py", 0);
 
-  /* "rsa_api.pyx":1379
+  /* "rsa_api.pyx":1383
  * 
  * def IQSTREAM_ClearAcqStatus_py():
  *     IQSTREAM_ClearAcqStatus()             # <<<<<<<<<<<<<<
@@ -29038,7 +29270,7 @@ static PyObject *__pyx_pf_7rsa_api_304IQSTREAM_ClearAcqStatus_py(CYTHON_UNUSED P
  */
   IQSTREAM_ClearAcqStatus();
 
-  /* "rsa_api.pyx":1378
+  /* "rsa_api.pyx":1382
  * 
  * 
  * def IQSTREAM_ClearAcqStatus_py():             # <<<<<<<<<<<<<<
@@ -29053,7 +29285,7 @@ static PyObject *__pyx_pf_7rsa_api_304IQSTREAM_ClearAcqStatus_py(CYTHON_UNUSED P
   return __pyx_r;
 }
 
-/* "rsa_api.pyx":1387
+/* "rsa_api.pyx":1391
  * 
  * 
  * def PLAYBACK_OpenDiskFile_py(fileName, startPercentage, stopPercentage,             # <<<<<<<<<<<<<<
@@ -29105,35 +29337,35 @@ static PyObject *__pyx_pw_7rsa_api_307PLAYBACK_OpenDiskFile_py(PyObject *__pyx_s
         case  1:
         if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_startPercentage)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("PLAYBACK_OpenDiskFile_py", 1, 6, 6, 1); __PYX_ERR(0, 1387, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("PLAYBACK_OpenDiskFile_py", 1, 6, 6, 1); __PYX_ERR(0, 1391, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_stopPercentage)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("PLAYBACK_OpenDiskFile_py", 1, 6, 6, 2); __PYX_ERR(0, 1387, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("PLAYBACK_OpenDiskFile_py", 1, 6, 6, 2); __PYX_ERR(0, 1391, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_skipTimeBetweenFullAcquisitions)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("PLAYBACK_OpenDiskFile_py", 1, 6, 6, 3); __PYX_ERR(0, 1387, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("PLAYBACK_OpenDiskFile_py", 1, 6, 6, 3); __PYX_ERR(0, 1391, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  4:
         if (likely((values[4] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_loopAtEndOfFile)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("PLAYBACK_OpenDiskFile_py", 1, 6, 6, 4); __PYX_ERR(0, 1387, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("PLAYBACK_OpenDiskFile_py", 1, 6, 6, 4); __PYX_ERR(0, 1391, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  5:
         if (likely((values[5] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_emulateRealTime)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("PLAYBACK_OpenDiskFile_py", 1, 6, 6, 5); __PYX_ERR(0, 1387, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("PLAYBACK_OpenDiskFile_py", 1, 6, 6, 5); __PYX_ERR(0, 1391, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "PLAYBACK_OpenDiskFile_py") < 0)) __PYX_ERR(0, 1387, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "PLAYBACK_OpenDiskFile_py") < 0)) __PYX_ERR(0, 1391, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 6) {
       goto __pyx_L5_argtuple_error;
@@ -29154,7 +29386,7 @@ static PyObject *__pyx_pw_7rsa_api_307PLAYBACK_OpenDiskFile_py(PyObject *__pyx_s
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("PLAYBACK_OpenDiskFile_py", 1, 6, 6, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 1387, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("PLAYBACK_OpenDiskFile_py", 1, 6, 6, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 1391, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("rsa_api.PLAYBACK_OpenDiskFile_py", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -29188,14 +29420,14 @@ static PyObject *__pyx_pf_7rsa_api_306PLAYBACK_OpenDiskFile_py(CYTHON_UNUSED PyO
   PyObject *__pyx_t_10 = NULL;
   __Pyx_RefNannySetupContext("PLAYBACK_OpenDiskFile_py", 0);
 
-  /* "rsa_api.pyx":1390
+  /* "rsa_api.pyx":1394
  *                              skipTimeBetweenFullAcquisitions,
  *                              loopAtEndOfFile, emulateRealTime):
  *     if not exists(fileName):             # <<<<<<<<<<<<<<
  *         raise RSAError('errorStreamedFileOpenFailure')
  *     cdef Py_UNICODE* _fileName = fileName
  */
-  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_exists); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1390, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_exists); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1394, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
@@ -29208,13 +29440,13 @@ static PyObject *__pyx_pf_7rsa_api_306PLAYBACK_OpenDiskFile_py(CYTHON_UNUSED PyO
     }
   }
   if (!__pyx_t_3) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_v_fileName); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1390, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_v_fileName); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1394, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   } else {
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_2)) {
       PyObject *__pyx_temp[2] = {__pyx_t_3, __pyx_v_fileName};
-      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1390, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1394, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_GOTREF(__pyx_t_1);
     } else
@@ -29222,46 +29454,46 @@ static PyObject *__pyx_pf_7rsa_api_306PLAYBACK_OpenDiskFile_py(CYTHON_UNUSED PyO
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
       PyObject *__pyx_temp[2] = {__pyx_t_3, __pyx_v_fileName};
-      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1390, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1394, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_GOTREF(__pyx_t_1);
     } else
     #endif
     {
-      __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1390, __pyx_L1_error)
+      __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1394, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_GIVEREF(__pyx_t_3); PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_3); __pyx_t_3 = NULL;
       __Pyx_INCREF(__pyx_v_fileName);
       __Pyx_GIVEREF(__pyx_v_fileName);
       PyTuple_SET_ITEM(__pyx_t_4, 0+1, __pyx_v_fileName);
-      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1390, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1394, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     }
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 1390, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 1394, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_t_6 = ((!__pyx_t_5) != 0);
   if (__pyx_t_6) {
 
-    /* "rsa_api.pyx":1391
+    /* "rsa_api.pyx":1395
  *                              loopAtEndOfFile, emulateRealTime):
  *     if not exists(fileName):
  *         raise RSAError('errorStreamedFileOpenFailure')             # <<<<<<<<<<<<<<
  *     cdef Py_UNICODE* _fileName = fileName
  *     cdef int _startPercentage = startPercentage
  */
-    __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_RSAError); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1391, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_RSAError); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1395, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__40, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1391, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__40, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1395, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_Raise(__pyx_t_2, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __PYX_ERR(0, 1391, __pyx_L1_error)
+    __PYX_ERR(0, 1395, __pyx_L1_error)
 
-    /* "rsa_api.pyx":1390
+    /* "rsa_api.pyx":1394
  *                              skipTimeBetweenFullAcquisitions,
  *                              loopAtEndOfFile, emulateRealTime):
  *     if not exists(fileName):             # <<<<<<<<<<<<<<
@@ -29270,65 +29502,65 @@ static PyObject *__pyx_pf_7rsa_api_306PLAYBACK_OpenDiskFile_py(CYTHON_UNUSED PyO
  */
   }
 
-  /* "rsa_api.pyx":1392
+  /* "rsa_api.pyx":1396
  *     if not exists(fileName):
  *         raise RSAError('errorStreamedFileOpenFailure')
  *     cdef Py_UNICODE* _fileName = fileName             # <<<<<<<<<<<<<<
  *     cdef int _startPercentage = startPercentage
  *     cdef int _stopPercentage = stopPercentage
  */
-  __pyx_t_7 = __Pyx_PyUnicode_AsUnicode(__pyx_v_fileName); if (unlikely((!__pyx_t_7) && PyErr_Occurred())) __PYX_ERR(0, 1392, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyUnicode_AsUnicode(__pyx_v_fileName); if (unlikely((!__pyx_t_7) && PyErr_Occurred())) __PYX_ERR(0, 1396, __pyx_L1_error)
   __pyx_v__fileName = __pyx_t_7;
 
-  /* "rsa_api.pyx":1393
+  /* "rsa_api.pyx":1397
  *         raise RSAError('errorStreamedFileOpenFailure')
  *     cdef Py_UNICODE* _fileName = fileName
  *     cdef int _startPercentage = startPercentage             # <<<<<<<<<<<<<<
  *     cdef int _stopPercentage = stopPercentage
  *     if skipTimeBetweenFullAcquisitions < 0:
  */
-  __pyx_t_8 = __Pyx_PyInt_As_int(__pyx_v_startPercentage); if (unlikely((__pyx_t_8 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1393, __pyx_L1_error)
+  __pyx_t_8 = __Pyx_PyInt_As_int(__pyx_v_startPercentage); if (unlikely((__pyx_t_8 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1397, __pyx_L1_error)
   __pyx_v__startPercentage = __pyx_t_8;
 
-  /* "rsa_api.pyx":1394
+  /* "rsa_api.pyx":1398
  *     cdef Py_UNICODE* _fileName = fileName
  *     cdef int _startPercentage = startPercentage
  *     cdef int _stopPercentage = stopPercentage             # <<<<<<<<<<<<<<
  *     if skipTimeBetweenFullAcquisitions < 0:
  *         raise RSAError('Parameter out of range.')
  */
-  __pyx_t_8 = __Pyx_PyInt_As_int(__pyx_v_stopPercentage); if (unlikely((__pyx_t_8 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1394, __pyx_L1_error)
+  __pyx_t_8 = __Pyx_PyInt_As_int(__pyx_v_stopPercentage); if (unlikely((__pyx_t_8 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1398, __pyx_L1_error)
   __pyx_v__stopPercentage = __pyx_t_8;
 
-  /* "rsa_api.pyx":1395
+  /* "rsa_api.pyx":1399
  *     cdef int _startPercentage = startPercentage
  *     cdef int _stopPercentage = stopPercentage
  *     if skipTimeBetweenFullAcquisitions < 0:             # <<<<<<<<<<<<<<
  *         raise RSAError('Parameter out of range.')
  *     cdef double _skipTimeBetweenFullAcquisitions = skipTimeBetweenFullAcquisitions
  */
-  __pyx_t_2 = PyObject_RichCompare(__pyx_v_skipTimeBetweenFullAcquisitions, __pyx_int_0, Py_LT); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1395, __pyx_L1_error)
-  __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 1395, __pyx_L1_error)
+  __pyx_t_2 = PyObject_RichCompare(__pyx_v_skipTimeBetweenFullAcquisitions, __pyx_int_0, Py_LT); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1399, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 1399, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   if (__pyx_t_6) {
 
-    /* "rsa_api.pyx":1396
+    /* "rsa_api.pyx":1400
  *     cdef int _stopPercentage = stopPercentage
  *     if skipTimeBetweenFullAcquisitions < 0:
  *         raise RSAError('Parameter out of range.')             # <<<<<<<<<<<<<<
  *     cdef double _skipTimeBetweenFullAcquisitions = skipTimeBetweenFullAcquisitions
  *     if not isinstance(loopAtEndOfFile, bool):
  */
-    __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_RSAError); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1396, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_RSAError); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1400, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__41, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1396, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__41, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1400, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_Raise(__pyx_t_1, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __PYX_ERR(0, 1396, __pyx_L1_error)
+    __PYX_ERR(0, 1400, __pyx_L1_error)
 
-    /* "rsa_api.pyx":1395
+    /* "rsa_api.pyx":1399
  *     cdef int _startPercentage = startPercentage
  *     cdef int _stopPercentage = stopPercentage
  *     if skipTimeBetweenFullAcquisitions < 0:             # <<<<<<<<<<<<<<
@@ -29337,17 +29569,17 @@ static PyObject *__pyx_pf_7rsa_api_306PLAYBACK_OpenDiskFile_py(CYTHON_UNUSED PyO
  */
   }
 
-  /* "rsa_api.pyx":1397
+  /* "rsa_api.pyx":1401
  *     if skipTimeBetweenFullAcquisitions < 0:
  *         raise RSAError('Parameter out of range.')
  *     cdef double _skipTimeBetweenFullAcquisitions = skipTimeBetweenFullAcquisitions             # <<<<<<<<<<<<<<
  *     if not isinstance(loopAtEndOfFile, bool):
  *         raise TypeError('"loopAtEndOfFile" argument must be of type "bool".')
  */
-  __pyx_t_9 = __pyx_PyFloat_AsDouble(__pyx_v_skipTimeBetweenFullAcquisitions); if (unlikely((__pyx_t_9 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 1397, __pyx_L1_error)
+  __pyx_t_9 = __pyx_PyFloat_AsDouble(__pyx_v_skipTimeBetweenFullAcquisitions); if (unlikely((__pyx_t_9 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 1401, __pyx_L1_error)
   __pyx_v__skipTimeBetweenFullAcquisitions = __pyx_t_9;
 
-  /* "rsa_api.pyx":1398
+  /* "rsa_api.pyx":1402
  *         raise RSAError('Parameter out of range.')
  *     cdef double _skipTimeBetweenFullAcquisitions = skipTimeBetweenFullAcquisitions
  *     if not isinstance(loopAtEndOfFile, bool):             # <<<<<<<<<<<<<<
@@ -29356,25 +29588,25 @@ static PyObject *__pyx_pf_7rsa_api_306PLAYBACK_OpenDiskFile_py(CYTHON_UNUSED PyO
  */
   __pyx_t_1 = ((PyObject*)&PyBool_Type);
   __Pyx_INCREF(__pyx_t_1);
-  __pyx_t_6 = PyObject_IsInstance(__pyx_v_loopAtEndOfFile, __pyx_t_1); if (unlikely(__pyx_t_6 == ((int)-1))) __PYX_ERR(0, 1398, __pyx_L1_error)
+  __pyx_t_6 = PyObject_IsInstance(__pyx_v_loopAtEndOfFile, __pyx_t_1); if (unlikely(__pyx_t_6 == ((int)-1))) __PYX_ERR(0, 1402, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_t_5 = ((!(__pyx_t_6 != 0)) != 0);
   if (__pyx_t_5) {
 
-    /* "rsa_api.pyx":1399
+    /* "rsa_api.pyx":1403
  *     cdef double _skipTimeBetweenFullAcquisitions = skipTimeBetweenFullAcquisitions
  *     if not isinstance(loopAtEndOfFile, bool):
  *         raise TypeError('"loopAtEndOfFile" argument must be of type "bool".')             # <<<<<<<<<<<<<<
  *     if not isinstance(emulateRealTime, bool):
  *         raise TypeError('"emulateRealTime" argument must be of type "bool".')
  */
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_TypeError, __pyx_tuple__42, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1399, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_TypeError, __pyx_tuple__42, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1403, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_Raise(__pyx_t_1, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __PYX_ERR(0, 1399, __pyx_L1_error)
+    __PYX_ERR(0, 1403, __pyx_L1_error)
 
-    /* "rsa_api.pyx":1398
+    /* "rsa_api.pyx":1402
  *         raise RSAError('Parameter out of range.')
  *     cdef double _skipTimeBetweenFullAcquisitions = skipTimeBetweenFullAcquisitions
  *     if not isinstance(loopAtEndOfFile, bool):             # <<<<<<<<<<<<<<
@@ -29383,7 +29615,7 @@ static PyObject *__pyx_pf_7rsa_api_306PLAYBACK_OpenDiskFile_py(CYTHON_UNUSED PyO
  */
   }
 
-  /* "rsa_api.pyx":1400
+  /* "rsa_api.pyx":1404
  *     if not isinstance(loopAtEndOfFile, bool):
  *         raise TypeError('"loopAtEndOfFile" argument must be of type "bool".')
  *     if not isinstance(emulateRealTime, bool):             # <<<<<<<<<<<<<<
@@ -29392,25 +29624,25 @@ static PyObject *__pyx_pf_7rsa_api_306PLAYBACK_OpenDiskFile_py(CYTHON_UNUSED PyO
  */
   __pyx_t_1 = ((PyObject*)&PyBool_Type);
   __Pyx_INCREF(__pyx_t_1);
-  __pyx_t_5 = PyObject_IsInstance(__pyx_v_emulateRealTime, __pyx_t_1); if (unlikely(__pyx_t_5 == ((int)-1))) __PYX_ERR(0, 1400, __pyx_L1_error)
+  __pyx_t_5 = PyObject_IsInstance(__pyx_v_emulateRealTime, __pyx_t_1); if (unlikely(__pyx_t_5 == ((int)-1))) __PYX_ERR(0, 1404, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_t_6 = ((!(__pyx_t_5 != 0)) != 0);
   if (__pyx_t_6) {
 
-    /* "rsa_api.pyx":1401
+    /* "rsa_api.pyx":1405
  *         raise TypeError('"loopAtEndOfFile" argument must be of type "bool".')
  *     if not isinstance(emulateRealTime, bool):
  *         raise TypeError('"emulateRealTime" argument must be of type "bool".')             # <<<<<<<<<<<<<<
  *     cdef bint _loopAtEndOfFile = loopAtEndOfFile
  *     cdef bint _emulateRealTime = emulateRealTime
  */
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_TypeError, __pyx_tuple__43, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1401, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_TypeError, __pyx_tuple__43, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1405, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_Raise(__pyx_t_1, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __PYX_ERR(0, 1401, __pyx_L1_error)
+    __PYX_ERR(0, 1405, __pyx_L1_error)
 
-    /* "rsa_api.pyx":1400
+    /* "rsa_api.pyx":1404
  *     if not isinstance(loopAtEndOfFile, bool):
  *         raise TypeError('"loopAtEndOfFile" argument must be of type "bool".')
  *     if not isinstance(emulateRealTime, bool):             # <<<<<<<<<<<<<<
@@ -29419,44 +29651,44 @@ static PyObject *__pyx_pf_7rsa_api_306PLAYBACK_OpenDiskFile_py(CYTHON_UNUSED PyO
  */
   }
 
-  /* "rsa_api.pyx":1402
+  /* "rsa_api.pyx":1406
  *     if not isinstance(emulateRealTime, bool):
  *         raise TypeError('"emulateRealTime" argument must be of type "bool".')
  *     cdef bint _loopAtEndOfFile = loopAtEndOfFile             # <<<<<<<<<<<<<<
  *     cdef bint _emulateRealTime = emulateRealTime
  *     err_check(PLAYBACK_OpenDiskFile(_fileName, _startPercentage,
  */
-  __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_v_loopAtEndOfFile); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1402, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_v_loopAtEndOfFile); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1406, __pyx_L1_error)
   __pyx_v__loopAtEndOfFile = __pyx_t_6;
 
-  /* "rsa_api.pyx":1403
+  /* "rsa_api.pyx":1407
  *         raise TypeError('"emulateRealTime" argument must be of type "bool".')
  *     cdef bint _loopAtEndOfFile = loopAtEndOfFile
  *     cdef bint _emulateRealTime = emulateRealTime             # <<<<<<<<<<<<<<
  *     err_check(PLAYBACK_OpenDiskFile(_fileName, _startPercentage,
  *                                     _stopPercentage,
  */
-  __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_v_emulateRealTime); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1403, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_v_emulateRealTime); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1407, __pyx_L1_error)
   __pyx_v__emulateRealTime = __pyx_t_6;
 
-  /* "rsa_api.pyx":1404
+  /* "rsa_api.pyx":1408
  *     cdef bint _loopAtEndOfFile = loopAtEndOfFile
  *     cdef bint _emulateRealTime = emulateRealTime
  *     err_check(PLAYBACK_OpenDiskFile(_fileName, _startPercentage,             # <<<<<<<<<<<<<<
  *                                     _stopPercentage,
  *                                     _skipTimeBetweenFullAcquisitions,
  */
-  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_err_check); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1404, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_err_check); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1408, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
 
-  /* "rsa_api.pyx":1407
+  /* "rsa_api.pyx":1411
  *                                     _stopPercentage,
  *                                     _skipTimeBetweenFullAcquisitions,
  *                                     _loopAtEndOfFile, _emulateRealTime))             # <<<<<<<<<<<<<<
  * 
  * 
  */
-  __pyx_t_4 = __Pyx_PyInt_From_ReturnStatus(PLAYBACK_OpenDiskFile(__pyx_v__fileName, __pyx_v__startPercentage, __pyx_v__stopPercentage, __pyx_v__skipTimeBetweenFullAcquisitions, __pyx_v__loopAtEndOfFile, __pyx_v__emulateRealTime)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1404, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyInt_From_ReturnStatus(PLAYBACK_OpenDiskFile(__pyx_v__fileName, __pyx_v__startPercentage, __pyx_v__stopPercentage, __pyx_v__skipTimeBetweenFullAcquisitions, __pyx_v__loopAtEndOfFile, __pyx_v__emulateRealTime)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1408, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __pyx_t_3 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
@@ -29469,14 +29701,14 @@ static PyObject *__pyx_pf_7rsa_api_306PLAYBACK_OpenDiskFile_py(CYTHON_UNUSED PyO
     }
   }
   if (!__pyx_t_3) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1404, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1408, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_GOTREF(__pyx_t_1);
   } else {
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_2)) {
       PyObject *__pyx_temp[2] = {__pyx_t_3, __pyx_t_4};
-      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1404, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1408, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
@@ -29485,20 +29717,20 @@ static PyObject *__pyx_pf_7rsa_api_306PLAYBACK_OpenDiskFile_py(CYTHON_UNUSED PyO
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
       PyObject *__pyx_temp[2] = {__pyx_t_3, __pyx_t_4};
-      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1404, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1408, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     } else
     #endif
     {
-      __pyx_t_10 = PyTuple_New(1+1); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 1404, __pyx_L1_error)
+      __pyx_t_10 = PyTuple_New(1+1); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 1408, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_10);
       __Pyx_GIVEREF(__pyx_t_3); PyTuple_SET_ITEM(__pyx_t_10, 0, __pyx_t_3); __pyx_t_3 = NULL;
       __Pyx_GIVEREF(__pyx_t_4);
       PyTuple_SET_ITEM(__pyx_t_10, 0+1, __pyx_t_4);
       __pyx_t_4 = 0;
-      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_10, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1404, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_10, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1408, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
     }
@@ -29506,7 +29738,7 @@ static PyObject *__pyx_pf_7rsa_api_306PLAYBACK_OpenDiskFile_py(CYTHON_UNUSED PyO
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "rsa_api.pyx":1387
+  /* "rsa_api.pyx":1391
  * 
  * 
  * def PLAYBACK_OpenDiskFile_py(fileName, startPercentage, stopPercentage,             # <<<<<<<<<<<<<<
@@ -29531,7 +29763,7 @@ static PyObject *__pyx_pf_7rsa_api_306PLAYBACK_OpenDiskFile_py(CYTHON_UNUSED PyO
   return __pyx_r;
 }
 
-/* "rsa_api.pyx":1410
+/* "rsa_api.pyx":1414
  * 
  * 
  * def PLAYBACK_GetReplayComplete_py():             # <<<<<<<<<<<<<<
@@ -29564,16 +29796,16 @@ static PyObject *__pyx_pf_7rsa_api_308PLAYBACK_GetReplayComplete_py(CYTHON_UNUSE
   PyObject *__pyx_t_5 = NULL;
   __Pyx_RefNannySetupContext("PLAYBACK_GetReplayComplete_py", 0);
 
-  /* "rsa_api.pyx":1412
+  /* "rsa_api.pyx":1416
  * def PLAYBACK_GetReplayComplete_py():
  *     cdef bint complete
  *     err_check(PLAYBACK_GetReplayComplete(&complete))             # <<<<<<<<<<<<<<
  *     return complete
  * 
  */
-  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_err_check); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1412, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_err_check); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1416, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyInt_From_ReturnStatus(PLAYBACK_GetReplayComplete((&__pyx_v_complete))); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1412, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyInt_From_ReturnStatus(PLAYBACK_GetReplayComplete((&__pyx_v_complete))); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1416, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_4 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
@@ -29586,14 +29818,14 @@ static PyObject *__pyx_pf_7rsa_api_308PLAYBACK_GetReplayComplete_py(CYTHON_UNUSE
     }
   }
   if (!__pyx_t_4) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1412, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1416, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_GOTREF(__pyx_t_1);
   } else {
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_2)) {
       PyObject *__pyx_temp[2] = {__pyx_t_4, __pyx_t_3};
-      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1412, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1416, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -29602,20 +29834,20 @@ static PyObject *__pyx_pf_7rsa_api_308PLAYBACK_GetReplayComplete_py(CYTHON_UNUSE
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
       PyObject *__pyx_temp[2] = {__pyx_t_4, __pyx_t_3};
-      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1412, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1416, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     } else
     #endif
     {
-      __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1412, __pyx_L1_error)
+      __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1416, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_4); __pyx_t_4 = NULL;
       __Pyx_GIVEREF(__pyx_t_3);
       PyTuple_SET_ITEM(__pyx_t_5, 0+1, __pyx_t_3);
       __pyx_t_3 = 0;
-      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1412, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1416, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     }
@@ -29623,7 +29855,7 @@ static PyObject *__pyx_pf_7rsa_api_308PLAYBACK_GetReplayComplete_py(CYTHON_UNUSE
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "rsa_api.pyx":1413
+  /* "rsa_api.pyx":1417
  *     cdef bint complete
  *     err_check(PLAYBACK_GetReplayComplete(&complete))
  *     return complete             # <<<<<<<<<<<<<<
@@ -29631,13 +29863,13 @@ static PyObject *__pyx_pf_7rsa_api_308PLAYBACK_GetReplayComplete_py(CYTHON_UNUSE
  * 
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyBool_FromLong(__pyx_v_complete); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1413, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyBool_FromLong(__pyx_v_complete); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1417, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "rsa_api.pyx":1410
+  /* "rsa_api.pyx":1414
  * 
  * 
  * def PLAYBACK_GetReplayComplete_py():             # <<<<<<<<<<<<<<
@@ -29660,7 +29892,7 @@ static PyObject *__pyx_pf_7rsa_api_308PLAYBACK_GetReplayComplete_py(CYTHON_UNUSE
   return __pyx_r;
 }
 
-/* "rsa_api.pyx":1421
+/* "rsa_api.pyx":1425
  * 
  * 
  * def GNSS_GetHwInstalled_py():             # <<<<<<<<<<<<<<
@@ -29693,16 +29925,16 @@ static PyObject *__pyx_pf_7rsa_api_310GNSS_GetHwInstalled_py(CYTHON_UNUSED PyObj
   PyObject *__pyx_t_5 = NULL;
   __Pyx_RefNannySetupContext("GNSS_GetHwInstalled_py", 0);
 
-  /* "rsa_api.pyx":1423
+  /* "rsa_api.pyx":1427
  * def GNSS_GetHwInstalled_py():
  *     cdef bint installed
  *     err_check(GNSS_GetHwInstalled(&installed))             # <<<<<<<<<<<<<<
  *     return installed
  * 
  */
-  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_err_check); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1423, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_err_check); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1427, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyInt_From_ReturnStatus(GNSS_GetHwInstalled((&__pyx_v_installed))); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1423, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyInt_From_ReturnStatus(GNSS_GetHwInstalled((&__pyx_v_installed))); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1427, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_4 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
@@ -29715,14 +29947,14 @@ static PyObject *__pyx_pf_7rsa_api_310GNSS_GetHwInstalled_py(CYTHON_UNUSED PyObj
     }
   }
   if (!__pyx_t_4) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1423, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1427, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_GOTREF(__pyx_t_1);
   } else {
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_2)) {
       PyObject *__pyx_temp[2] = {__pyx_t_4, __pyx_t_3};
-      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1423, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1427, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -29731,20 +29963,20 @@ static PyObject *__pyx_pf_7rsa_api_310GNSS_GetHwInstalled_py(CYTHON_UNUSED PyObj
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
       PyObject *__pyx_temp[2] = {__pyx_t_4, __pyx_t_3};
-      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1423, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1427, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     } else
     #endif
     {
-      __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1423, __pyx_L1_error)
+      __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1427, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_4); __pyx_t_4 = NULL;
       __Pyx_GIVEREF(__pyx_t_3);
       PyTuple_SET_ITEM(__pyx_t_5, 0+1, __pyx_t_3);
       __pyx_t_3 = 0;
-      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1423, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1427, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     }
@@ -29752,7 +29984,7 @@ static PyObject *__pyx_pf_7rsa_api_310GNSS_GetHwInstalled_py(CYTHON_UNUSED PyObj
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "rsa_api.pyx":1424
+  /* "rsa_api.pyx":1428
  *     cdef bint installed
  *     err_check(GNSS_GetHwInstalled(&installed))
  *     return installed             # <<<<<<<<<<<<<<
@@ -29760,13 +29992,13 @@ static PyObject *__pyx_pf_7rsa_api_310GNSS_GetHwInstalled_py(CYTHON_UNUSED PyObj
  * def GNSS_SetEnable_py(enable):
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyBool_FromLong(__pyx_v_installed); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1424, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyBool_FromLong(__pyx_v_installed); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1428, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "rsa_api.pyx":1421
+  /* "rsa_api.pyx":1425
  * 
  * 
  * def GNSS_GetHwInstalled_py():             # <<<<<<<<<<<<<<
@@ -29789,7 +30021,7 @@ static PyObject *__pyx_pf_7rsa_api_310GNSS_GetHwInstalled_py(CYTHON_UNUSED PyObj
   return __pyx_r;
 }
 
-/* "rsa_api.pyx":1426
+/* "rsa_api.pyx":1430
  *     return installed
  * 
  * def GNSS_SetEnable_py(enable):             # <<<<<<<<<<<<<<
@@ -29823,26 +30055,26 @@ static PyObject *__pyx_pf_7rsa_api_312GNSS_SetEnable_py(CYTHON_UNUSED PyObject *
   PyObject *__pyx_t_6 = NULL;
   __Pyx_RefNannySetupContext("GNSS_SetEnable_py", 0);
 
-  /* "rsa_api.pyx":1427
+  /* "rsa_api.pyx":1431
  * 
  * def GNSS_SetEnable_py(enable):
  *     cdef bint _enable = enable             # <<<<<<<<<<<<<<
  *     err_check(GNSS_SetEnable(_enable))
  * 
  */
-  __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_v_enable); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1427, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_v_enable); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1431, __pyx_L1_error)
   __pyx_v__enable = __pyx_t_1;
 
-  /* "rsa_api.pyx":1428
+  /* "rsa_api.pyx":1432
  * def GNSS_SetEnable_py(enable):
  *     cdef bint _enable = enable
  *     err_check(GNSS_SetEnable(_enable))             # <<<<<<<<<<<<<<
  * 
  * 
  */
-  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_err_check); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1428, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_err_check); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1432, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_PyInt_From_ReturnStatus(GNSS_SetEnable(__pyx_v__enable)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1428, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyInt_From_ReturnStatus(GNSS_SetEnable(__pyx_v__enable)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1432, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __pyx_t_5 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
@@ -29855,14 +30087,14 @@ static PyObject *__pyx_pf_7rsa_api_312GNSS_SetEnable_py(CYTHON_UNUSED PyObject *
     }
   }
   if (!__pyx_t_5) {
-    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1428, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1432, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_GOTREF(__pyx_t_2);
   } else {
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_3)) {
       PyObject *__pyx_temp[2] = {__pyx_t_5, __pyx_t_4};
-      __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1428, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1432, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
@@ -29871,20 +30103,20 @@ static PyObject *__pyx_pf_7rsa_api_312GNSS_SetEnable_py(CYTHON_UNUSED PyObject *
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_3)) {
       PyObject *__pyx_temp[2] = {__pyx_t_5, __pyx_t_4};
-      __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1428, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1432, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     } else
     #endif
     {
-      __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1428, __pyx_L1_error)
+      __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1432, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_5); __pyx_t_5 = NULL;
       __Pyx_GIVEREF(__pyx_t_4);
       PyTuple_SET_ITEM(__pyx_t_6, 0+1, __pyx_t_4);
       __pyx_t_4 = 0;
-      __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_6, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1428, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_6, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1432, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     }
@@ -29892,7 +30124,7 @@ static PyObject *__pyx_pf_7rsa_api_312GNSS_SetEnable_py(CYTHON_UNUSED PyObject *
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "rsa_api.pyx":1426
+  /* "rsa_api.pyx":1430
  *     return installed
  * 
  * def GNSS_SetEnable_py(enable):             # <<<<<<<<<<<<<<
@@ -29917,7 +30149,7 @@ static PyObject *__pyx_pf_7rsa_api_312GNSS_SetEnable_py(CYTHON_UNUSED PyObject *
   return __pyx_r;
 }
 
-/* "rsa_api.pyx":1431
+/* "rsa_api.pyx":1435
  * 
  * 
  * def GNSS_GetEnable_py():             # <<<<<<<<<<<<<<
@@ -29950,16 +30182,16 @@ static PyObject *__pyx_pf_7rsa_api_314GNSS_GetEnable_py(CYTHON_UNUSED PyObject *
   PyObject *__pyx_t_5 = NULL;
   __Pyx_RefNannySetupContext("GNSS_GetEnable_py", 0);
 
-  /* "rsa_api.pyx":1433
+  /* "rsa_api.pyx":1437
  * def GNSS_GetEnable_py():
  *     cdef bint enable
  *     err_check(GNSS_GetEnable(&enable))             # <<<<<<<<<<<<<<
  *     return enable
  * 
  */
-  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_err_check); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1433, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_err_check); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1437, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyInt_From_ReturnStatus(GNSS_GetEnable((&__pyx_v_enable))); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1433, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyInt_From_ReturnStatus(GNSS_GetEnable((&__pyx_v_enable))); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1437, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_4 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
@@ -29972,14 +30204,14 @@ static PyObject *__pyx_pf_7rsa_api_314GNSS_GetEnable_py(CYTHON_UNUSED PyObject *
     }
   }
   if (!__pyx_t_4) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1433, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1437, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_GOTREF(__pyx_t_1);
   } else {
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_2)) {
       PyObject *__pyx_temp[2] = {__pyx_t_4, __pyx_t_3};
-      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1433, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1437, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -29988,20 +30220,20 @@ static PyObject *__pyx_pf_7rsa_api_314GNSS_GetEnable_py(CYTHON_UNUSED PyObject *
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
       PyObject *__pyx_temp[2] = {__pyx_t_4, __pyx_t_3};
-      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1433, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1437, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     } else
     #endif
     {
-      __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1433, __pyx_L1_error)
+      __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1437, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_4); __pyx_t_4 = NULL;
       __Pyx_GIVEREF(__pyx_t_3);
       PyTuple_SET_ITEM(__pyx_t_5, 0+1, __pyx_t_3);
       __pyx_t_3 = 0;
-      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1433, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1437, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     }
@@ -30009,7 +30241,7 @@ static PyObject *__pyx_pf_7rsa_api_314GNSS_GetEnable_py(CYTHON_UNUSED PyObject *
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "rsa_api.pyx":1434
+  /* "rsa_api.pyx":1438
  *     cdef bint enable
  *     err_check(GNSS_GetEnable(&enable))
  *     return enable             # <<<<<<<<<<<<<<
@@ -30017,13 +30249,13 @@ static PyObject *__pyx_pf_7rsa_api_314GNSS_GetEnable_py(CYTHON_UNUSED PyObject *
  * 
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyBool_FromLong(__pyx_v_enable); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1434, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyBool_FromLong(__pyx_v_enable); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1438, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "rsa_api.pyx":1431
+  /* "rsa_api.pyx":1435
  * 
  * 
  * def GNSS_GetEnable_py():             # <<<<<<<<<<<<<<
@@ -30046,7 +30278,7 @@ static PyObject *__pyx_pf_7rsa_api_314GNSS_GetEnable_py(CYTHON_UNUSED PyObject *
   return __pyx_r;
 }
 
-/* "rsa_api.pyx":1437
+/* "rsa_api.pyx":1441
  * 
  * 
  * def GNSS_SetSatSystem_py(satSystem):             # <<<<<<<<<<<<<<
@@ -30082,7 +30314,7 @@ static PyObject *__pyx_pf_7rsa_api_316GNSS_SetSatSystem_py(CYTHON_UNUSED PyObjec
   PyObject *__pyx_t_8 = NULL;
   __Pyx_RefNannySetupContext("GNSS_SetSatSystem_py", 0);
 
-  /* "rsa_api.pyx":1438
+  /* "rsa_api.pyx":1442
  * 
  * def GNSS_SetSatSystem_py(satSystem):
  *     if satSystem not in [GNSS_SATSYS.GNSS_NOSYS, GNSS_SATSYS.GNSS_GPS_GLONASS,             # <<<<<<<<<<<<<<
@@ -30091,22 +30323,22 @@ static PyObject *__pyx_pf_7rsa_api_316GNSS_SetSatSystem_py(CYTHON_UNUSED PyObjec
  */
   __Pyx_INCREF(__pyx_v_satSystem);
   __pyx_t_1 = __pyx_v_satSystem;
-  __pyx_t_3 = __Pyx_PyInt_From_enum____pyx_t_7rsa_api_GNSS_SATSYS(__pyx_e_7rsa_api_GNSS_NOSYS); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1438, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyInt_From_enum____pyx_t_7rsa_api_GNSS_SATSYS(__pyx_e_7rsa_api_GNSS_NOSYS); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1442, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = PyObject_RichCompare(__pyx_t_1, __pyx_t_3, Py_NE); __Pyx_XGOTREF(__pyx_t_4); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1438, __pyx_L1_error)
+  __pyx_t_4 = PyObject_RichCompare(__pyx_t_1, __pyx_t_3, Py_NE); __Pyx_XGOTREF(__pyx_t_4); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1442, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 1438, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 1442, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   if (__pyx_t_5) {
   } else {
     __pyx_t_2 = __pyx_t_5;
     goto __pyx_L4_bool_binop_done;
   }
-  __pyx_t_4 = __Pyx_PyInt_From_enum____pyx_t_7rsa_api_GNSS_SATSYS(__pyx_e_7rsa_api_GNSS_GPS_GLONASS); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1438, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyInt_From_enum____pyx_t_7rsa_api_GNSS_SATSYS(__pyx_e_7rsa_api_GNSS_GPS_GLONASS); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1442, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_3 = PyObject_RichCompare(__pyx_t_1, __pyx_t_4, Py_NE); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1438, __pyx_L1_error)
+  __pyx_t_3 = PyObject_RichCompare(__pyx_t_1, __pyx_t_4, Py_NE); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1442, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 1438, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 1442, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   if (__pyx_t_5) {
   } else {
@@ -30114,26 +30346,26 @@ static PyObject *__pyx_pf_7rsa_api_316GNSS_SetSatSystem_py(CYTHON_UNUSED PyObjec
     goto __pyx_L4_bool_binop_done;
   }
 
-  /* "rsa_api.pyx":1439
+  /* "rsa_api.pyx":1443
  * def GNSS_SetSatSystem_py(satSystem):
  *     if satSystem not in [GNSS_SATSYS.GNSS_NOSYS, GNSS_SATSYS.GNSS_GPS_GLONASS,
  *                      GNSS_SATSYS.GNSS_GPS_BEIDOU, GNSS_SATSYS.GNSS_GPS,             # <<<<<<<<<<<<<<
  *                      GNSS_SATSYS.GNSS_GLONASS, GNSS_SATSYS.GNSS_BEIDOU]:
  *         raise RSAError('Parameter out of range.')
  */
-  __pyx_t_3 = __Pyx_PyInt_From_enum____pyx_t_7rsa_api_GNSS_SATSYS(__pyx_e_7rsa_api_GNSS_GPS_BEIDOU); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1439, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyInt_From_enum____pyx_t_7rsa_api_GNSS_SATSYS(__pyx_e_7rsa_api_GNSS_GPS_BEIDOU); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1443, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = PyObject_RichCompare(__pyx_t_1, __pyx_t_3, Py_NE); __Pyx_XGOTREF(__pyx_t_4); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1438, __pyx_L1_error)
+  __pyx_t_4 = PyObject_RichCompare(__pyx_t_1, __pyx_t_3, Py_NE); __Pyx_XGOTREF(__pyx_t_4); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1442, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "rsa_api.pyx":1438
+  /* "rsa_api.pyx":1442
  * 
  * def GNSS_SetSatSystem_py(satSystem):
  *     if satSystem not in [GNSS_SATSYS.GNSS_NOSYS, GNSS_SATSYS.GNSS_GPS_GLONASS,             # <<<<<<<<<<<<<<
  *                      GNSS_SATSYS.GNSS_GPS_BEIDOU, GNSS_SATSYS.GNSS_GPS,
  *                      GNSS_SATSYS.GNSS_GLONASS, GNSS_SATSYS.GNSS_BEIDOU]:
  */
-  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 1438, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 1442, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   if (__pyx_t_5) {
   } else {
@@ -30141,26 +30373,26 @@ static PyObject *__pyx_pf_7rsa_api_316GNSS_SetSatSystem_py(CYTHON_UNUSED PyObjec
     goto __pyx_L4_bool_binop_done;
   }
 
-  /* "rsa_api.pyx":1439
+  /* "rsa_api.pyx":1443
  * def GNSS_SetSatSystem_py(satSystem):
  *     if satSystem not in [GNSS_SATSYS.GNSS_NOSYS, GNSS_SATSYS.GNSS_GPS_GLONASS,
  *                      GNSS_SATSYS.GNSS_GPS_BEIDOU, GNSS_SATSYS.GNSS_GPS,             # <<<<<<<<<<<<<<
  *                      GNSS_SATSYS.GNSS_GLONASS, GNSS_SATSYS.GNSS_BEIDOU]:
  *         raise RSAError('Parameter out of range.')
  */
-  __pyx_t_4 = __Pyx_PyInt_From_enum____pyx_t_7rsa_api_GNSS_SATSYS(__pyx_e_7rsa_api_GNSS_GPS); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1439, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyInt_From_enum____pyx_t_7rsa_api_GNSS_SATSYS(__pyx_e_7rsa_api_GNSS_GPS); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1443, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_3 = PyObject_RichCompare(__pyx_t_1, __pyx_t_4, Py_NE); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1438, __pyx_L1_error)
+  __pyx_t_3 = PyObject_RichCompare(__pyx_t_1, __pyx_t_4, Py_NE); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1442, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "rsa_api.pyx":1438
+  /* "rsa_api.pyx":1442
  * 
  * def GNSS_SetSatSystem_py(satSystem):
  *     if satSystem not in [GNSS_SATSYS.GNSS_NOSYS, GNSS_SATSYS.GNSS_GPS_GLONASS,             # <<<<<<<<<<<<<<
  *                      GNSS_SATSYS.GNSS_GPS_BEIDOU, GNSS_SATSYS.GNSS_GPS,
  *                      GNSS_SATSYS.GNSS_GLONASS, GNSS_SATSYS.GNSS_BEIDOU]:
  */
-  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 1438, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 1442, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   if (__pyx_t_5) {
   } else {
@@ -30168,26 +30400,26 @@ static PyObject *__pyx_pf_7rsa_api_316GNSS_SetSatSystem_py(CYTHON_UNUSED PyObjec
     goto __pyx_L4_bool_binop_done;
   }
 
-  /* "rsa_api.pyx":1440
+  /* "rsa_api.pyx":1444
  *     if satSystem not in [GNSS_SATSYS.GNSS_NOSYS, GNSS_SATSYS.GNSS_GPS_GLONASS,
  *                      GNSS_SATSYS.GNSS_GPS_BEIDOU, GNSS_SATSYS.GNSS_GPS,
  *                      GNSS_SATSYS.GNSS_GLONASS, GNSS_SATSYS.GNSS_BEIDOU]:             # <<<<<<<<<<<<<<
  *         raise RSAError('Parameter out of range.')
  *     cdef int _satSystem = satSystem
  */
-  __pyx_t_3 = __Pyx_PyInt_From_enum____pyx_t_7rsa_api_GNSS_SATSYS(__pyx_e_7rsa_api_GNSS_GLONASS); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1440, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyInt_From_enum____pyx_t_7rsa_api_GNSS_SATSYS(__pyx_e_7rsa_api_GNSS_GLONASS); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1444, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = PyObject_RichCompare(__pyx_t_1, __pyx_t_3, Py_NE); __Pyx_XGOTREF(__pyx_t_4); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1438, __pyx_L1_error)
+  __pyx_t_4 = PyObject_RichCompare(__pyx_t_1, __pyx_t_3, Py_NE); __Pyx_XGOTREF(__pyx_t_4); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1442, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "rsa_api.pyx":1438
+  /* "rsa_api.pyx":1442
  * 
  * def GNSS_SetSatSystem_py(satSystem):
  *     if satSystem not in [GNSS_SATSYS.GNSS_NOSYS, GNSS_SATSYS.GNSS_GPS_GLONASS,             # <<<<<<<<<<<<<<
  *                      GNSS_SATSYS.GNSS_GPS_BEIDOU, GNSS_SATSYS.GNSS_GPS,
  *                      GNSS_SATSYS.GNSS_GLONASS, GNSS_SATSYS.GNSS_BEIDOU]:
  */
-  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 1438, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 1442, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   if (__pyx_t_5) {
   } else {
@@ -30195,26 +30427,26 @@ static PyObject *__pyx_pf_7rsa_api_316GNSS_SetSatSystem_py(CYTHON_UNUSED PyObjec
     goto __pyx_L4_bool_binop_done;
   }
 
-  /* "rsa_api.pyx":1440
+  /* "rsa_api.pyx":1444
  *     if satSystem not in [GNSS_SATSYS.GNSS_NOSYS, GNSS_SATSYS.GNSS_GPS_GLONASS,
  *                      GNSS_SATSYS.GNSS_GPS_BEIDOU, GNSS_SATSYS.GNSS_GPS,
  *                      GNSS_SATSYS.GNSS_GLONASS, GNSS_SATSYS.GNSS_BEIDOU]:             # <<<<<<<<<<<<<<
  *         raise RSAError('Parameter out of range.')
  *     cdef int _satSystem = satSystem
  */
-  __pyx_t_4 = __Pyx_PyInt_From_enum____pyx_t_7rsa_api_GNSS_SATSYS(__pyx_e_7rsa_api_GNSS_BEIDOU); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1440, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyInt_From_enum____pyx_t_7rsa_api_GNSS_SATSYS(__pyx_e_7rsa_api_GNSS_BEIDOU); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1444, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_3 = PyObject_RichCompare(__pyx_t_1, __pyx_t_4, Py_NE); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1438, __pyx_L1_error)
+  __pyx_t_3 = PyObject_RichCompare(__pyx_t_1, __pyx_t_4, Py_NE); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1442, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "rsa_api.pyx":1438
+  /* "rsa_api.pyx":1442
  * 
  * def GNSS_SetSatSystem_py(satSystem):
  *     if satSystem not in [GNSS_SATSYS.GNSS_NOSYS, GNSS_SATSYS.GNSS_GPS_GLONASS,             # <<<<<<<<<<<<<<
  *                      GNSS_SATSYS.GNSS_GPS_BEIDOU, GNSS_SATSYS.GNSS_GPS,
  *                      GNSS_SATSYS.GNSS_GLONASS, GNSS_SATSYS.GNSS_BEIDOU]:
  */
-  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 1438, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 1442, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_t_2 = __pyx_t_5;
   __pyx_L4_bool_binop_done:;
@@ -30222,23 +30454,23 @@ static PyObject *__pyx_pf_7rsa_api_316GNSS_SetSatSystem_py(CYTHON_UNUSED PyObjec
   __pyx_t_5 = (__pyx_t_2 != 0);
   if (__pyx_t_5) {
 
-    /* "rsa_api.pyx":1441
+    /* "rsa_api.pyx":1445
  *                      GNSS_SATSYS.GNSS_GPS_BEIDOU, GNSS_SATSYS.GNSS_GPS,
  *                      GNSS_SATSYS.GNSS_GLONASS, GNSS_SATSYS.GNSS_BEIDOU]:
  *         raise RSAError('Parameter out of range.')             # <<<<<<<<<<<<<<
  *     cdef int _satSystem = satSystem
  *     err_check(GNSS_SetSatSystem(_satSystem))
  */
-    __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_RSAError); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1441, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_RSAError); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1445, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__44, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1441, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__44, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1445, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_Raise(__pyx_t_3, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __PYX_ERR(0, 1441, __pyx_L1_error)
+    __PYX_ERR(0, 1445, __pyx_L1_error)
 
-    /* "rsa_api.pyx":1438
+    /* "rsa_api.pyx":1442
  * 
  * def GNSS_SetSatSystem_py(satSystem):
  *     if satSystem not in [GNSS_SATSYS.GNSS_NOSYS, GNSS_SATSYS.GNSS_GPS_GLONASS,             # <<<<<<<<<<<<<<
@@ -30247,26 +30479,26 @@ static PyObject *__pyx_pf_7rsa_api_316GNSS_SetSatSystem_py(CYTHON_UNUSED PyObjec
  */
   }
 
-  /* "rsa_api.pyx":1442
+  /* "rsa_api.pyx":1446
  *                      GNSS_SATSYS.GNSS_GLONASS, GNSS_SATSYS.GNSS_BEIDOU]:
  *         raise RSAError('Parameter out of range.')
  *     cdef int _satSystem = satSystem             # <<<<<<<<<<<<<<
  *     err_check(GNSS_SetSatSystem(_satSystem))
  * 
  */
-  __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_v_satSystem); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1442, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_v_satSystem); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1446, __pyx_L1_error)
   __pyx_v__satSystem = __pyx_t_6;
 
-  /* "rsa_api.pyx":1443
+  /* "rsa_api.pyx":1447
  *         raise RSAError('Parameter out of range.')
  *     cdef int _satSystem = satSystem
  *     err_check(GNSS_SetSatSystem(_satSystem))             # <<<<<<<<<<<<<<
  * 
  * 
  */
-  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_err_check); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1443, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_err_check); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1447, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_4 = __Pyx_PyInt_From_ReturnStatus(GNSS_SetSatSystem(__pyx_v__satSystem)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1443, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyInt_From_ReturnStatus(GNSS_SetSatSystem(__pyx_v__satSystem)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1447, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __pyx_t_7 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_1))) {
@@ -30279,14 +30511,14 @@ static PyObject *__pyx_pf_7rsa_api_316GNSS_SetSatSystem_py(CYTHON_UNUSED PyObjec
     }
   }
   if (!__pyx_t_7) {
-    __pyx_t_3 = __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_t_4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1443, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_t_4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1447, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_GOTREF(__pyx_t_3);
   } else {
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_1)) {
       PyObject *__pyx_temp[2] = {__pyx_t_7, __pyx_t_4};
-      __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_1, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1443, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_1, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1447, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
@@ -30295,20 +30527,20 @@ static PyObject *__pyx_pf_7rsa_api_316GNSS_SetSatSystem_py(CYTHON_UNUSED PyObjec
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_1)) {
       PyObject *__pyx_temp[2] = {__pyx_t_7, __pyx_t_4};
-      __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_1, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1443, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_1, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1447, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     } else
     #endif
     {
-      __pyx_t_8 = PyTuple_New(1+1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1443, __pyx_L1_error)
+      __pyx_t_8 = PyTuple_New(1+1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1447, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
       __Pyx_GIVEREF(__pyx_t_7); PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_t_7); __pyx_t_7 = NULL;
       __Pyx_GIVEREF(__pyx_t_4);
       PyTuple_SET_ITEM(__pyx_t_8, 0+1, __pyx_t_4);
       __pyx_t_4 = 0;
-      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_8, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1443, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_8, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1447, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     }
@@ -30316,7 +30548,7 @@ static PyObject *__pyx_pf_7rsa_api_316GNSS_SetSatSystem_py(CYTHON_UNUSED PyObjec
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "rsa_api.pyx":1437
+  /* "rsa_api.pyx":1441
  * 
  * 
  * def GNSS_SetSatSystem_py(satSystem):             # <<<<<<<<<<<<<<
@@ -30341,7 +30573,7 @@ static PyObject *__pyx_pf_7rsa_api_316GNSS_SetSatSystem_py(CYTHON_UNUSED PyObjec
   return __pyx_r;
 }
 
-/* "rsa_api.pyx":1446
+/* "rsa_api.pyx":1450
  * 
  * 
  * def GNSS_GetSatSystem_py():             # <<<<<<<<<<<<<<
@@ -30374,16 +30606,16 @@ static PyObject *__pyx_pf_7rsa_api_318GNSS_GetSatSystem_py(CYTHON_UNUSED PyObjec
   PyObject *__pyx_t_5 = NULL;
   __Pyx_RefNannySetupContext("GNSS_GetSatSystem_py", 0);
 
-  /* "rsa_api.pyx":1448
+  /* "rsa_api.pyx":1452
  * def GNSS_GetSatSystem_py():
  *     cdef int satSystem
  *     err_check(GNSS_GetSatSystem(&satSystem))             # <<<<<<<<<<<<<<
  *     return satSystem
  * 
  */
-  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_err_check); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1448, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_err_check); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1452, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyInt_From_ReturnStatus(GNSS_GetSatSystem((&__pyx_v_satSystem))); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1448, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyInt_From_ReturnStatus(GNSS_GetSatSystem((&__pyx_v_satSystem))); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1452, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_4 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
@@ -30396,14 +30628,14 @@ static PyObject *__pyx_pf_7rsa_api_318GNSS_GetSatSystem_py(CYTHON_UNUSED PyObjec
     }
   }
   if (!__pyx_t_4) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1448, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1452, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_GOTREF(__pyx_t_1);
   } else {
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_2)) {
       PyObject *__pyx_temp[2] = {__pyx_t_4, __pyx_t_3};
-      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1448, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1452, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -30412,20 +30644,20 @@ static PyObject *__pyx_pf_7rsa_api_318GNSS_GetSatSystem_py(CYTHON_UNUSED PyObjec
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
       PyObject *__pyx_temp[2] = {__pyx_t_4, __pyx_t_3};
-      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1448, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1452, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     } else
     #endif
     {
-      __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1448, __pyx_L1_error)
+      __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1452, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_4); __pyx_t_4 = NULL;
       __Pyx_GIVEREF(__pyx_t_3);
       PyTuple_SET_ITEM(__pyx_t_5, 0+1, __pyx_t_3);
       __pyx_t_3 = 0;
-      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1448, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1452, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     }
@@ -30433,7 +30665,7 @@ static PyObject *__pyx_pf_7rsa_api_318GNSS_GetSatSystem_py(CYTHON_UNUSED PyObjec
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "rsa_api.pyx":1449
+  /* "rsa_api.pyx":1453
  *     cdef int satSystem
  *     err_check(GNSS_GetSatSystem(&satSystem))
  *     return satSystem             # <<<<<<<<<<<<<<
@@ -30441,13 +30673,13 @@ static PyObject *__pyx_pf_7rsa_api_318GNSS_GetSatSystem_py(CYTHON_UNUSED PyObjec
  * 
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_satSystem); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1449, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_satSystem); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1453, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "rsa_api.pyx":1446
+  /* "rsa_api.pyx":1450
  * 
  * 
  * def GNSS_GetSatSystem_py():             # <<<<<<<<<<<<<<
@@ -30470,7 +30702,7 @@ static PyObject *__pyx_pf_7rsa_api_318GNSS_GetSatSystem_py(CYTHON_UNUSED PyObjec
   return __pyx_r;
 }
 
-/* "rsa_api.pyx":1452
+/* "rsa_api.pyx":1456
  * 
  * 
  * def GNSS_SetAntennaPower_py(powered):             # <<<<<<<<<<<<<<
@@ -30504,26 +30736,26 @@ static PyObject *__pyx_pf_7rsa_api_320GNSS_SetAntennaPower_py(CYTHON_UNUSED PyOb
   PyObject *__pyx_t_6 = NULL;
   __Pyx_RefNannySetupContext("GNSS_SetAntennaPower_py", 0);
 
-  /* "rsa_api.pyx":1453
+  /* "rsa_api.pyx":1457
  * 
  * def GNSS_SetAntennaPower_py(powered):
  *     cdef bint _powered = powered             # <<<<<<<<<<<<<<
  *     err_check(GNSS_SetAntennaPower(_powered))
  * 
  */
-  __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_v_powered); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1453, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_v_powered); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1457, __pyx_L1_error)
   __pyx_v__powered = __pyx_t_1;
 
-  /* "rsa_api.pyx":1454
+  /* "rsa_api.pyx":1458
  * def GNSS_SetAntennaPower_py(powered):
  *     cdef bint _powered = powered
  *     err_check(GNSS_SetAntennaPower(_powered))             # <<<<<<<<<<<<<<
  * 
  * 
  */
-  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_err_check); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1454, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_err_check); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1458, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_PyInt_From_ReturnStatus(GNSS_SetAntennaPower(__pyx_v__powered)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1454, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyInt_From_ReturnStatus(GNSS_SetAntennaPower(__pyx_v__powered)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1458, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __pyx_t_5 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
@@ -30536,14 +30768,14 @@ static PyObject *__pyx_pf_7rsa_api_320GNSS_SetAntennaPower_py(CYTHON_UNUSED PyOb
     }
   }
   if (!__pyx_t_5) {
-    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1454, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1458, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_GOTREF(__pyx_t_2);
   } else {
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_3)) {
       PyObject *__pyx_temp[2] = {__pyx_t_5, __pyx_t_4};
-      __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1454, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1458, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
@@ -30552,20 +30784,20 @@ static PyObject *__pyx_pf_7rsa_api_320GNSS_SetAntennaPower_py(CYTHON_UNUSED PyOb
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_3)) {
       PyObject *__pyx_temp[2] = {__pyx_t_5, __pyx_t_4};
-      __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1454, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1458, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     } else
     #endif
     {
-      __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1454, __pyx_L1_error)
+      __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1458, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_5); __pyx_t_5 = NULL;
       __Pyx_GIVEREF(__pyx_t_4);
       PyTuple_SET_ITEM(__pyx_t_6, 0+1, __pyx_t_4);
       __pyx_t_4 = 0;
-      __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_6, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1454, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_6, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1458, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     }
@@ -30573,7 +30805,7 @@ static PyObject *__pyx_pf_7rsa_api_320GNSS_SetAntennaPower_py(CYTHON_UNUSED PyOb
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "rsa_api.pyx":1452
+  /* "rsa_api.pyx":1456
  * 
  * 
  * def GNSS_SetAntennaPower_py(powered):             # <<<<<<<<<<<<<<
@@ -30598,7 +30830,7 @@ static PyObject *__pyx_pf_7rsa_api_320GNSS_SetAntennaPower_py(CYTHON_UNUSED PyOb
   return __pyx_r;
 }
 
-/* "rsa_api.pyx":1457
+/* "rsa_api.pyx":1461
  * 
  * 
  * def GNSS_GetAntennaPower_py():             # <<<<<<<<<<<<<<
@@ -30631,16 +30863,16 @@ static PyObject *__pyx_pf_7rsa_api_322GNSS_GetAntennaPower_py(CYTHON_UNUSED PyOb
   PyObject *__pyx_t_5 = NULL;
   __Pyx_RefNannySetupContext("GNSS_GetAntennaPower_py", 0);
 
-  /* "rsa_api.pyx":1459
+  /* "rsa_api.pyx":1463
  * def GNSS_GetAntennaPower_py():
  *     cdef bint powered
  *     err_check(GNSS_GetAntennaPower(&powered))             # <<<<<<<<<<<<<<
  *     return powered
  * 
  */
-  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_err_check); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1459, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_err_check); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1463, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyInt_From_ReturnStatus(GNSS_GetAntennaPower((&__pyx_v_powered))); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1459, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyInt_From_ReturnStatus(GNSS_GetAntennaPower((&__pyx_v_powered))); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1463, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_4 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
@@ -30653,14 +30885,14 @@ static PyObject *__pyx_pf_7rsa_api_322GNSS_GetAntennaPower_py(CYTHON_UNUSED PyOb
     }
   }
   if (!__pyx_t_4) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1459, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1463, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_GOTREF(__pyx_t_1);
   } else {
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_2)) {
       PyObject *__pyx_temp[2] = {__pyx_t_4, __pyx_t_3};
-      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1459, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1463, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -30669,20 +30901,20 @@ static PyObject *__pyx_pf_7rsa_api_322GNSS_GetAntennaPower_py(CYTHON_UNUSED PyOb
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
       PyObject *__pyx_temp[2] = {__pyx_t_4, __pyx_t_3};
-      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1459, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1463, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     } else
     #endif
     {
-      __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1459, __pyx_L1_error)
+      __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1463, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_4); __pyx_t_4 = NULL;
       __Pyx_GIVEREF(__pyx_t_3);
       PyTuple_SET_ITEM(__pyx_t_5, 0+1, __pyx_t_3);
       __pyx_t_3 = 0;
-      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1459, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1463, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     }
@@ -30690,7 +30922,7 @@ static PyObject *__pyx_pf_7rsa_api_322GNSS_GetAntennaPower_py(CYTHON_UNUSED PyOb
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "rsa_api.pyx":1460
+  /* "rsa_api.pyx":1464
  *     cdef bint powered
  *     err_check(GNSS_GetAntennaPower(&powered))
  *     return powered             # <<<<<<<<<<<<<<
@@ -30698,13 +30930,13 @@ static PyObject *__pyx_pf_7rsa_api_322GNSS_GetAntennaPower_py(CYTHON_UNUSED PyOb
  * 
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyBool_FromLong(__pyx_v_powered); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1460, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyBool_FromLong(__pyx_v_powered); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1464, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "rsa_api.pyx":1457
+  /* "rsa_api.pyx":1461
  * 
  * 
  * def GNSS_GetAntennaPower_py():             # <<<<<<<<<<<<<<
@@ -30727,7 +30959,7 @@ static PyObject *__pyx_pf_7rsa_api_322GNSS_GetAntennaPower_py(CYTHON_UNUSED PyOb
   return __pyx_r;
 }
 
-/* "rsa_api.pyx":1463
+/* "rsa_api.pyx":1467
  * 
  * 
  * def GNSS_GetNavMessageData_py():             # <<<<<<<<<<<<<<
@@ -30761,16 +30993,16 @@ static PyObject *__pyx_pf_7rsa_api_324GNSS_GetNavMessageData_py(CYTHON_UNUSED Py
   PyObject *__pyx_t_5 = NULL;
   __Pyx_RefNannySetupContext("GNSS_GetNavMessageData_py", 0);
 
-  /* "rsa_api.pyx":1466
+  /* "rsa_api.pyx":1470
  *     cdef int msgLen
  *     cdef char* message
  *     err_check(GNSS_GetNavMessageData(&msgLen, &message))             # <<<<<<<<<<<<<<
  *     return message, msgLen
  * 
  */
-  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_err_check); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1466, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_err_check); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1470, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyInt_From_ReturnStatus(GNSS_GetNavMessageData((&__pyx_v_msgLen), (&__pyx_v_message))); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1466, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyInt_From_ReturnStatus(GNSS_GetNavMessageData((&__pyx_v_msgLen), (&__pyx_v_message))); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1470, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_4 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
@@ -30783,14 +31015,14 @@ static PyObject *__pyx_pf_7rsa_api_324GNSS_GetNavMessageData_py(CYTHON_UNUSED Py
     }
   }
   if (!__pyx_t_4) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1466, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1470, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_GOTREF(__pyx_t_1);
   } else {
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_2)) {
       PyObject *__pyx_temp[2] = {__pyx_t_4, __pyx_t_3};
-      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1466, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1470, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -30799,20 +31031,20 @@ static PyObject *__pyx_pf_7rsa_api_324GNSS_GetNavMessageData_py(CYTHON_UNUSED Py
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
       PyObject *__pyx_temp[2] = {__pyx_t_4, __pyx_t_3};
-      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1466, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1470, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     } else
     #endif
     {
-      __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1466, __pyx_L1_error)
+      __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1470, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_4); __pyx_t_4 = NULL;
       __Pyx_GIVEREF(__pyx_t_3);
       PyTuple_SET_ITEM(__pyx_t_5, 0+1, __pyx_t_3);
       __pyx_t_3 = 0;
-      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1466, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1470, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     }
@@ -30820,7 +31052,7 @@ static PyObject *__pyx_pf_7rsa_api_324GNSS_GetNavMessageData_py(CYTHON_UNUSED Py
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "rsa_api.pyx":1467
+  /* "rsa_api.pyx":1471
  *     cdef char* message
  *     err_check(GNSS_GetNavMessageData(&msgLen, &message))
  *     return message, msgLen             # <<<<<<<<<<<<<<
@@ -30828,11 +31060,11 @@ static PyObject *__pyx_pf_7rsa_api_324GNSS_GetNavMessageData_py(CYTHON_UNUSED Py
  * 
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyBytes_FromString(__pyx_v_message); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1467, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyBytes_FromString(__pyx_v_message); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1471, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_msgLen); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1467, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_msgLen); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1471, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_5 = PyTuple_New(2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1467, __pyx_L1_error)
+  __pyx_t_5 = PyTuple_New(2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1471, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_1);
@@ -30844,7 +31076,7 @@ static PyObject *__pyx_pf_7rsa_api_324GNSS_GetNavMessageData_py(CYTHON_UNUSED Py
   __pyx_t_5 = 0;
   goto __pyx_L0;
 
-  /* "rsa_api.pyx":1463
+  /* "rsa_api.pyx":1467
  * 
  * 
  * def GNSS_GetNavMessageData_py():             # <<<<<<<<<<<<<<
@@ -30867,7 +31099,7 @@ static PyObject *__pyx_pf_7rsa_api_324GNSS_GetNavMessageData_py(CYTHON_UNUSED Py
   return __pyx_r;
 }
 
-/* "rsa_api.pyx":1470
+/* "rsa_api.pyx":1474
  * 
  * 
  * def GNSS_ClearNavMessageData_py():             # <<<<<<<<<<<<<<
@@ -30899,16 +31131,16 @@ static PyObject *__pyx_pf_7rsa_api_326GNSS_ClearNavMessageData_py(CYTHON_UNUSED 
   PyObject *__pyx_t_5 = NULL;
   __Pyx_RefNannySetupContext("GNSS_ClearNavMessageData_py", 0);
 
-  /* "rsa_api.pyx":1471
+  /* "rsa_api.pyx":1475
  * 
  * def GNSS_ClearNavMessageData_py():
  *     err_check(GNSS_ClearNavMessageData())             # <<<<<<<<<<<<<<
  * 
  * 
  */
-  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_err_check); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1471, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_err_check); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1475, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyInt_From_ReturnStatus(GNSS_ClearNavMessageData()); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1471, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyInt_From_ReturnStatus(GNSS_ClearNavMessageData()); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1475, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_4 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
@@ -30921,14 +31153,14 @@ static PyObject *__pyx_pf_7rsa_api_326GNSS_ClearNavMessageData_py(CYTHON_UNUSED 
     }
   }
   if (!__pyx_t_4) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1471, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1475, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_GOTREF(__pyx_t_1);
   } else {
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_2)) {
       PyObject *__pyx_temp[2] = {__pyx_t_4, __pyx_t_3};
-      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1471, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1475, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -30937,20 +31169,20 @@ static PyObject *__pyx_pf_7rsa_api_326GNSS_ClearNavMessageData_py(CYTHON_UNUSED 
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
       PyObject *__pyx_temp[2] = {__pyx_t_4, __pyx_t_3};
-      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1471, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1475, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     } else
     #endif
     {
-      __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1471, __pyx_L1_error)
+      __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1475, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_4); __pyx_t_4 = NULL;
       __Pyx_GIVEREF(__pyx_t_3);
       PyTuple_SET_ITEM(__pyx_t_5, 0+1, __pyx_t_3);
       __pyx_t_3 = 0;
-      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1471, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1475, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     }
@@ -30958,7 +31190,7 @@ static PyObject *__pyx_pf_7rsa_api_326GNSS_ClearNavMessageData_py(CYTHON_UNUSED 
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "rsa_api.pyx":1470
+  /* "rsa_api.pyx":1474
  * 
  * 
  * def GNSS_ClearNavMessageData_py():             # <<<<<<<<<<<<<<
@@ -30983,7 +31215,7 @@ static PyObject *__pyx_pf_7rsa_api_326GNSS_ClearNavMessageData_py(CYTHON_UNUSED 
   return __pyx_r;
 }
 
-/* "rsa_api.pyx":1474
+/* "rsa_api.pyx":1478
  * 
  * 
  * def GNSS_Get1PPSTimestamp_py():             # <<<<<<<<<<<<<<
@@ -31017,16 +31249,16 @@ static PyObject *__pyx_pf_7rsa_api_328GNSS_Get1PPSTimestamp_py(CYTHON_UNUSED PyO
   PyObject *__pyx_t_5 = NULL;
   __Pyx_RefNannySetupContext("GNSS_Get1PPSTimestamp_py", 0);
 
-  /* "rsa_api.pyx":1477
+  /* "rsa_api.pyx":1481
  *     cdef bint isValid
  *     cdef uint64_t timestamp1PPS
  *     err_check(GNSS_Get1PPSTimestamp(&isValid, &timestamp1PPS))             # <<<<<<<<<<<<<<
  *     return timestamp1PPS, isValid
  * 
  */
-  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_err_check); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1477, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_err_check); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1481, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyInt_From_ReturnStatus(GNSS_Get1PPSTimestamp((&__pyx_v_isValid), (&__pyx_v_timestamp1PPS))); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1477, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyInt_From_ReturnStatus(GNSS_Get1PPSTimestamp((&__pyx_v_isValid), (&__pyx_v_timestamp1PPS))); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1481, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_4 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
@@ -31039,14 +31271,14 @@ static PyObject *__pyx_pf_7rsa_api_328GNSS_Get1PPSTimestamp_py(CYTHON_UNUSED PyO
     }
   }
   if (!__pyx_t_4) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1477, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1481, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_GOTREF(__pyx_t_1);
   } else {
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_2)) {
       PyObject *__pyx_temp[2] = {__pyx_t_4, __pyx_t_3};
-      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1477, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1481, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -31055,20 +31287,20 @@ static PyObject *__pyx_pf_7rsa_api_328GNSS_Get1PPSTimestamp_py(CYTHON_UNUSED PyO
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
       PyObject *__pyx_temp[2] = {__pyx_t_4, __pyx_t_3};
-      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1477, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1481, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     } else
     #endif
     {
-      __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1477, __pyx_L1_error)
+      __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1481, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_4); __pyx_t_4 = NULL;
       __Pyx_GIVEREF(__pyx_t_3);
       PyTuple_SET_ITEM(__pyx_t_5, 0+1, __pyx_t_3);
       __pyx_t_3 = 0;
-      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1477, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1481, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     }
@@ -31076,7 +31308,7 @@ static PyObject *__pyx_pf_7rsa_api_328GNSS_Get1PPSTimestamp_py(CYTHON_UNUSED PyO
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "rsa_api.pyx":1478
+  /* "rsa_api.pyx":1482
  *     cdef uint64_t timestamp1PPS
  *     err_check(GNSS_Get1PPSTimestamp(&isValid, &timestamp1PPS))
  *     return timestamp1PPS, isValid             # <<<<<<<<<<<<<<
@@ -31084,11 +31316,11 @@ static PyObject *__pyx_pf_7rsa_api_328GNSS_Get1PPSTimestamp_py(CYTHON_UNUSED PyO
  * 
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyInt_From_uint64_t(__pyx_v_timestamp1PPS); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1478, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_uint64_t(__pyx_v_timestamp1PPS); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1482, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyBool_FromLong(__pyx_v_isValid); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1478, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyBool_FromLong(__pyx_v_isValid); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1482, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_5 = PyTuple_New(2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1478, __pyx_L1_error)
+  __pyx_t_5 = PyTuple_New(2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1482, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_1);
@@ -31100,7 +31332,7 @@ static PyObject *__pyx_pf_7rsa_api_328GNSS_Get1PPSTimestamp_py(CYTHON_UNUSED PyO
   __pyx_t_5 = 0;
   goto __pyx_L0;
 
-  /* "rsa_api.pyx":1474
+  /* "rsa_api.pyx":1478
  * 
  * 
  * def GNSS_Get1PPSTimestamp_py():             # <<<<<<<<<<<<<<
@@ -31123,7 +31355,7 @@ static PyObject *__pyx_pf_7rsa_api_328GNSS_Get1PPSTimestamp_py(CYTHON_UNUSED PyO
   return __pyx_r;
 }
 
-/* "rsa_api.pyx":1481
+/* "rsa_api.pyx":1485
  * 
  * 
  * def GNSS_GetStatusRxLock_py():             # <<<<<<<<<<<<<<
@@ -31156,16 +31388,16 @@ static PyObject *__pyx_pf_7rsa_api_330GNSS_GetStatusRxLock_py(CYTHON_UNUSED PyOb
   PyObject *__pyx_t_5 = NULL;
   __Pyx_RefNannySetupContext("GNSS_GetStatusRxLock_py", 0);
 
-  /* "rsa_api.pyx":1483
+  /* "rsa_api.pyx":1487
  * def GNSS_GetStatusRxLock_py():
  *     cdef bint lock
  *     err_check(GNSS_GetStatusRxLock(&lock))             # <<<<<<<<<<<<<<
  *     return lock
  * 
  */
-  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_err_check); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1483, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_err_check); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1487, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyInt_From_ReturnStatus(GNSS_GetStatusRxLock((&__pyx_v_lock))); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1483, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyInt_From_ReturnStatus(GNSS_GetStatusRxLock((&__pyx_v_lock))); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1487, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_4 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
@@ -31178,14 +31410,14 @@ static PyObject *__pyx_pf_7rsa_api_330GNSS_GetStatusRxLock_py(CYTHON_UNUSED PyOb
     }
   }
   if (!__pyx_t_4) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1483, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1487, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_GOTREF(__pyx_t_1);
   } else {
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_2)) {
       PyObject *__pyx_temp[2] = {__pyx_t_4, __pyx_t_3};
-      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1483, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1487, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -31194,20 +31426,20 @@ static PyObject *__pyx_pf_7rsa_api_330GNSS_GetStatusRxLock_py(CYTHON_UNUSED PyOb
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
       PyObject *__pyx_temp[2] = {__pyx_t_4, __pyx_t_3};
-      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1483, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1487, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     } else
     #endif
     {
-      __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1483, __pyx_L1_error)
+      __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1487, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_4); __pyx_t_4 = NULL;
       __Pyx_GIVEREF(__pyx_t_3);
       PyTuple_SET_ITEM(__pyx_t_5, 0+1, __pyx_t_3);
       __pyx_t_3 = 0;
-      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1483, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1487, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     }
@@ -31215,7 +31447,7 @@ static PyObject *__pyx_pf_7rsa_api_330GNSS_GetStatusRxLock_py(CYTHON_UNUSED PyOb
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "rsa_api.pyx":1484
+  /* "rsa_api.pyx":1488
  *     cdef bint lock
  *     err_check(GNSS_GetStatusRxLock(&lock))
  *     return lock             # <<<<<<<<<<<<<<
@@ -31223,13 +31455,13 @@ static PyObject *__pyx_pf_7rsa_api_330GNSS_GetStatusRxLock_py(CYTHON_UNUSED PyOb
  * 
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyBool_FromLong(__pyx_v_lock); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1484, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyBool_FromLong(__pyx_v_lock); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1488, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "rsa_api.pyx":1481
+  /* "rsa_api.pyx":1485
  * 
  * 
  * def GNSS_GetStatusRxLock_py():             # <<<<<<<<<<<<<<
@@ -31252,7 +31484,7 @@ static PyObject *__pyx_pf_7rsa_api_330GNSS_GetStatusRxLock_py(CYTHON_UNUSED PyOb
   return __pyx_r;
 }
 
-/* "rsa_api.pyx":1492
+/* "rsa_api.pyx":1496
  * 
  * 
  * def POWER_GetStatus_py():             # <<<<<<<<<<<<<<
@@ -31285,15 +31517,15 @@ static PyObject *__pyx_pf_7rsa_api_332POWER_GetStatus_py(CYTHON_UNUSED PyObject 
   PyObject *__pyx_t_5 = NULL;
   __Pyx_RefNannySetupContext("POWER_GetStatus_py", 0);
 
-  /* "rsa_api.pyx":1494
+  /* "rsa_api.pyx":1498
  * def POWER_GetStatus_py():
  *     cdef POWER_INFO powerInfo
  *     err_check(POWER_GetStatus(&powerInfo))             # <<<<<<<<<<<<<<
  *     return powerInfo
  */
-  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_err_check); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1494, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_err_check); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1498, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyInt_From_ReturnStatus(POWER_GetStatus((&__pyx_v_powerInfo))); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1494, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyInt_From_ReturnStatus(POWER_GetStatus((&__pyx_v_powerInfo))); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1498, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_4 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
@@ -31306,14 +31538,14 @@ static PyObject *__pyx_pf_7rsa_api_332POWER_GetStatus_py(CYTHON_UNUSED PyObject 
     }
   }
   if (!__pyx_t_4) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1494, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1498, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_GOTREF(__pyx_t_1);
   } else {
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_2)) {
       PyObject *__pyx_temp[2] = {__pyx_t_4, __pyx_t_3};
-      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1494, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1498, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -31322,20 +31554,20 @@ static PyObject *__pyx_pf_7rsa_api_332POWER_GetStatus_py(CYTHON_UNUSED PyObject 
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
       PyObject *__pyx_temp[2] = {__pyx_t_4, __pyx_t_3};
-      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1494, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1498, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     } else
     #endif
     {
-      __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1494, __pyx_L1_error)
+      __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1498, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_4); __pyx_t_4 = NULL;
       __Pyx_GIVEREF(__pyx_t_3);
       PyTuple_SET_ITEM(__pyx_t_5, 0+1, __pyx_t_3);
       __pyx_t_3 = 0;
-      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1494, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1498, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     }
@@ -31343,19 +31575,19 @@ static PyObject *__pyx_pf_7rsa_api_332POWER_GetStatus_py(CYTHON_UNUSED PyObject 
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "rsa_api.pyx":1495
+  /* "rsa_api.pyx":1499
  *     cdef POWER_INFO powerInfo
  *     err_check(POWER_GetStatus(&powerInfo))
  *     return powerInfo             # <<<<<<<<<<<<<<
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_convert__to_py_POWER_INFO(__pyx_v_powerInfo); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1495, __pyx_L1_error)
+  __pyx_t_1 = __pyx_convert__to_py_POWER_INFO(__pyx_v_powerInfo); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1499, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "rsa_api.pyx":1492
+  /* "rsa_api.pyx":1496
  * 
  * 
  * def POWER_GetStatus_py():             # <<<<<<<<<<<<<<
@@ -38816,6 +39048,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_IQSTREAM_GetDiskFileWriteStatus, __pyx_k_IQSTREAM_GetDiskFileWriteStatus, sizeof(__pyx_k_IQSTREAM_GetDiskFileWriteStatus), 0, 0, 1, 1},
   {&__pyx_n_s_IQSTREAM_GetEnable_py, __pyx_k_IQSTREAM_GetEnable_py, sizeof(__pyx_k_IQSTREAM_GetEnable_py), 0, 0, 1, 1},
   {&__pyx_n_s_IQSTREAM_GetIQDataBufferSize_py, __pyx_k_IQSTREAM_GetIQDataBufferSize_py, sizeof(__pyx_k_IQSTREAM_GetIQDataBufferSize_py), 0, 0, 1, 1},
+  {&__pyx_n_s_IQSTREAM_GetIQData_py, __pyx_k_IQSTREAM_GetIQData_py, sizeof(__pyx_k_IQSTREAM_GetIQData_py), 0, 0, 1, 1},
   {&__pyx_n_s_IQSTREAM_GetMaxAcqBandwidth_py, __pyx_k_IQSTREAM_GetMaxAcqBandwidth_py, sizeof(__pyx_k_IQSTREAM_GetMaxAcqBandwidth_py), 0, 0, 1, 1},
   {&__pyx_n_s_IQSTREAM_GetMinAcqBandwidth_py, __pyx_k_IQSTREAM_GetMinAcqBandwidth_py, sizeof(__pyx_k_IQSTREAM_GetMinAcqBandwidth_py), 0, 0, 1, 1},
   {&__pyx_n_s_IQSTREAM_SetAcqBandwidth_py, __pyx_k_IQSTREAM_SetAcqBandwidth_py, sizeof(__pyx_k_IQSTREAM_SetAcqBandwidth_py), 0, 0, 1, 1},
@@ -38978,6 +39211,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_bitmapWidth, __pyx_k_bitmapWidth, sizeof(__pyx_k_bitmapWidth), 0, 0, 1, 1},
   {&__pyx_n_s_bitmapWidth_2, __pyx_k_bitmapWidth_2, sizeof(__pyx_k_bitmapWidth_2), 0, 0, 1, 1},
   {&__pyx_n_s_buffSize, __pyx_k_buffSize, sizeof(__pyx_k_buffSize), 0, 0, 1, 1},
+  {&__pyx_n_s_bufferDType, __pyx_k_bufferDType, sizeof(__pyx_k_bufferDType), 0, 0, 1, 1},
   {&__pyx_n_s_bwHz_act, __pyx_k_bwHz_act, sizeof(__pyx_k_bwHz_act), 0, 0, 1, 1},
   {&__pyx_n_s_bwHz_req, __pyx_k_bwHz_req, sizeof(__pyx_k_bwHz_req), 0, 0, 1, 1},
   {&__pyx_n_s_bwHz_req_2, __pyx_k_bwHz_req_2, sizeof(__pyx_k_bwHz_req_2), 0, 0, 1, 1},
@@ -38993,6 +39227,8 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_complete, __pyx_k_complete, sizeof(__pyx_k_complete), 0, 0, 1, 1},
   {&__pyx_n_s_count, __pyx_k_count, sizeof(__pyx_k_count), 0, 0, 1, 1},
   {&__pyx_n_s_count_2, __pyx_k_count_2, sizeof(__pyx_k_count_2), 0, 0, 1, 1},
+  {&__pyx_n_s_dType, __pyx_k_dType, sizeof(__pyx_k_dType), 0, 0, 1, 1},
+  {&__pyx_kp_s_dType_must_be_of_type_IQSOUTDTY, __pyx_k_dType_must_be_of_type_IQSOUTDTY, sizeof(__pyx_k_dType_must_be_of_type_IQSOUTDTY), 0, 0, 1, 0},
   {&__pyx_n_s_data, __pyx_k_data, sizeof(__pyx_k_data), 0, 0, 1, 1},
   {&__pyx_n_s_dataInfo, __pyx_k_dataInfo, sizeof(__pyx_k_dataInfo), 0, 0, 1, 1},
   {&__pyx_n_s_dataLen, __pyx_k_dataLen, sizeof(__pyx_k_dataLen), 0, 0, 1, 1},
@@ -39076,12 +39312,16 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_infinitePersistence, __pyx_k_infinitePersistence, sizeof(__pyx_k_infinitePersistence), 0, 0, 1, 1},
   {&__pyx_n_s_infinitePersistence_2, __pyx_k_infinitePersistence_2, sizeof(__pyx_k_infinitePersistence_2), 0, 0, 1, 1},
   {&__pyx_n_s_init, __pyx_k_init, sizeof(__pyx_k_init), 0, 0, 1, 1},
+  {&__pyx_n_s_inputBuffer, __pyx_k_inputBuffer, sizeof(__pyx_k_inputBuffer), 0, 0, 1, 1},
   {&__pyx_n_s_installed, __pyx_k_installed, sizeof(__pyx_k_installed), 0, 0, 1, 1},
   {&__pyx_n_s_int16, __pyx_k_int16, sizeof(__pyx_k_int16), 0, 0, 1, 1},
+  {&__pyx_n_s_int32, __pyx_k_int32, sizeof(__pyx_k_int32), 0, 0, 1, 1},
   {&__pyx_n_s_iqBandwidth, __pyx_k_iqBandwidth, sizeof(__pyx_k_iqBandwidth), 0, 0, 1, 1},
   {&__pyx_n_s_iqBandwidth_2, __pyx_k_iqBandwidth_2, sizeof(__pyx_k_iqBandwidth_2), 0, 0, 1, 1},
   {&__pyx_n_s_iqData, __pyx_k_iqData, sizeof(__pyx_k_iqData), 0, 0, 1, 1},
   {&__pyx_n_s_iqSampleRate, __pyx_k_iqSampleRate, sizeof(__pyx_k_iqSampleRate), 0, 0, 1, 1},
+  {&__pyx_n_s_iqinfo, __pyx_k_iqinfo, sizeof(__pyx_k_iqinfo), 0, 0, 1, 1},
+  {&__pyx_n_s_iqlen, __pyx_k_iqlen, sizeof(__pyx_k_iqlen), 0, 0, 1, 1},
   {&__pyx_n_s_isComplete, __pyx_k_isComplete, sizeof(__pyx_k_isComplete), 0, 0, 1, 1},
   {&__pyx_n_s_isValid, __pyx_k_isValid, sizeof(__pyx_k_isValid), 0, 0, 1, 1},
   {&__pyx_n_s_isWriting, __pyx_k_isWriting, sizeof(__pyx_k_isWriting), 0, 0, 1, 1},
@@ -39509,80 +39749,91 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple__33);
   __Pyx_GIVEREF(__pyx_tuple__33);
 
-  /* "rsa_api.pyx":1324
+  /* "rsa_api.pyx":1316
  *     if suffixCtl not in [IQSSDFN_SUFFIX_INCRINDEX_MIN, IQSSDFN_SUFFIX_TIMESTAMP,
  *                      IQSSDFN_SUFFIX_NONE]:
  *         raise RSAError('Parameter out of range.')             # <<<<<<<<<<<<<<
  *     cdef int _suffixCtl = suffixCtl
  *     err_check(IQSTREAM_SetDiskFilenameSuffix(_suffixCtl))
  */
-  __pyx_tuple__38 = PyTuple_Pack(1, __pyx_kp_s_Parameter_out_of_range); if (unlikely(!__pyx_tuple__38)) __PYX_ERR(0, 1324, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__38);
-  __Pyx_GIVEREF(__pyx_tuple__38);
+  __pyx_tuple__37 = PyTuple_Pack(1, __pyx_kp_s_Parameter_out_of_range); if (unlikely(!__pyx_tuple__37)) __PYX_ERR(0, 1316, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__37);
+  __Pyx_GIVEREF(__pyx_tuple__37);
 
-  /* "rsa_api.pyx":1331
+  /* "rsa_api.pyx":1323
  * def IQSTREAM_SetDiskFileLength_py(msec):
  *     if msec < 0:
  *         raise RSAError('Parameter out of range.')             # <<<<<<<<<<<<<<
  *     cdef int _msec = msec
  *     err_check(IQSTREAM_SetDiskFileLength(_msec))
  */
-  __pyx_tuple__39 = PyTuple_Pack(1, __pyx_kp_s_Parameter_out_of_range); if (unlikely(!__pyx_tuple__39)) __PYX_ERR(0, 1331, __pyx_L1_error)
+  __pyx_tuple__38 = PyTuple_Pack(1, __pyx_kp_s_Parameter_out_of_range); if (unlikely(!__pyx_tuple__38)) __PYX_ERR(0, 1323, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__38);
+  __Pyx_GIVEREF(__pyx_tuple__38);
+
+  /* "rsa_api.pyx":1361
+ *                      IQSOUTDTYPE.IQSODT_INT16,
+ *                      IQSOUTDTYPE.IQSODT_SINGLE_SCALE_INT32]:
+ *         raise RSAError('"dType" must be of type IQSOUTDTYPE')             # <<<<<<<<<<<<<<
+ *     if dType == IQSOUTDTYPE.IQSODT_INT16:
+ *         bufferDType = np.int16
+ */
+  __pyx_tuple__39 = PyTuple_Pack(1, __pyx_kp_s_dType_must_be_of_type_IQSOUTDTY); if (unlikely(!__pyx_tuple__39)) __PYX_ERR(0, 1361, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__39);
   __Pyx_GIVEREF(__pyx_tuple__39);
 
-  /* "rsa_api.pyx":1391
+  /* "rsa_api.pyx":1395
  *                              loopAtEndOfFile, emulateRealTime):
  *     if not exists(fileName):
  *         raise RSAError('errorStreamedFileOpenFailure')             # <<<<<<<<<<<<<<
  *     cdef Py_UNICODE* _fileName = fileName
  *     cdef int _startPercentage = startPercentage
  */
-  __pyx_tuple__40 = PyTuple_Pack(1, __pyx_n_s_errorStreamedFileOpenFailure); if (unlikely(!__pyx_tuple__40)) __PYX_ERR(0, 1391, __pyx_L1_error)
+  __pyx_tuple__40 = PyTuple_Pack(1, __pyx_n_s_errorStreamedFileOpenFailure); if (unlikely(!__pyx_tuple__40)) __PYX_ERR(0, 1395, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__40);
   __Pyx_GIVEREF(__pyx_tuple__40);
 
-  /* "rsa_api.pyx":1396
+  /* "rsa_api.pyx":1400
  *     cdef int _stopPercentage = stopPercentage
  *     if skipTimeBetweenFullAcquisitions < 0:
  *         raise RSAError('Parameter out of range.')             # <<<<<<<<<<<<<<
  *     cdef double _skipTimeBetweenFullAcquisitions = skipTimeBetweenFullAcquisitions
  *     if not isinstance(loopAtEndOfFile, bool):
  */
-  __pyx_tuple__41 = PyTuple_Pack(1, __pyx_kp_s_Parameter_out_of_range); if (unlikely(!__pyx_tuple__41)) __PYX_ERR(0, 1396, __pyx_L1_error)
+  __pyx_tuple__41 = PyTuple_Pack(1, __pyx_kp_s_Parameter_out_of_range); if (unlikely(!__pyx_tuple__41)) __PYX_ERR(0, 1400, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__41);
   __Pyx_GIVEREF(__pyx_tuple__41);
 
-  /* "rsa_api.pyx":1399
+  /* "rsa_api.pyx":1403
  *     cdef double _skipTimeBetweenFullAcquisitions = skipTimeBetweenFullAcquisitions
  *     if not isinstance(loopAtEndOfFile, bool):
  *         raise TypeError('"loopAtEndOfFile" argument must be of type "bool".')             # <<<<<<<<<<<<<<
  *     if not isinstance(emulateRealTime, bool):
  *         raise TypeError('"emulateRealTime" argument must be of type "bool".')
  */
-  __pyx_tuple__42 = PyTuple_Pack(1, __pyx_kp_s_loopAtEndOfFile_argument_must_b); if (unlikely(!__pyx_tuple__42)) __PYX_ERR(0, 1399, __pyx_L1_error)
+  __pyx_tuple__42 = PyTuple_Pack(1, __pyx_kp_s_loopAtEndOfFile_argument_must_b); if (unlikely(!__pyx_tuple__42)) __PYX_ERR(0, 1403, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__42);
   __Pyx_GIVEREF(__pyx_tuple__42);
 
-  /* "rsa_api.pyx":1401
+  /* "rsa_api.pyx":1405
  *         raise TypeError('"loopAtEndOfFile" argument must be of type "bool".')
  *     if not isinstance(emulateRealTime, bool):
  *         raise TypeError('"emulateRealTime" argument must be of type "bool".')             # <<<<<<<<<<<<<<
  *     cdef bint _loopAtEndOfFile = loopAtEndOfFile
  *     cdef bint _emulateRealTime = emulateRealTime
  */
-  __pyx_tuple__43 = PyTuple_Pack(1, __pyx_kp_s_emulateRealTime_argument_must_b); if (unlikely(!__pyx_tuple__43)) __PYX_ERR(0, 1401, __pyx_L1_error)
+  __pyx_tuple__43 = PyTuple_Pack(1, __pyx_kp_s_emulateRealTime_argument_must_b); if (unlikely(!__pyx_tuple__43)) __PYX_ERR(0, 1405, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__43);
   __Pyx_GIVEREF(__pyx_tuple__43);
 
-  /* "rsa_api.pyx":1441
+  /* "rsa_api.pyx":1445
  *                      GNSS_SATSYS.GNSS_GPS_BEIDOU, GNSS_SATSYS.GNSS_GPS,
  *                      GNSS_SATSYS.GNSS_GLONASS, GNSS_SATSYS.GNSS_BEIDOU]:
  *         raise RSAError('Parameter out of range.')             # <<<<<<<<<<<<<<
  *     cdef int _satSystem = satSystem
  *     err_check(GNSS_SetSatSystem(_satSystem))
  */
-  __pyx_tuple__44 = PyTuple_Pack(1, __pyx_kp_s_Parameter_out_of_range); if (unlikely(!__pyx_tuple__44)) __PYX_ERR(0, 1441, __pyx_L1_error)
+  __pyx_tuple__44 = PyTuple_Pack(1, __pyx_kp_s_Parameter_out_of_range); if (unlikely(!__pyx_tuple__44)) __PYX_ERR(0, 1445, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__44);
   __Pyx_GIVEREF(__pyx_tuple__44);
 
@@ -41428,365 +41679,365 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GIVEREF(__pyx_tuple__325);
   __pyx_codeobj__326 = (PyObject*)__Pyx_PyCode_New(0, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__325, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_rsa_api_pyx, __pyx_n_s_IFSTREAM_GetIFData_py, 1243, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__326)) __PYX_ERR(0, 1243, __pyx_L1_error)
 
-  /* "rsa_api.pyx":1252
- * 
- * 
- * def SPECTRUM_GetTrace_py(trace=SpectrumTraces.SpectrumTrace1, tracePoints=801):             # <<<<<<<<<<<<<<
- *     cdef int _tracePoints = tracePoints
- *     cdef np.ndarray traceData = np.empty(shape=(tracePoints), dtype=np.float32,
- */
-  __pyx_tuple__327 = PyTuple_Pack(5, __pyx_n_s_trace, __pyx_n_s_tracePoints, __pyx_n_s_tracePoints_2, __pyx_n_s_traceData, __pyx_n_s_outTracePoints); if (unlikely(!__pyx_tuple__327)) __PYX_ERR(0, 1252, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__327);
-  __Pyx_GIVEREF(__pyx_tuple__327);
-  __pyx_codeobj__328 = (PyObject*)__Pyx_PyCode_New(2, 0, 5, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__327, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_rsa_api_pyx, __pyx_n_s_SPECTRUM_GetTrace_py, 1252, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__328)) __PYX_ERR(0, 1252, __pyx_L1_error)
-
-  /* "rsa_api.pyx":1273
+  /* "rsa_api.pyx":1265
  * 
  * 
  * def IQSTREAM_GetMinAcqBandwidth_py():             # <<<<<<<<<<<<<<
  *     cdef double minBandwidthHz
  *     err_check(IQSTREAM_GetMinAcqBandwidth(&minBandwidthHz))
  */
-  __pyx_tuple__329 = PyTuple_Pack(1, __pyx_n_s_minBandwidthHz); if (unlikely(!__pyx_tuple__329)) __PYX_ERR(0, 1273, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__329);
-  __Pyx_GIVEREF(__pyx_tuple__329);
-  __pyx_codeobj__330 = (PyObject*)__Pyx_PyCode_New(0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__329, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_rsa_api_pyx, __pyx_n_s_IQSTREAM_GetMinAcqBandwidth_py, 1273, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__330)) __PYX_ERR(0, 1273, __pyx_L1_error)
+  __pyx_tuple__327 = PyTuple_Pack(1, __pyx_n_s_minBandwidthHz); if (unlikely(!__pyx_tuple__327)) __PYX_ERR(0, 1265, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__327);
+  __Pyx_GIVEREF(__pyx_tuple__327);
+  __pyx_codeobj__328 = (PyObject*)__Pyx_PyCode_New(0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__327, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_rsa_api_pyx, __pyx_n_s_IQSTREAM_GetMinAcqBandwidth_py, 1265, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__328)) __PYX_ERR(0, 1265, __pyx_L1_error)
 
-  /* "rsa_api.pyx":1279
+  /* "rsa_api.pyx":1271
  * 
  * 
  * def IQSTREAM_GetMaxAcqBandwidth_py():             # <<<<<<<<<<<<<<
  *     cdef double maxBandwidthHz
  *     err_check(IQSTREAM_GetMaxAcqBandwidth(&maxBandwidthHz))
  */
-  __pyx_tuple__331 = PyTuple_Pack(1, __pyx_n_s_maxBandwidthHz); if (unlikely(!__pyx_tuple__331)) __PYX_ERR(0, 1279, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__331);
-  __Pyx_GIVEREF(__pyx_tuple__331);
-  __pyx_codeobj__332 = (PyObject*)__Pyx_PyCode_New(0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__331, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_rsa_api_pyx, __pyx_n_s_IQSTREAM_GetMaxAcqBandwidth_py, 1279, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__332)) __PYX_ERR(0, 1279, __pyx_L1_error)
+  __pyx_tuple__329 = PyTuple_Pack(1, __pyx_n_s_maxBandwidthHz); if (unlikely(!__pyx_tuple__329)) __PYX_ERR(0, 1271, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__329);
+  __Pyx_GIVEREF(__pyx_tuple__329);
+  __pyx_codeobj__330 = (PyObject*)__Pyx_PyCode_New(0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__329, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_rsa_api_pyx, __pyx_n_s_IQSTREAM_GetMaxAcqBandwidth_py, 1271, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__330)) __PYX_ERR(0, 1271, __pyx_L1_error)
 
-  /* "rsa_api.pyx":1285
+  /* "rsa_api.pyx":1277
  * 
  * 
  * def IQSTREAM_SetAcqBandwidth_py(bwHz_req):             # <<<<<<<<<<<<<<
  *     cdef double _bwHz_req = bwHz_req
  *     err_check(IQSTREAM_SetAcqBandwidth(_bwHz_req))
  */
-  __pyx_tuple__333 = PyTuple_Pack(2, __pyx_n_s_bwHz_req, __pyx_n_s_bwHz_req_2); if (unlikely(!__pyx_tuple__333)) __PYX_ERR(0, 1285, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__333);
-  __Pyx_GIVEREF(__pyx_tuple__333);
-  __pyx_codeobj__334 = (PyObject*)__Pyx_PyCode_New(1, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__333, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_rsa_api_pyx, __pyx_n_s_IQSTREAM_SetAcqBandwidth_py, 1285, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__334)) __PYX_ERR(0, 1285, __pyx_L1_error)
+  __pyx_tuple__331 = PyTuple_Pack(2, __pyx_n_s_bwHz_req, __pyx_n_s_bwHz_req_2); if (unlikely(!__pyx_tuple__331)) __PYX_ERR(0, 1277, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__331);
+  __Pyx_GIVEREF(__pyx_tuple__331);
+  __pyx_codeobj__332 = (PyObject*)__Pyx_PyCode_New(1, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__331, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_rsa_api_pyx, __pyx_n_s_IQSTREAM_SetAcqBandwidth_py, 1277, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__332)) __PYX_ERR(0, 1277, __pyx_L1_error)
 
-  /* "rsa_api.pyx":1291
+  /* "rsa_api.pyx":1283
  * 
  * # This MUST be sent before IQSTREAM_Start() or the resulting file will be empty
  * def IQSTREAM_GetAcqParameters_py():             # <<<<<<<<<<<<<<
  *     cdef double bwHz_act
  *     cdef double srSps
  */
-  __pyx_tuple__335 = PyTuple_Pack(2, __pyx_n_s_bwHz_act, __pyx_n_s_srSps); if (unlikely(!__pyx_tuple__335)) __PYX_ERR(0, 1291, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__335);
-  __Pyx_GIVEREF(__pyx_tuple__335);
-  __pyx_codeobj__336 = (PyObject*)__Pyx_PyCode_New(0, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__335, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_rsa_api_pyx, __pyx_n_s_IQSTREAM_GetAcqParameters_py, 1291, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__336)) __PYX_ERR(0, 1291, __pyx_L1_error)
+  __pyx_tuple__333 = PyTuple_Pack(2, __pyx_n_s_bwHz_act, __pyx_n_s_srSps); if (unlikely(!__pyx_tuple__333)) __PYX_ERR(0, 1283, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__333);
+  __Pyx_GIVEREF(__pyx_tuple__333);
+  __pyx_codeobj__334 = (PyObject*)__Pyx_PyCode_New(0, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__333, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_rsa_api_pyx, __pyx_n_s_IQSTREAM_GetAcqParameters_py, 1283, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__334)) __PYX_ERR(0, 1283, __pyx_L1_error)
 
-  /* "rsa_api.pyx":1298
+  /* "rsa_api.pyx":1290
  * 
  * 
  * def IQSTREAM_SetOutputConfiguration_py(dest=IQSOUTDEST.IQSOD_FILE_SIQ,             # <<<<<<<<<<<<<<
  *                                        dtype=IQSOUTDTYPE.IQSODT_INT16):
  *     cdef IQSOUTDEST _dest = dest
  */
-  __pyx_tuple__337 = PyTuple_Pack(4, __pyx_n_s_dest, __pyx_n_s_dtype, __pyx_n_s_dest_2, __pyx_n_s_dtype_2); if (unlikely(!__pyx_tuple__337)) __PYX_ERR(0, 1298, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__337);
-  __Pyx_GIVEREF(__pyx_tuple__337);
-  __pyx_codeobj__338 = (PyObject*)__Pyx_PyCode_New(2, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__337, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_rsa_api_pyx, __pyx_n_s_IQSTREAM_SetOutputConfiguration, 1298, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__338)) __PYX_ERR(0, 1298, __pyx_L1_error)
+  __pyx_tuple__335 = PyTuple_Pack(4, __pyx_n_s_dest, __pyx_n_s_dtype, __pyx_n_s_dest_2, __pyx_n_s_dtype_2); if (unlikely(!__pyx_tuple__335)) __PYX_ERR(0, 1290, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__335);
+  __Pyx_GIVEREF(__pyx_tuple__335);
+  __pyx_codeobj__336 = (PyObject*)__Pyx_PyCode_New(2, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__335, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_rsa_api_pyx, __pyx_n_s_IQSTREAM_SetOutputConfiguration, 1290, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__336)) __PYX_ERR(0, 1290, __pyx_L1_error)
 
-  /* "rsa_api.pyx":1305
+  /* "rsa_api.pyx":1297
  * 
  * 
  * def IQSTREAM_SetIQDataBufferSize_py(reqSize):             # <<<<<<<<<<<<<<
  *     cdef int _reqSize = reqSize
  *     err_check(IQSTREAM_SetIQDataBufferSize(_reqSize))
  */
-  __pyx_tuple__339 = PyTuple_Pack(2, __pyx_n_s_reqSize, __pyx_n_s_reqSize_2); if (unlikely(!__pyx_tuple__339)) __PYX_ERR(0, 1305, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__339);
-  __Pyx_GIVEREF(__pyx_tuple__339);
-  __pyx_codeobj__340 = (PyObject*)__Pyx_PyCode_New(1, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__339, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_rsa_api_pyx, __pyx_n_s_IQSTREAM_SetIQDataBufferSize_py, 1305, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__340)) __PYX_ERR(0, 1305, __pyx_L1_error)
+  __pyx_tuple__337 = PyTuple_Pack(2, __pyx_n_s_reqSize, __pyx_n_s_reqSize_2); if (unlikely(!__pyx_tuple__337)) __PYX_ERR(0, 1297, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__337);
+  __Pyx_GIVEREF(__pyx_tuple__337);
+  __pyx_codeobj__338 = (PyObject*)__Pyx_PyCode_New(1, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__337, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_rsa_api_pyx, __pyx_n_s_IQSTREAM_SetIQDataBufferSize_py, 1297, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__338)) __PYX_ERR(0, 1297, __pyx_L1_error)
 
-  /* "rsa_api.pyx":1310
+  /* "rsa_api.pyx":1302
  * 
  * 
  * def IQSTREAM_GetIQDataBufferSize_py():             # <<<<<<<<<<<<<<
  *     cdef int maxSize
  *     err_check(IQSTREAM_GetIQDataBufferSize(&maxSize))
  */
-  __pyx_tuple__341 = PyTuple_Pack(1, __pyx_n_s_maxSize); if (unlikely(!__pyx_tuple__341)) __PYX_ERR(0, 1310, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__341);
-  __Pyx_GIVEREF(__pyx_tuple__341);
-  __pyx_codeobj__342 = (PyObject*)__Pyx_PyCode_New(0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__341, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_rsa_api_pyx, __pyx_n_s_IQSTREAM_GetIQDataBufferSize_py, 1310, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__342)) __PYX_ERR(0, 1310, __pyx_L1_error)
+  __pyx_tuple__339 = PyTuple_Pack(1, __pyx_n_s_maxSize); if (unlikely(!__pyx_tuple__339)) __PYX_ERR(0, 1302, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__339);
+  __Pyx_GIVEREF(__pyx_tuple__339);
+  __pyx_codeobj__340 = (PyObject*)__Pyx_PyCode_New(0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__339, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_rsa_api_pyx, __pyx_n_s_IQSTREAM_GetIQDataBufferSize_py, 1302, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__340)) __PYX_ERR(0, 1302, __pyx_L1_error)
 
-  /* "rsa_api.pyx":1316
+  /* "rsa_api.pyx":1308
  * 
  * 
  * def IQSTREAM_SetDiskFilenameBase_py(filenameBase):             # <<<<<<<<<<<<<<
  *     cdef char* _filenameBase = filenameBase
  *     err_check(IQSTREAM_SetDiskFilenameBase(_filenameBase))
  */
-  __pyx_tuple__343 = PyTuple_Pack(2, __pyx_n_s_filenameBase, __pyx_n_s_filenameBase_2); if (unlikely(!__pyx_tuple__343)) __PYX_ERR(0, 1316, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__343);
-  __Pyx_GIVEREF(__pyx_tuple__343);
-  __pyx_codeobj__344 = (PyObject*)__Pyx_PyCode_New(1, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__343, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_rsa_api_pyx, __pyx_n_s_IQSTREAM_SetDiskFilenameBase_py, 1316, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__344)) __PYX_ERR(0, 1316, __pyx_L1_error)
+  __pyx_tuple__341 = PyTuple_Pack(2, __pyx_n_s_filenameBase, __pyx_n_s_filenameBase_2); if (unlikely(!__pyx_tuple__341)) __PYX_ERR(0, 1308, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__341);
+  __Pyx_GIVEREF(__pyx_tuple__341);
+  __pyx_codeobj__342 = (PyObject*)__Pyx_PyCode_New(1, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__341, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_rsa_api_pyx, __pyx_n_s_IQSTREAM_SetDiskFilenameBase_py, 1308, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__342)) __PYX_ERR(0, 1308, __pyx_L1_error)
 
-  /* "rsa_api.pyx":1321
+  /* "rsa_api.pyx":1313
  * 
  * 
  * def IQSTREAM_SetDiskFilenameSuffix_py(suffixCtl=IQSSDFN_SUFFIX_NONE):             # <<<<<<<<<<<<<<
  *     if suffixCtl not in [IQSSDFN_SUFFIX_INCRINDEX_MIN, IQSSDFN_SUFFIX_TIMESTAMP,
  *                      IQSSDFN_SUFFIX_NONE]:
  */
-  __pyx_tuple__345 = PyTuple_Pack(2, __pyx_n_s_suffixCtl, __pyx_n_s_suffixCtl_2); if (unlikely(!__pyx_tuple__345)) __PYX_ERR(0, 1321, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__345);
-  __Pyx_GIVEREF(__pyx_tuple__345);
-  __pyx_codeobj__346 = (PyObject*)__Pyx_PyCode_New(1, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__345, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_rsa_api_pyx, __pyx_n_s_IQSTREAM_SetDiskFilenameSuffix_p, 1321, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__346)) __PYX_ERR(0, 1321, __pyx_L1_error)
+  __pyx_tuple__343 = PyTuple_Pack(2, __pyx_n_s_suffixCtl, __pyx_n_s_suffixCtl_2); if (unlikely(!__pyx_tuple__343)) __PYX_ERR(0, 1313, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__343);
+  __Pyx_GIVEREF(__pyx_tuple__343);
+  __pyx_codeobj__344 = (PyObject*)__Pyx_PyCode_New(1, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__343, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_rsa_api_pyx, __pyx_n_s_IQSTREAM_SetDiskFilenameSuffix_p, 1313, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__344)) __PYX_ERR(0, 1313, __pyx_L1_error)
 
-  /* "rsa_api.pyx":1329
+  /* "rsa_api.pyx":1321
  * 
  * 
  * def IQSTREAM_SetDiskFileLength_py(msec):             # <<<<<<<<<<<<<<
  *     if msec < 0:
  *         raise RSAError('Parameter out of range.')
  */
-  __pyx_tuple__347 = PyTuple_Pack(2, __pyx_n_s_msec, __pyx_n_s_msec_2); if (unlikely(!__pyx_tuple__347)) __PYX_ERR(0, 1329, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__347);
-  __Pyx_GIVEREF(__pyx_tuple__347);
-  __pyx_codeobj__348 = (PyObject*)__Pyx_PyCode_New(1, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__347, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_rsa_api_pyx, __pyx_n_s_IQSTREAM_SetDiskFileLength_py, 1329, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__348)) __PYX_ERR(0, 1329, __pyx_L1_error)
+  __pyx_tuple__345 = PyTuple_Pack(2, __pyx_n_s_msec, __pyx_n_s_msec_2); if (unlikely(!__pyx_tuple__345)) __PYX_ERR(0, 1321, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__345);
+  __Pyx_GIVEREF(__pyx_tuple__345);
+  __pyx_codeobj__346 = (PyObject*)__Pyx_PyCode_New(1, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__345, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_rsa_api_pyx, __pyx_n_s_IQSTREAM_SetDiskFileLength_py, 1321, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__346)) __PYX_ERR(0, 1321, __pyx_L1_error)
 
-  /* "rsa_api.pyx":1336
+  /* "rsa_api.pyx":1328
  * 
  * 
  * def IQSTREAM_Start_py():             # <<<<<<<<<<<<<<
  *     err_check(IQSTREAM_Start())
  * 
  */
-  __pyx_codeobj__349 = (PyObject*)__Pyx_PyCode_New(0, 0, 0, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_rsa_api_pyx, __pyx_n_s_IQSTREAM_Start_py, 1336, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__349)) __PYX_ERR(0, 1336, __pyx_L1_error)
+  __pyx_codeobj__347 = (PyObject*)__Pyx_PyCode_New(0, 0, 0, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_rsa_api_pyx, __pyx_n_s_IQSTREAM_Start_py, 1328, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__347)) __PYX_ERR(0, 1328, __pyx_L1_error)
 
-  /* "rsa_api.pyx":1340
+  /* "rsa_api.pyx":1332
  * 
  * 
  * def IQSTREAM_GetEnable_py():             # <<<<<<<<<<<<<<
  *     cdef bint enable
  *     err_check(IQSTREAM_GetEnable(&enable))
  */
-  __pyx_tuple__350 = PyTuple_Pack(1, __pyx_n_s_enable); if (unlikely(!__pyx_tuple__350)) __PYX_ERR(0, 1340, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__350);
-  __Pyx_GIVEREF(__pyx_tuple__350);
-  __pyx_codeobj__351 = (PyObject*)__Pyx_PyCode_New(0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__350, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_rsa_api_pyx, __pyx_n_s_IQSTREAM_GetEnable_py, 1340, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__351)) __PYX_ERR(0, 1340, __pyx_L1_error)
+  __pyx_tuple__348 = PyTuple_Pack(1, __pyx_n_s_enable); if (unlikely(!__pyx_tuple__348)) __PYX_ERR(0, 1332, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__348);
+  __Pyx_GIVEREF(__pyx_tuple__348);
+  __pyx_codeobj__349 = (PyObject*)__Pyx_PyCode_New(0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__348, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_rsa_api_pyx, __pyx_n_s_IQSTREAM_GetEnable_py, 1332, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__349)) __PYX_ERR(0, 1332, __pyx_L1_error)
 
-  /* "rsa_api.pyx":1346
+  /* "rsa_api.pyx":1338
  * 
  * 
  * def IQSTREAM_GetDiskFileWriteStatus_py():             # <<<<<<<<<<<<<<
  *     cdef bint isComplete
  *     cdef bint isWriting
  */
-  __pyx_tuple__352 = PyTuple_Pack(2, __pyx_n_s_isComplete, __pyx_n_s_isWriting); if (unlikely(!__pyx_tuple__352)) __PYX_ERR(0, 1346, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__352);
-  __Pyx_GIVEREF(__pyx_tuple__352);
-  __pyx_codeobj__353 = (PyObject*)__Pyx_PyCode_New(0, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__352, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_rsa_api_pyx, __pyx_n_s_IQSTREAM_GetDiskFileWriteStatus, 1346, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__353)) __PYX_ERR(0, 1346, __pyx_L1_error)
+  __pyx_tuple__350 = PyTuple_Pack(2, __pyx_n_s_isComplete, __pyx_n_s_isWriting); if (unlikely(!__pyx_tuple__350)) __PYX_ERR(0, 1338, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__350);
+  __Pyx_GIVEREF(__pyx_tuple__350);
+  __pyx_codeobj__351 = (PyObject*)__Pyx_PyCode_New(0, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__350, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_rsa_api_pyx, __pyx_n_s_IQSTREAM_GetDiskFileWriteStatus, 1338, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__351)) __PYX_ERR(0, 1338, __pyx_L1_error)
 
-  /* "rsa_api.pyx":1353
+  /* "rsa_api.pyx":1345
  * 
  * 
  * def IQSTREAM_Stop_py():             # <<<<<<<<<<<<<<
  *     err_check(IQSTREAM_Stop())
  * 
  */
-  __pyx_codeobj__354 = (PyObject*)__Pyx_PyCode_New(0, 0, 0, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_rsa_api_pyx, __pyx_n_s_IQSTREAM_Stop_py, 1353, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__354)) __PYX_ERR(0, 1353, __pyx_L1_error)
+  __pyx_codeobj__352 = (PyObject*)__Pyx_PyCode_New(0, 0, 0, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_rsa_api_pyx, __pyx_n_s_IQSTREAM_Stop_py, 1345, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__352)) __PYX_ERR(0, 1345, __pyx_L1_error)
 
-  /* "rsa_api.pyx":1357
+  /* "rsa_api.pyx":1349
  * 
  * 
  * def IQSTREAM_WaitForIQDataReady_py(timeoutMsec=10):             # <<<<<<<<<<<<<<
  *     cdef int _timeoutMsec = timeoutMsec
  *     cdef bint ready
  */
-  __pyx_tuple__355 = PyTuple_Pack(3, __pyx_n_s_timeoutMsec, __pyx_n_s_timeoutMsec_2, __pyx_n_s_ready); if (unlikely(!__pyx_tuple__355)) __PYX_ERR(0, 1357, __pyx_L1_error)
+  __pyx_tuple__353 = PyTuple_Pack(3, __pyx_n_s_timeoutMsec, __pyx_n_s_timeoutMsec_2, __pyx_n_s_ready); if (unlikely(!__pyx_tuple__353)) __PYX_ERR(0, 1349, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__353);
+  __Pyx_GIVEREF(__pyx_tuple__353);
+  __pyx_codeobj__354 = (PyObject*)__Pyx_PyCode_New(1, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__353, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_rsa_api_pyx, __pyx_n_s_IQSTREAM_WaitForIQDataReady_py, 1349, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__354)) __PYX_ERR(0, 1349, __pyx_L1_error)
+
+  /* "rsa_api.pyx":1356
+ * 
+ * 
+ * def IQSTREAM_GetIQData_py(inputBuffer, dType):             # <<<<<<<<<<<<<<
+ *     # cdef void* iqData
+ *     if dType not in [IQSOUTDTYPE.IQSODT_SINGLE, IQSOUTDTYPE.IQSODT_INT32,
+ */
+  __pyx_tuple__355 = PyTuple_Pack(6, __pyx_n_s_inputBuffer, __pyx_n_s_dType, __pyx_n_s_bufferDType, __pyx_n_s_iqData, __pyx_n_s_iqlen, __pyx_n_s_iqinfo); if (unlikely(!__pyx_tuple__355)) __PYX_ERR(0, 1356, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__355);
   __Pyx_GIVEREF(__pyx_tuple__355);
-  __pyx_codeobj__356 = (PyObject*)__Pyx_PyCode_New(1, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__355, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_rsa_api_pyx, __pyx_n_s_IQSTREAM_WaitForIQDataReady_py, 1357, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__356)) __PYX_ERR(0, 1357, __pyx_L1_error)
+  __pyx_codeobj__356 = (PyObject*)__Pyx_PyCode_New(2, 0, 6, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__355, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_rsa_api_pyx, __pyx_n_s_IQSTREAM_GetIQData_py, 1356, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__356)) __PYX_ERR(0, 1356, __pyx_L1_error)
 
-  /* "rsa_api.pyx":1378
+  /* "rsa_api.pyx":1382
  * 
  * 
  * def IQSTREAM_ClearAcqStatus_py():             # <<<<<<<<<<<<<<
  *     IQSTREAM_ClearAcqStatus()
  * 
  */
-  __pyx_codeobj__357 = (PyObject*)__Pyx_PyCode_New(0, 0, 0, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_rsa_api_pyx, __pyx_n_s_IQSTREAM_ClearAcqStatus_py, 1378, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__357)) __PYX_ERR(0, 1378, __pyx_L1_error)
+  __pyx_codeobj__357 = (PyObject*)__Pyx_PyCode_New(0, 0, 0, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_rsa_api_pyx, __pyx_n_s_IQSTREAM_ClearAcqStatus_py, 1382, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__357)) __PYX_ERR(0, 1382, __pyx_L1_error)
 
-  /* "rsa_api.pyx":1387
+  /* "rsa_api.pyx":1391
  * 
  * 
  * def PLAYBACK_OpenDiskFile_py(fileName, startPercentage, stopPercentage,             # <<<<<<<<<<<<<<
  *                              skipTimeBetweenFullAcquisitions,
  *                              loopAtEndOfFile, emulateRealTime):
  */
-  __pyx_tuple__358 = PyTuple_Pack(12, __pyx_n_s_fileName, __pyx_n_s_startPercentage, __pyx_n_s_stopPercentage, __pyx_n_s_skipTimeBetweenFullAcquisitions, __pyx_n_s_loopAtEndOfFile, __pyx_n_s_emulateRealTime, __pyx_n_s_fileName_2, __pyx_n_s_startPercentage_2, __pyx_n_s_stopPercentage_2, __pyx_n_s_skipTimeBetweenFullAcquisitions_2, __pyx_n_s_loopAtEndOfFile_2, __pyx_n_s_emulateRealTime_2); if (unlikely(!__pyx_tuple__358)) __PYX_ERR(0, 1387, __pyx_L1_error)
+  __pyx_tuple__358 = PyTuple_Pack(12, __pyx_n_s_fileName, __pyx_n_s_startPercentage, __pyx_n_s_stopPercentage, __pyx_n_s_skipTimeBetweenFullAcquisitions, __pyx_n_s_loopAtEndOfFile, __pyx_n_s_emulateRealTime, __pyx_n_s_fileName_2, __pyx_n_s_startPercentage_2, __pyx_n_s_stopPercentage_2, __pyx_n_s_skipTimeBetweenFullAcquisitions_2, __pyx_n_s_loopAtEndOfFile_2, __pyx_n_s_emulateRealTime_2); if (unlikely(!__pyx_tuple__358)) __PYX_ERR(0, 1391, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__358);
   __Pyx_GIVEREF(__pyx_tuple__358);
-  __pyx_codeobj__359 = (PyObject*)__Pyx_PyCode_New(6, 0, 12, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__358, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_rsa_api_pyx, __pyx_n_s_PLAYBACK_OpenDiskFile_py, 1387, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__359)) __PYX_ERR(0, 1387, __pyx_L1_error)
+  __pyx_codeobj__359 = (PyObject*)__Pyx_PyCode_New(6, 0, 12, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__358, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_rsa_api_pyx, __pyx_n_s_PLAYBACK_OpenDiskFile_py, 1391, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__359)) __PYX_ERR(0, 1391, __pyx_L1_error)
 
-  /* "rsa_api.pyx":1410
+  /* "rsa_api.pyx":1414
  * 
  * 
  * def PLAYBACK_GetReplayComplete_py():             # <<<<<<<<<<<<<<
  *     cdef bint complete
  *     err_check(PLAYBACK_GetReplayComplete(&complete))
  */
-  __pyx_tuple__360 = PyTuple_Pack(1, __pyx_n_s_complete); if (unlikely(!__pyx_tuple__360)) __PYX_ERR(0, 1410, __pyx_L1_error)
+  __pyx_tuple__360 = PyTuple_Pack(1, __pyx_n_s_complete); if (unlikely(!__pyx_tuple__360)) __PYX_ERR(0, 1414, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__360);
   __Pyx_GIVEREF(__pyx_tuple__360);
-  __pyx_codeobj__361 = (PyObject*)__Pyx_PyCode_New(0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__360, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_rsa_api_pyx, __pyx_n_s_PLAYBACK_GetReplayComplete_py, 1410, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__361)) __PYX_ERR(0, 1410, __pyx_L1_error)
+  __pyx_codeobj__361 = (PyObject*)__Pyx_PyCode_New(0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__360, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_rsa_api_pyx, __pyx_n_s_PLAYBACK_GetReplayComplete_py, 1414, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__361)) __PYX_ERR(0, 1414, __pyx_L1_error)
 
-  /* "rsa_api.pyx":1421
+  /* "rsa_api.pyx":1425
  * 
  * 
  * def GNSS_GetHwInstalled_py():             # <<<<<<<<<<<<<<
  *     cdef bint installed
  *     err_check(GNSS_GetHwInstalled(&installed))
  */
-  __pyx_tuple__362 = PyTuple_Pack(1, __pyx_n_s_installed); if (unlikely(!__pyx_tuple__362)) __PYX_ERR(0, 1421, __pyx_L1_error)
+  __pyx_tuple__362 = PyTuple_Pack(1, __pyx_n_s_installed); if (unlikely(!__pyx_tuple__362)) __PYX_ERR(0, 1425, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__362);
   __Pyx_GIVEREF(__pyx_tuple__362);
-  __pyx_codeobj__363 = (PyObject*)__Pyx_PyCode_New(0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__362, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_rsa_api_pyx, __pyx_n_s_GNSS_GetHwInstalled_py, 1421, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__363)) __PYX_ERR(0, 1421, __pyx_L1_error)
+  __pyx_codeobj__363 = (PyObject*)__Pyx_PyCode_New(0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__362, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_rsa_api_pyx, __pyx_n_s_GNSS_GetHwInstalled_py, 1425, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__363)) __PYX_ERR(0, 1425, __pyx_L1_error)
 
-  /* "rsa_api.pyx":1426
+  /* "rsa_api.pyx":1430
  *     return installed
  * 
  * def GNSS_SetEnable_py(enable):             # <<<<<<<<<<<<<<
  *     cdef bint _enable = enable
  *     err_check(GNSS_SetEnable(_enable))
  */
-  __pyx_tuple__364 = PyTuple_Pack(2, __pyx_n_s_enable, __pyx_n_s_enable_2); if (unlikely(!__pyx_tuple__364)) __PYX_ERR(0, 1426, __pyx_L1_error)
+  __pyx_tuple__364 = PyTuple_Pack(2, __pyx_n_s_enable, __pyx_n_s_enable_2); if (unlikely(!__pyx_tuple__364)) __PYX_ERR(0, 1430, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__364);
   __Pyx_GIVEREF(__pyx_tuple__364);
-  __pyx_codeobj__365 = (PyObject*)__Pyx_PyCode_New(1, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__364, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_rsa_api_pyx, __pyx_n_s_GNSS_SetEnable_py, 1426, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__365)) __PYX_ERR(0, 1426, __pyx_L1_error)
+  __pyx_codeobj__365 = (PyObject*)__Pyx_PyCode_New(1, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__364, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_rsa_api_pyx, __pyx_n_s_GNSS_SetEnable_py, 1430, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__365)) __PYX_ERR(0, 1430, __pyx_L1_error)
 
-  /* "rsa_api.pyx":1431
+  /* "rsa_api.pyx":1435
  * 
  * 
  * def GNSS_GetEnable_py():             # <<<<<<<<<<<<<<
  *     cdef bint enable
  *     err_check(GNSS_GetEnable(&enable))
  */
-  __pyx_tuple__366 = PyTuple_Pack(1, __pyx_n_s_enable); if (unlikely(!__pyx_tuple__366)) __PYX_ERR(0, 1431, __pyx_L1_error)
+  __pyx_tuple__366 = PyTuple_Pack(1, __pyx_n_s_enable); if (unlikely(!__pyx_tuple__366)) __PYX_ERR(0, 1435, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__366);
   __Pyx_GIVEREF(__pyx_tuple__366);
-  __pyx_codeobj__367 = (PyObject*)__Pyx_PyCode_New(0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__366, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_rsa_api_pyx, __pyx_n_s_GNSS_GetEnable_py, 1431, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__367)) __PYX_ERR(0, 1431, __pyx_L1_error)
+  __pyx_codeobj__367 = (PyObject*)__Pyx_PyCode_New(0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__366, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_rsa_api_pyx, __pyx_n_s_GNSS_GetEnable_py, 1435, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__367)) __PYX_ERR(0, 1435, __pyx_L1_error)
 
-  /* "rsa_api.pyx":1437
+  /* "rsa_api.pyx":1441
  * 
  * 
  * def GNSS_SetSatSystem_py(satSystem):             # <<<<<<<<<<<<<<
  *     if satSystem not in [GNSS_SATSYS.GNSS_NOSYS, GNSS_SATSYS.GNSS_GPS_GLONASS,
  *                      GNSS_SATSYS.GNSS_GPS_BEIDOU, GNSS_SATSYS.GNSS_GPS,
  */
-  __pyx_tuple__368 = PyTuple_Pack(2, __pyx_n_s_satSystem, __pyx_n_s_satSystem_2); if (unlikely(!__pyx_tuple__368)) __PYX_ERR(0, 1437, __pyx_L1_error)
+  __pyx_tuple__368 = PyTuple_Pack(2, __pyx_n_s_satSystem, __pyx_n_s_satSystem_2); if (unlikely(!__pyx_tuple__368)) __PYX_ERR(0, 1441, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__368);
   __Pyx_GIVEREF(__pyx_tuple__368);
-  __pyx_codeobj__369 = (PyObject*)__Pyx_PyCode_New(1, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__368, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_rsa_api_pyx, __pyx_n_s_GNSS_SetSatSystem_py, 1437, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__369)) __PYX_ERR(0, 1437, __pyx_L1_error)
+  __pyx_codeobj__369 = (PyObject*)__Pyx_PyCode_New(1, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__368, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_rsa_api_pyx, __pyx_n_s_GNSS_SetSatSystem_py, 1441, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__369)) __PYX_ERR(0, 1441, __pyx_L1_error)
 
-  /* "rsa_api.pyx":1446
+  /* "rsa_api.pyx":1450
  * 
  * 
  * def GNSS_GetSatSystem_py():             # <<<<<<<<<<<<<<
  *     cdef int satSystem
  *     err_check(GNSS_GetSatSystem(&satSystem))
  */
-  __pyx_tuple__370 = PyTuple_Pack(1, __pyx_n_s_satSystem); if (unlikely(!__pyx_tuple__370)) __PYX_ERR(0, 1446, __pyx_L1_error)
+  __pyx_tuple__370 = PyTuple_Pack(1, __pyx_n_s_satSystem); if (unlikely(!__pyx_tuple__370)) __PYX_ERR(0, 1450, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__370);
   __Pyx_GIVEREF(__pyx_tuple__370);
-  __pyx_codeobj__371 = (PyObject*)__Pyx_PyCode_New(0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__370, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_rsa_api_pyx, __pyx_n_s_GNSS_GetSatSystem_py, 1446, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__371)) __PYX_ERR(0, 1446, __pyx_L1_error)
+  __pyx_codeobj__371 = (PyObject*)__Pyx_PyCode_New(0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__370, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_rsa_api_pyx, __pyx_n_s_GNSS_GetSatSystem_py, 1450, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__371)) __PYX_ERR(0, 1450, __pyx_L1_error)
 
-  /* "rsa_api.pyx":1452
+  /* "rsa_api.pyx":1456
  * 
  * 
  * def GNSS_SetAntennaPower_py(powered):             # <<<<<<<<<<<<<<
  *     cdef bint _powered = powered
  *     err_check(GNSS_SetAntennaPower(_powered))
  */
-  __pyx_tuple__372 = PyTuple_Pack(2, __pyx_n_s_powered, __pyx_n_s_powered_2); if (unlikely(!__pyx_tuple__372)) __PYX_ERR(0, 1452, __pyx_L1_error)
+  __pyx_tuple__372 = PyTuple_Pack(2, __pyx_n_s_powered, __pyx_n_s_powered_2); if (unlikely(!__pyx_tuple__372)) __PYX_ERR(0, 1456, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__372);
   __Pyx_GIVEREF(__pyx_tuple__372);
-  __pyx_codeobj__373 = (PyObject*)__Pyx_PyCode_New(1, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__372, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_rsa_api_pyx, __pyx_n_s_GNSS_SetAntennaPower_py, 1452, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__373)) __PYX_ERR(0, 1452, __pyx_L1_error)
+  __pyx_codeobj__373 = (PyObject*)__Pyx_PyCode_New(1, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__372, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_rsa_api_pyx, __pyx_n_s_GNSS_SetAntennaPower_py, 1456, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__373)) __PYX_ERR(0, 1456, __pyx_L1_error)
 
-  /* "rsa_api.pyx":1457
+  /* "rsa_api.pyx":1461
  * 
  * 
  * def GNSS_GetAntennaPower_py():             # <<<<<<<<<<<<<<
  *     cdef bint powered
  *     err_check(GNSS_GetAntennaPower(&powered))
  */
-  __pyx_tuple__374 = PyTuple_Pack(1, __pyx_n_s_powered); if (unlikely(!__pyx_tuple__374)) __PYX_ERR(0, 1457, __pyx_L1_error)
+  __pyx_tuple__374 = PyTuple_Pack(1, __pyx_n_s_powered); if (unlikely(!__pyx_tuple__374)) __PYX_ERR(0, 1461, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__374);
   __Pyx_GIVEREF(__pyx_tuple__374);
-  __pyx_codeobj__375 = (PyObject*)__Pyx_PyCode_New(0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__374, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_rsa_api_pyx, __pyx_n_s_GNSS_GetAntennaPower_py, 1457, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__375)) __PYX_ERR(0, 1457, __pyx_L1_error)
+  __pyx_codeobj__375 = (PyObject*)__Pyx_PyCode_New(0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__374, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_rsa_api_pyx, __pyx_n_s_GNSS_GetAntennaPower_py, 1461, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__375)) __PYX_ERR(0, 1461, __pyx_L1_error)
 
-  /* "rsa_api.pyx":1463
+  /* "rsa_api.pyx":1467
  * 
  * 
  * def GNSS_GetNavMessageData_py():             # <<<<<<<<<<<<<<
  *     cdef int msgLen
  *     cdef char* message
  */
-  __pyx_tuple__376 = PyTuple_Pack(2, __pyx_n_s_msgLen, __pyx_n_s_message); if (unlikely(!__pyx_tuple__376)) __PYX_ERR(0, 1463, __pyx_L1_error)
+  __pyx_tuple__376 = PyTuple_Pack(2, __pyx_n_s_msgLen, __pyx_n_s_message); if (unlikely(!__pyx_tuple__376)) __PYX_ERR(0, 1467, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__376);
   __Pyx_GIVEREF(__pyx_tuple__376);
-  __pyx_codeobj__377 = (PyObject*)__Pyx_PyCode_New(0, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__376, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_rsa_api_pyx, __pyx_n_s_GNSS_GetNavMessageData_py, 1463, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__377)) __PYX_ERR(0, 1463, __pyx_L1_error)
+  __pyx_codeobj__377 = (PyObject*)__Pyx_PyCode_New(0, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__376, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_rsa_api_pyx, __pyx_n_s_GNSS_GetNavMessageData_py, 1467, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__377)) __PYX_ERR(0, 1467, __pyx_L1_error)
 
-  /* "rsa_api.pyx":1470
+  /* "rsa_api.pyx":1474
  * 
  * 
  * def GNSS_ClearNavMessageData_py():             # <<<<<<<<<<<<<<
  *     err_check(GNSS_ClearNavMessageData())
  * 
  */
-  __pyx_codeobj__378 = (PyObject*)__Pyx_PyCode_New(0, 0, 0, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_rsa_api_pyx, __pyx_n_s_GNSS_ClearNavMessageData_py, 1470, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__378)) __PYX_ERR(0, 1470, __pyx_L1_error)
+  __pyx_codeobj__378 = (PyObject*)__Pyx_PyCode_New(0, 0, 0, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_rsa_api_pyx, __pyx_n_s_GNSS_ClearNavMessageData_py, 1474, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__378)) __PYX_ERR(0, 1474, __pyx_L1_error)
 
-  /* "rsa_api.pyx":1474
+  /* "rsa_api.pyx":1478
  * 
  * 
  * def GNSS_Get1PPSTimestamp_py():             # <<<<<<<<<<<<<<
  *     cdef bint isValid
  *     cdef uint64_t timestamp1PPS
  */
-  __pyx_tuple__379 = PyTuple_Pack(2, __pyx_n_s_isValid, __pyx_n_s_timestamp1PPS); if (unlikely(!__pyx_tuple__379)) __PYX_ERR(0, 1474, __pyx_L1_error)
+  __pyx_tuple__379 = PyTuple_Pack(2, __pyx_n_s_isValid, __pyx_n_s_timestamp1PPS); if (unlikely(!__pyx_tuple__379)) __PYX_ERR(0, 1478, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__379);
   __Pyx_GIVEREF(__pyx_tuple__379);
-  __pyx_codeobj__380 = (PyObject*)__Pyx_PyCode_New(0, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__379, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_rsa_api_pyx, __pyx_n_s_GNSS_Get1PPSTimestamp_py, 1474, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__380)) __PYX_ERR(0, 1474, __pyx_L1_error)
+  __pyx_codeobj__380 = (PyObject*)__Pyx_PyCode_New(0, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__379, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_rsa_api_pyx, __pyx_n_s_GNSS_Get1PPSTimestamp_py, 1478, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__380)) __PYX_ERR(0, 1478, __pyx_L1_error)
 
-  /* "rsa_api.pyx":1481
+  /* "rsa_api.pyx":1485
  * 
  * 
  * def GNSS_GetStatusRxLock_py():             # <<<<<<<<<<<<<<
  *     cdef bint lock
  *     err_check(GNSS_GetStatusRxLock(&lock))
  */
-  __pyx_tuple__381 = PyTuple_Pack(1, __pyx_n_s_lock); if (unlikely(!__pyx_tuple__381)) __PYX_ERR(0, 1481, __pyx_L1_error)
+  __pyx_tuple__381 = PyTuple_Pack(1, __pyx_n_s_lock); if (unlikely(!__pyx_tuple__381)) __PYX_ERR(0, 1485, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__381);
   __Pyx_GIVEREF(__pyx_tuple__381);
-  __pyx_codeobj__382 = (PyObject*)__Pyx_PyCode_New(0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__381, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_rsa_api_pyx, __pyx_n_s_GNSS_GetStatusRxLock_py, 1481, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__382)) __PYX_ERR(0, 1481, __pyx_L1_error)
+  __pyx_codeobj__382 = (PyObject*)__Pyx_PyCode_New(0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__381, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_rsa_api_pyx, __pyx_n_s_GNSS_GetStatusRxLock_py, 1485, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__382)) __PYX_ERR(0, 1485, __pyx_L1_error)
 
-  /* "rsa_api.pyx":1492
+  /* "rsa_api.pyx":1496
  * 
  * 
  * def POWER_GetStatus_py():             # <<<<<<<<<<<<<<
  *     cdef POWER_INFO powerInfo
  *     err_check(POWER_GetStatus(&powerInfo))
  */
-  __pyx_tuple__383 = PyTuple_Pack(1, __pyx_n_s_powerInfo); if (unlikely(!__pyx_tuple__383)) __PYX_ERR(0, 1492, __pyx_L1_error)
+  __pyx_tuple__383 = PyTuple_Pack(1, __pyx_n_s_powerInfo); if (unlikely(!__pyx_tuple__383)) __PYX_ERR(0, 1496, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__383);
   __Pyx_GIVEREF(__pyx_tuple__383);
-  __pyx_codeobj__384 = (PyObject*)__Pyx_PyCode_New(0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__383, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_rsa_api_pyx, __pyx_n_s_POWER_GetStatus_py, 1492, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__384)) __PYX_ERR(0, 1492, __pyx_L1_error)
+  __pyx_codeobj__384 = (PyObject*)__Pyx_PyCode_New(0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__383, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_rsa_api_pyx, __pyx_n_s_POWER_GetStatus_py, 1496, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__384)) __PYX_ERR(0, 1496, __pyx_L1_error)
 
   /* "EnumBase":28
  * class __Pyx_EnumBase(int):
@@ -44332,412 +44583,407 @@ static int __pyx_pymod_exec_rsa_api(PyObject *__pyx_pyinit_module)
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_IFSTREAM_GetIFData_py, __pyx_t_2) < 0) __PYX_ERR(0, 1243, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "rsa_api.pyx":1252
- * 
- * 
- * def SPECTRUM_GetTrace_py(trace=SpectrumTraces.SpectrumTrace1, tracePoints=801):             # <<<<<<<<<<<<<<
- *     cdef int _tracePoints = tracePoints
- *     cdef np.ndarray traceData = np.empty(shape=(tracePoints), dtype=np.float32,
- */
-  __pyx_t_2 = __Pyx_PyInt_From_enum____pyx_t_7rsa_api_SpectrumTraces(__pyx_e_7rsa_api_SpectrumTrace1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1252, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __pyx_k__34 = __pyx_t_2;
-  __Pyx_GIVEREF(__pyx_t_2);
-  __pyx_t_2 = 0;
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_7rsa_api_273SPECTRUM_GetTrace_py, NULL, __pyx_n_s_rsa_api); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1252, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_SPECTRUM_GetTrace_py, __pyx_t_2) < 0) __PYX_ERR(0, 1252, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-
-  /* "rsa_api.pyx":1273
+  /* "rsa_api.pyx":1265
  * 
  * 
  * def IQSTREAM_GetMinAcqBandwidth_py():             # <<<<<<<<<<<<<<
  *     cdef double minBandwidthHz
  *     err_check(IQSTREAM_GetMinAcqBandwidth(&minBandwidthHz))
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_7rsa_api_275IQSTREAM_GetMinAcqBandwidth_py, NULL, __pyx_n_s_rsa_api); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1273, __pyx_L1_error)
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_7rsa_api_273IQSTREAM_GetMinAcqBandwidth_py, NULL, __pyx_n_s_rsa_api); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1265, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_IQSTREAM_GetMinAcqBandwidth_py, __pyx_t_2) < 0) __PYX_ERR(0, 1273, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_IQSTREAM_GetMinAcqBandwidth_py, __pyx_t_2) < 0) __PYX_ERR(0, 1265, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "rsa_api.pyx":1279
+  /* "rsa_api.pyx":1271
  * 
  * 
  * def IQSTREAM_GetMaxAcqBandwidth_py():             # <<<<<<<<<<<<<<
  *     cdef double maxBandwidthHz
  *     err_check(IQSTREAM_GetMaxAcqBandwidth(&maxBandwidthHz))
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_7rsa_api_277IQSTREAM_GetMaxAcqBandwidth_py, NULL, __pyx_n_s_rsa_api); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1279, __pyx_L1_error)
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_7rsa_api_275IQSTREAM_GetMaxAcqBandwidth_py, NULL, __pyx_n_s_rsa_api); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1271, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_IQSTREAM_GetMaxAcqBandwidth_py, __pyx_t_2) < 0) __PYX_ERR(0, 1279, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_IQSTREAM_GetMaxAcqBandwidth_py, __pyx_t_2) < 0) __PYX_ERR(0, 1271, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "rsa_api.pyx":1285
+  /* "rsa_api.pyx":1277
  * 
  * 
  * def IQSTREAM_SetAcqBandwidth_py(bwHz_req):             # <<<<<<<<<<<<<<
  *     cdef double _bwHz_req = bwHz_req
  *     err_check(IQSTREAM_SetAcqBandwidth(_bwHz_req))
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_7rsa_api_279IQSTREAM_SetAcqBandwidth_py, NULL, __pyx_n_s_rsa_api); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1285, __pyx_L1_error)
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_7rsa_api_277IQSTREAM_SetAcqBandwidth_py, NULL, __pyx_n_s_rsa_api); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1277, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_IQSTREAM_SetAcqBandwidth_py, __pyx_t_2) < 0) __PYX_ERR(0, 1285, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_IQSTREAM_SetAcqBandwidth_py, __pyx_t_2) < 0) __PYX_ERR(0, 1277, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "rsa_api.pyx":1291
+  /* "rsa_api.pyx":1283
  * 
  * # This MUST be sent before IQSTREAM_Start() or the resulting file will be empty
  * def IQSTREAM_GetAcqParameters_py():             # <<<<<<<<<<<<<<
  *     cdef double bwHz_act
  *     cdef double srSps
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_7rsa_api_281IQSTREAM_GetAcqParameters_py, NULL, __pyx_n_s_rsa_api); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1291, __pyx_L1_error)
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_7rsa_api_279IQSTREAM_GetAcqParameters_py, NULL, __pyx_n_s_rsa_api); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1283, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_IQSTREAM_GetAcqParameters_py, __pyx_t_2) < 0) __PYX_ERR(0, 1291, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_IQSTREAM_GetAcqParameters_py, __pyx_t_2) < 0) __PYX_ERR(0, 1283, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "rsa_api.pyx":1298
+  /* "rsa_api.pyx":1290
  * 
  * 
  * def IQSTREAM_SetOutputConfiguration_py(dest=IQSOUTDEST.IQSOD_FILE_SIQ,             # <<<<<<<<<<<<<<
  *                                        dtype=IQSOUTDTYPE.IQSODT_INT16):
  *     cdef IQSOUTDEST _dest = dest
  */
-  __pyx_t_2 = __Pyx_PyInt_From_enum____pyx_t_7rsa_api_IQSOUTDEST(__pyx_e_7rsa_api_IQSOD_FILE_SIQ); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1298, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyInt_From_enum____pyx_t_7rsa_api_IQSOUTDEST(__pyx_e_7rsa_api_IQSOD_FILE_SIQ); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1290, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_k__35 = __pyx_t_2;
+  __pyx_k__34 = __pyx_t_2;
   __Pyx_GIVEREF(__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "rsa_api.pyx":1299
+  /* "rsa_api.pyx":1291
  * 
  * def IQSTREAM_SetOutputConfiguration_py(dest=IQSOUTDEST.IQSOD_FILE_SIQ,
  *                                        dtype=IQSOUTDTYPE.IQSODT_INT16):             # <<<<<<<<<<<<<<
  *     cdef IQSOUTDEST _dest = dest
  *     cdef IQSOUTDTYPE _dtype = dtype
  */
-  __pyx_t_2 = __Pyx_PyInt_From_enum____pyx_t_7rsa_api_IQSOUTDTYPE(__pyx_e_7rsa_api_IQSODT_INT16); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1299, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyInt_From_enum____pyx_t_7rsa_api_IQSOUTDTYPE(__pyx_e_7rsa_api_IQSODT_INT16); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1291, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_k__36 = __pyx_t_2;
+  __pyx_k__35 = __pyx_t_2;
   __Pyx_GIVEREF(__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "rsa_api.pyx":1298
+  /* "rsa_api.pyx":1290
  * 
  * 
  * def IQSTREAM_SetOutputConfiguration_py(dest=IQSOUTDEST.IQSOD_FILE_SIQ,             # <<<<<<<<<<<<<<
  *                                        dtype=IQSOUTDTYPE.IQSODT_INT16):
  *     cdef IQSOUTDEST _dest = dest
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_7rsa_api_283IQSTREAM_SetOutputConfiguration_py, NULL, __pyx_n_s_rsa_api); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1298, __pyx_L1_error)
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_7rsa_api_281IQSTREAM_SetOutputConfiguration_py, NULL, __pyx_n_s_rsa_api); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1290, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_IQSTREAM_SetOutputConfiguration, __pyx_t_2) < 0) __PYX_ERR(0, 1298, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_IQSTREAM_SetOutputConfiguration, __pyx_t_2) < 0) __PYX_ERR(0, 1290, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "rsa_api.pyx":1305
+  /* "rsa_api.pyx":1297
  * 
  * 
  * def IQSTREAM_SetIQDataBufferSize_py(reqSize):             # <<<<<<<<<<<<<<
  *     cdef int _reqSize = reqSize
  *     err_check(IQSTREAM_SetIQDataBufferSize(_reqSize))
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_7rsa_api_285IQSTREAM_SetIQDataBufferSize_py, NULL, __pyx_n_s_rsa_api); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1305, __pyx_L1_error)
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_7rsa_api_283IQSTREAM_SetIQDataBufferSize_py, NULL, __pyx_n_s_rsa_api); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1297, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_IQSTREAM_SetIQDataBufferSize_py, __pyx_t_2) < 0) __PYX_ERR(0, 1305, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_IQSTREAM_SetIQDataBufferSize_py, __pyx_t_2) < 0) __PYX_ERR(0, 1297, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "rsa_api.pyx":1310
+  /* "rsa_api.pyx":1302
  * 
  * 
  * def IQSTREAM_GetIQDataBufferSize_py():             # <<<<<<<<<<<<<<
  *     cdef int maxSize
  *     err_check(IQSTREAM_GetIQDataBufferSize(&maxSize))
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_7rsa_api_287IQSTREAM_GetIQDataBufferSize_py, NULL, __pyx_n_s_rsa_api); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1310, __pyx_L1_error)
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_7rsa_api_285IQSTREAM_GetIQDataBufferSize_py, NULL, __pyx_n_s_rsa_api); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1302, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_IQSTREAM_GetIQDataBufferSize_py, __pyx_t_2) < 0) __PYX_ERR(0, 1310, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_IQSTREAM_GetIQDataBufferSize_py, __pyx_t_2) < 0) __PYX_ERR(0, 1302, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "rsa_api.pyx":1316
+  /* "rsa_api.pyx":1308
  * 
  * 
  * def IQSTREAM_SetDiskFilenameBase_py(filenameBase):             # <<<<<<<<<<<<<<
  *     cdef char* _filenameBase = filenameBase
  *     err_check(IQSTREAM_SetDiskFilenameBase(_filenameBase))
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_7rsa_api_289IQSTREAM_SetDiskFilenameBase_py, NULL, __pyx_n_s_rsa_api); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1316, __pyx_L1_error)
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_7rsa_api_287IQSTREAM_SetDiskFilenameBase_py, NULL, __pyx_n_s_rsa_api); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1308, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_IQSTREAM_SetDiskFilenameBase_py, __pyx_t_2) < 0) __PYX_ERR(0, 1316, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_IQSTREAM_SetDiskFilenameBase_py, __pyx_t_2) < 0) __PYX_ERR(0, 1308, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "rsa_api.pyx":1321
+  /* "rsa_api.pyx":1313
  * 
  * 
  * def IQSTREAM_SetDiskFilenameSuffix_py(suffixCtl=IQSSDFN_SUFFIX_NONE):             # <<<<<<<<<<<<<<
  *     if suffixCtl not in [IQSSDFN_SUFFIX_INCRINDEX_MIN, IQSSDFN_SUFFIX_TIMESTAMP,
  *                      IQSSDFN_SUFFIX_NONE]:
  */
-  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_IQSSDFN_SUFFIX_NONE); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1321, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_IQSSDFN_SUFFIX_NONE); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1313, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_k__37 = __pyx_t_2;
+  __pyx_k__36 = __pyx_t_2;
   __Pyx_GIVEREF(__pyx_t_2);
   __pyx_t_2 = 0;
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_7rsa_api_291IQSTREAM_SetDiskFilenameSuffix_py, NULL, __pyx_n_s_rsa_api); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1321, __pyx_L1_error)
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_7rsa_api_289IQSTREAM_SetDiskFilenameSuffix_py, NULL, __pyx_n_s_rsa_api); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1313, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_IQSTREAM_SetDiskFilenameSuffix_p, __pyx_t_2) < 0) __PYX_ERR(0, 1321, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_IQSTREAM_SetDiskFilenameSuffix_p, __pyx_t_2) < 0) __PYX_ERR(0, 1313, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "rsa_api.pyx":1329
+  /* "rsa_api.pyx":1321
  * 
  * 
  * def IQSTREAM_SetDiskFileLength_py(msec):             # <<<<<<<<<<<<<<
  *     if msec < 0:
  *         raise RSAError('Parameter out of range.')
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_7rsa_api_293IQSTREAM_SetDiskFileLength_py, NULL, __pyx_n_s_rsa_api); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1329, __pyx_L1_error)
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_7rsa_api_291IQSTREAM_SetDiskFileLength_py, NULL, __pyx_n_s_rsa_api); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1321, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_IQSTREAM_SetDiskFileLength_py, __pyx_t_2) < 0) __PYX_ERR(0, 1329, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_IQSTREAM_SetDiskFileLength_py, __pyx_t_2) < 0) __PYX_ERR(0, 1321, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "rsa_api.pyx":1336
+  /* "rsa_api.pyx":1328
  * 
  * 
  * def IQSTREAM_Start_py():             # <<<<<<<<<<<<<<
  *     err_check(IQSTREAM_Start())
  * 
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_7rsa_api_295IQSTREAM_Start_py, NULL, __pyx_n_s_rsa_api); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1336, __pyx_L1_error)
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_7rsa_api_293IQSTREAM_Start_py, NULL, __pyx_n_s_rsa_api); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1328, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_IQSTREAM_Start_py, __pyx_t_2) < 0) __PYX_ERR(0, 1336, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_IQSTREAM_Start_py, __pyx_t_2) < 0) __PYX_ERR(0, 1328, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "rsa_api.pyx":1340
+  /* "rsa_api.pyx":1332
  * 
  * 
  * def IQSTREAM_GetEnable_py():             # <<<<<<<<<<<<<<
  *     cdef bint enable
  *     err_check(IQSTREAM_GetEnable(&enable))
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_7rsa_api_297IQSTREAM_GetEnable_py, NULL, __pyx_n_s_rsa_api); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1340, __pyx_L1_error)
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_7rsa_api_295IQSTREAM_GetEnable_py, NULL, __pyx_n_s_rsa_api); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1332, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_IQSTREAM_GetEnable_py, __pyx_t_2) < 0) __PYX_ERR(0, 1340, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_IQSTREAM_GetEnable_py, __pyx_t_2) < 0) __PYX_ERR(0, 1332, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "rsa_api.pyx":1346
+  /* "rsa_api.pyx":1338
  * 
  * 
  * def IQSTREAM_GetDiskFileWriteStatus_py():             # <<<<<<<<<<<<<<
  *     cdef bint isComplete
  *     cdef bint isWriting
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_7rsa_api_299IQSTREAM_GetDiskFileWriteStatus_py, NULL, __pyx_n_s_rsa_api); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1346, __pyx_L1_error)
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_7rsa_api_297IQSTREAM_GetDiskFileWriteStatus_py, NULL, __pyx_n_s_rsa_api); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1338, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_IQSTREAM_GetDiskFileWriteStatus, __pyx_t_2) < 0) __PYX_ERR(0, 1346, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_IQSTREAM_GetDiskFileWriteStatus, __pyx_t_2) < 0) __PYX_ERR(0, 1338, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "rsa_api.pyx":1353
+  /* "rsa_api.pyx":1345
  * 
  * 
  * def IQSTREAM_Stop_py():             # <<<<<<<<<<<<<<
  *     err_check(IQSTREAM_Stop())
  * 
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_7rsa_api_301IQSTREAM_Stop_py, NULL, __pyx_n_s_rsa_api); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1353, __pyx_L1_error)
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_7rsa_api_299IQSTREAM_Stop_py, NULL, __pyx_n_s_rsa_api); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1345, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_IQSTREAM_Stop_py, __pyx_t_2) < 0) __PYX_ERR(0, 1353, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_IQSTREAM_Stop_py, __pyx_t_2) < 0) __PYX_ERR(0, 1345, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "rsa_api.pyx":1357
+  /* "rsa_api.pyx":1349
  * 
  * 
  * def IQSTREAM_WaitForIQDataReady_py(timeoutMsec=10):             # <<<<<<<<<<<<<<
  *     cdef int _timeoutMsec = timeoutMsec
  *     cdef bint ready
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_7rsa_api_303IQSTREAM_WaitForIQDataReady_py, NULL, __pyx_n_s_rsa_api); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1357, __pyx_L1_error)
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_7rsa_api_301IQSTREAM_WaitForIQDataReady_py, NULL, __pyx_n_s_rsa_api); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1349, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_IQSTREAM_WaitForIQDataReady_py, __pyx_t_2) < 0) __PYX_ERR(0, 1357, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_IQSTREAM_WaitForIQDataReady_py, __pyx_t_2) < 0) __PYX_ERR(0, 1349, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "rsa_api.pyx":1378
+  /* "rsa_api.pyx":1356
+ * 
+ * 
+ * def IQSTREAM_GetIQData_py(inputBuffer, dType):             # <<<<<<<<<<<<<<
+ *     # cdef void* iqData
+ *     if dType not in [IQSOUTDTYPE.IQSODT_SINGLE, IQSOUTDTYPE.IQSODT_INT32,
+ */
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_7rsa_api_303IQSTREAM_GetIQData_py, NULL, __pyx_n_s_rsa_api); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1356, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_IQSTREAM_GetIQData_py, __pyx_t_2) < 0) __PYX_ERR(0, 1356, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+
+  /* "rsa_api.pyx":1382
  * 
  * 
  * def IQSTREAM_ClearAcqStatus_py():             # <<<<<<<<<<<<<<
  *     IQSTREAM_ClearAcqStatus()
  * 
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_7rsa_api_305IQSTREAM_ClearAcqStatus_py, NULL, __pyx_n_s_rsa_api); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1378, __pyx_L1_error)
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_7rsa_api_305IQSTREAM_ClearAcqStatus_py, NULL, __pyx_n_s_rsa_api); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1382, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_IQSTREAM_ClearAcqStatus_py, __pyx_t_2) < 0) __PYX_ERR(0, 1378, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_IQSTREAM_ClearAcqStatus_py, __pyx_t_2) < 0) __PYX_ERR(0, 1382, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "rsa_api.pyx":1387
+  /* "rsa_api.pyx":1391
  * 
  * 
  * def PLAYBACK_OpenDiskFile_py(fileName, startPercentage, stopPercentage,             # <<<<<<<<<<<<<<
  *                              skipTimeBetweenFullAcquisitions,
  *                              loopAtEndOfFile, emulateRealTime):
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_7rsa_api_307PLAYBACK_OpenDiskFile_py, NULL, __pyx_n_s_rsa_api); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1387, __pyx_L1_error)
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_7rsa_api_307PLAYBACK_OpenDiskFile_py, NULL, __pyx_n_s_rsa_api); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1391, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_PLAYBACK_OpenDiskFile_py, __pyx_t_2) < 0) __PYX_ERR(0, 1387, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_PLAYBACK_OpenDiskFile_py, __pyx_t_2) < 0) __PYX_ERR(0, 1391, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "rsa_api.pyx":1410
+  /* "rsa_api.pyx":1414
  * 
  * 
  * def PLAYBACK_GetReplayComplete_py():             # <<<<<<<<<<<<<<
  *     cdef bint complete
  *     err_check(PLAYBACK_GetReplayComplete(&complete))
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_7rsa_api_309PLAYBACK_GetReplayComplete_py, NULL, __pyx_n_s_rsa_api); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1410, __pyx_L1_error)
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_7rsa_api_309PLAYBACK_GetReplayComplete_py, NULL, __pyx_n_s_rsa_api); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1414, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_PLAYBACK_GetReplayComplete_py, __pyx_t_2) < 0) __PYX_ERR(0, 1410, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_PLAYBACK_GetReplayComplete_py, __pyx_t_2) < 0) __PYX_ERR(0, 1414, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "rsa_api.pyx":1421
+  /* "rsa_api.pyx":1425
  * 
  * 
  * def GNSS_GetHwInstalled_py():             # <<<<<<<<<<<<<<
  *     cdef bint installed
  *     err_check(GNSS_GetHwInstalled(&installed))
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_7rsa_api_311GNSS_GetHwInstalled_py, NULL, __pyx_n_s_rsa_api); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1421, __pyx_L1_error)
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_7rsa_api_311GNSS_GetHwInstalled_py, NULL, __pyx_n_s_rsa_api); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1425, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_GNSS_GetHwInstalled_py, __pyx_t_2) < 0) __PYX_ERR(0, 1421, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_GNSS_GetHwInstalled_py, __pyx_t_2) < 0) __PYX_ERR(0, 1425, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "rsa_api.pyx":1426
+  /* "rsa_api.pyx":1430
  *     return installed
  * 
  * def GNSS_SetEnable_py(enable):             # <<<<<<<<<<<<<<
  *     cdef bint _enable = enable
  *     err_check(GNSS_SetEnable(_enable))
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_7rsa_api_313GNSS_SetEnable_py, NULL, __pyx_n_s_rsa_api); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1426, __pyx_L1_error)
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_7rsa_api_313GNSS_SetEnable_py, NULL, __pyx_n_s_rsa_api); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1430, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_GNSS_SetEnable_py, __pyx_t_2) < 0) __PYX_ERR(0, 1426, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_GNSS_SetEnable_py, __pyx_t_2) < 0) __PYX_ERR(0, 1430, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "rsa_api.pyx":1431
+  /* "rsa_api.pyx":1435
  * 
  * 
  * def GNSS_GetEnable_py():             # <<<<<<<<<<<<<<
  *     cdef bint enable
  *     err_check(GNSS_GetEnable(&enable))
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_7rsa_api_315GNSS_GetEnable_py, NULL, __pyx_n_s_rsa_api); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1431, __pyx_L1_error)
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_7rsa_api_315GNSS_GetEnable_py, NULL, __pyx_n_s_rsa_api); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1435, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_GNSS_GetEnable_py, __pyx_t_2) < 0) __PYX_ERR(0, 1431, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_GNSS_GetEnable_py, __pyx_t_2) < 0) __PYX_ERR(0, 1435, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "rsa_api.pyx":1437
+  /* "rsa_api.pyx":1441
  * 
  * 
  * def GNSS_SetSatSystem_py(satSystem):             # <<<<<<<<<<<<<<
  *     if satSystem not in [GNSS_SATSYS.GNSS_NOSYS, GNSS_SATSYS.GNSS_GPS_GLONASS,
  *                      GNSS_SATSYS.GNSS_GPS_BEIDOU, GNSS_SATSYS.GNSS_GPS,
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_7rsa_api_317GNSS_SetSatSystem_py, NULL, __pyx_n_s_rsa_api); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1437, __pyx_L1_error)
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_7rsa_api_317GNSS_SetSatSystem_py, NULL, __pyx_n_s_rsa_api); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1441, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_GNSS_SetSatSystem_py, __pyx_t_2) < 0) __PYX_ERR(0, 1437, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_GNSS_SetSatSystem_py, __pyx_t_2) < 0) __PYX_ERR(0, 1441, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "rsa_api.pyx":1446
+  /* "rsa_api.pyx":1450
  * 
  * 
  * def GNSS_GetSatSystem_py():             # <<<<<<<<<<<<<<
  *     cdef int satSystem
  *     err_check(GNSS_GetSatSystem(&satSystem))
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_7rsa_api_319GNSS_GetSatSystem_py, NULL, __pyx_n_s_rsa_api); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1446, __pyx_L1_error)
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_7rsa_api_319GNSS_GetSatSystem_py, NULL, __pyx_n_s_rsa_api); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1450, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_GNSS_GetSatSystem_py, __pyx_t_2) < 0) __PYX_ERR(0, 1446, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_GNSS_GetSatSystem_py, __pyx_t_2) < 0) __PYX_ERR(0, 1450, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "rsa_api.pyx":1452
+  /* "rsa_api.pyx":1456
  * 
  * 
  * def GNSS_SetAntennaPower_py(powered):             # <<<<<<<<<<<<<<
  *     cdef bint _powered = powered
  *     err_check(GNSS_SetAntennaPower(_powered))
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_7rsa_api_321GNSS_SetAntennaPower_py, NULL, __pyx_n_s_rsa_api); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1452, __pyx_L1_error)
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_7rsa_api_321GNSS_SetAntennaPower_py, NULL, __pyx_n_s_rsa_api); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1456, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_GNSS_SetAntennaPower_py, __pyx_t_2) < 0) __PYX_ERR(0, 1452, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_GNSS_SetAntennaPower_py, __pyx_t_2) < 0) __PYX_ERR(0, 1456, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "rsa_api.pyx":1457
+  /* "rsa_api.pyx":1461
  * 
  * 
  * def GNSS_GetAntennaPower_py():             # <<<<<<<<<<<<<<
  *     cdef bint powered
  *     err_check(GNSS_GetAntennaPower(&powered))
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_7rsa_api_323GNSS_GetAntennaPower_py, NULL, __pyx_n_s_rsa_api); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1457, __pyx_L1_error)
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_7rsa_api_323GNSS_GetAntennaPower_py, NULL, __pyx_n_s_rsa_api); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1461, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_GNSS_GetAntennaPower_py, __pyx_t_2) < 0) __PYX_ERR(0, 1457, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_GNSS_GetAntennaPower_py, __pyx_t_2) < 0) __PYX_ERR(0, 1461, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "rsa_api.pyx":1463
+  /* "rsa_api.pyx":1467
  * 
  * 
  * def GNSS_GetNavMessageData_py():             # <<<<<<<<<<<<<<
  *     cdef int msgLen
  *     cdef char* message
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_7rsa_api_325GNSS_GetNavMessageData_py, NULL, __pyx_n_s_rsa_api); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1463, __pyx_L1_error)
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_7rsa_api_325GNSS_GetNavMessageData_py, NULL, __pyx_n_s_rsa_api); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1467, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_GNSS_GetNavMessageData_py, __pyx_t_2) < 0) __PYX_ERR(0, 1463, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_GNSS_GetNavMessageData_py, __pyx_t_2) < 0) __PYX_ERR(0, 1467, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "rsa_api.pyx":1470
+  /* "rsa_api.pyx":1474
  * 
  * 
  * def GNSS_ClearNavMessageData_py():             # <<<<<<<<<<<<<<
  *     err_check(GNSS_ClearNavMessageData())
  * 
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_7rsa_api_327GNSS_ClearNavMessageData_py, NULL, __pyx_n_s_rsa_api); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1470, __pyx_L1_error)
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_7rsa_api_327GNSS_ClearNavMessageData_py, NULL, __pyx_n_s_rsa_api); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1474, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_GNSS_ClearNavMessageData_py, __pyx_t_2) < 0) __PYX_ERR(0, 1470, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_GNSS_ClearNavMessageData_py, __pyx_t_2) < 0) __PYX_ERR(0, 1474, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "rsa_api.pyx":1474
+  /* "rsa_api.pyx":1478
  * 
  * 
  * def GNSS_Get1PPSTimestamp_py():             # <<<<<<<<<<<<<<
  *     cdef bint isValid
  *     cdef uint64_t timestamp1PPS
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_7rsa_api_329GNSS_Get1PPSTimestamp_py, NULL, __pyx_n_s_rsa_api); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1474, __pyx_L1_error)
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_7rsa_api_329GNSS_Get1PPSTimestamp_py, NULL, __pyx_n_s_rsa_api); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1478, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_GNSS_Get1PPSTimestamp_py, __pyx_t_2) < 0) __PYX_ERR(0, 1474, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_GNSS_Get1PPSTimestamp_py, __pyx_t_2) < 0) __PYX_ERR(0, 1478, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "rsa_api.pyx":1481
+  /* "rsa_api.pyx":1485
  * 
  * 
  * def GNSS_GetStatusRxLock_py():             # <<<<<<<<<<<<<<
  *     cdef bint lock
  *     err_check(GNSS_GetStatusRxLock(&lock))
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_7rsa_api_331GNSS_GetStatusRxLock_py, NULL, __pyx_n_s_rsa_api); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1481, __pyx_L1_error)
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_7rsa_api_331GNSS_GetStatusRxLock_py, NULL, __pyx_n_s_rsa_api); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1485, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_GNSS_GetStatusRxLock_py, __pyx_t_2) < 0) __PYX_ERR(0, 1481, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_GNSS_GetStatusRxLock_py, __pyx_t_2) < 0) __PYX_ERR(0, 1485, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "rsa_api.pyx":1492
+  /* "rsa_api.pyx":1496
  * 
  * 
  * def POWER_GetStatus_py():             # <<<<<<<<<<<<<<
  *     cdef POWER_INFO powerInfo
  *     err_check(POWER_GetStatus(&powerInfo))
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_7rsa_api_333POWER_GetStatus_py, NULL, __pyx_n_s_rsa_api); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1492, __pyx_L1_error)
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_7rsa_api_333POWER_GetStatus_py, NULL, __pyx_n_s_rsa_api); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1496, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_POWER_GetStatus_py, __pyx_t_2) < 0) __PYX_ERR(0, 1492, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_POWER_GetStatus_py, __pyx_t_2) < 0) __PYX_ERR(0, 1496, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
   /* "rsa_api.pyx":1
@@ -57694,6 +57940,11 @@ bad:
     return NULL;
 }
 
+/* None */
+    static CYTHON_INLINE void __Pyx_RaiseUnboundLocalError(const char *varname) {
+    PyErr_Format(PyExc_UnboundLocalError, "local variable '%s' referenced before assignment", varname);
+}
+
 /* RaiseTooManyValuesToUnpack */
     static CYTHON_INLINE void __Pyx_RaiseTooManyValuesError(Py_ssize_t expected) {
     PyErr_Format(PyExc_ValueError,
@@ -59968,6 +60219,31 @@ static PyObject* __pyx_convert__to_py_DPX_FrameBuffer(DPX_FrameBuffer s) {
             Py_DECREF(member);
             member = __Pyx_carray_to_py_int(s.triggerIndices, 32); if (unlikely(!member)) goto bad;
             if (unlikely(PyDict_SetItem(res, __pyx_n_s_triggerIndices, member) < 0)) goto bad;
+            Py_DECREF(member);
+            member = __Pyx_PyInt_From_uint32_t(s.acqStatus); if (unlikely(!member)) goto bad;
+            if (unlikely(PyDict_SetItem(res, __pyx_n_s_acqStatus, member) < 0)) goto bad;
+            Py_DECREF(member);
+            return res;
+            bad:
+            Py_XDECREF(member);
+            Py_DECREF(res);
+            return NULL;
+          }
+          static PyObject* __pyx_convert__to_py_IQSTRMIQINFO(IQSTRMIQINFO s) {
+            PyObject* res;
+            PyObject* member;
+            res = __Pyx_PyDict_NewPresized(5); if (unlikely(!res)) return NULL;
+            member = __Pyx_PyInt_From_uint64_t(s.timestamp); if (unlikely(!member)) goto bad;
+            if (unlikely(PyDict_SetItem(res, __pyx_n_s_timestamp, member) < 0)) goto bad;
+            Py_DECREF(member);
+            member = __Pyx_PyInt_From_int(s.triggerCount); if (unlikely(!member)) goto bad;
+            if (unlikely(PyDict_SetItem(res, __pyx_n_s_triggerCount, member) < 0)) goto bad;
+            Py_DECREF(member);
+            member = __Pyx_carray_to_py_int(s.triggerIndices, 0x64); if (unlikely(!member)) goto bad;
+            if (unlikely(PyDict_SetItem(res, __pyx_n_s_triggerIndices, member) < 0)) goto bad;
+            Py_DECREF(member);
+            member = PyFloat_FromDouble(s.scaleFactor); if (unlikely(!member)) goto bad;
+            if (unlikely(PyDict_SetItem(res, __pyx_n_s_scaleFactor, member) < 0)) goto bad;
             Py_DECREF(member);
             member = __Pyx_PyInt_From_uint32_t(s.acqStatus); if (unlikely(!member)) goto bad;
             if (unlikely(PyDict_SetItem(res, __pyx_n_s_acqStatus, member) < 0)) goto bad;

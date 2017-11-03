@@ -1,7 +1,7 @@
 """
 Tektronix RSA_API Cython Unit Test for RSA500/600
 Author: Morgan Allison
-Date edited: 10/17
+Date edited: 11/17
 Windows 7 64-bit
 RSA API version 3.11.0047
 Python 3.6.1 64-bit (Anaconda 4.4.0)
@@ -19,24 +19,32 @@ from rsa_api import *
 from os.path import isdir
 from os import mkdir
 
-"""There must be a connected RSA in order to correctly test these params"""
-DEVICE_Connect_py(0)
-
-nameList = ['RSA503A', 'RSA507A', 'RSA603A', 'RSA607A']
-if DEVICE_GetNomenclature_py() not in nameList:
-    raise Exception('Incorrect RSA model, please connect RSA503A, RSA507A, RSA603A, or RSA607A')
-
-num = 400
-neg = -400
 
 class rsa_api_test(unittest.TestCase):
     """Test for rsa_api.pyd"""
+
+    def test_err_check_no_error(self):
+        """err_check() returns None if there are no errors."""
+        self.assertIsNone(err_check(0))
+
+    def test_err_check_err_not_connected(self):
+        self.assertRaises(RSAError, err_check, 101)
+        try:
+            err_check(101)
+        except RSAError as e:
+            self.assertEqual(e.__str__(), 'Not Connected')
+
+    def test_err_check_measurement_not_enabled(self):
+        self.assertRaises(RSAError, err_check, 1102)
+        try:
+            err_check(1102)
+        except RSAError as e:
+            self.assertEqual(e.__str__(), 'Measurement not enabled')
     
     """DEVICE Command Testing"""
     
     def test_DEVICE_GetOverTemperatureStatus_py(self):
         self.assertIsInstance(DEVICE_GetOverTemperatureStatus_py(), bool)
-        # self.assertEqual(DEVICE_GetOverTemperatureStatus_py(), False)
     
     def test_DEVICE_GetNomenclature_py(self):
         self.assertEqual(DEVICE_GetNomenclature_py(), 'RSA507A')
@@ -75,7 +83,6 @@ class rsa_api_test(unittest.TestCase):
         self.assertEqual(CONFIG_GetCenterFreq_py(), 1.5e9)
         self.assertEqual(CONFIG_GetReferenceLevel_py(), 0)
         self.assertEqual(IQBLK_GetIQBandwidth_py(), 40e6)
-        # self.assertEqual(IQBLK_GetIQRecordLength_py(), 1024)
     
     def test_CONFIG_ReferenceLevel(self):
         refLevel = 17
@@ -84,7 +91,6 @@ class rsa_api_test(unittest.TestCase):
         self.assertRaises(TypeError, CONFIG_SetReferenceLevel_py, 'abc')
         self.assertRaises(RSAError, CONFIG_SetReferenceLevel_py, 31)
         self.assertRaises(RSAError, CONFIG_SetReferenceLevel_py, -131)
-        
     
     def test_CONFIG_GetMaxCenterFreq_py_rsa507a(self):
         self.assertEqual(CONFIG_GetMaxCenterFreq_py(), 7.5e9)
@@ -103,16 +109,6 @@ class rsa_api_test(unittest.TestCase):
         # RSA507A doesn't raise RSAError if cf is outside of allowable range
         # self.assertRaises(RSAError, CONFIG_SetCenterFreq_py, 400e9)
         # self.assertRaises(RSAError, CONFIG_SetCenterFreq_py, -40e6)
-    
-    """
-    def test_CONFIG_ExternalRef(self):
-        self.assertIsNone(CONFIG_SetExternalRefEnable_py(enable=True))
-        self.assertTrue(CONFIG_GetExternalRefEnable_py())
-        # CONFIG_GetExternalRefFrequency does not work in any Python
-        # implementation
-        extRefFreq = 10e6
-        self.assertEqual(CONFIG_GetExternalRefFrequency_py(), extRefFreq)
-    """
     
     def test_CONFIG_AutoAttenuation(self):
         atten = [False, True]
@@ -133,7 +129,6 @@ class rsa_api_test(unittest.TestCase):
         self.assertIsNone(CONFIG_SetRFAttenuator_py(atten))
         self.assertEqual(CONFIG_GetRFAttenuator_py(), atten)
         self.assertRaises(TypeError, CONFIG_SetRFAttenuator_py, 'abc')
-    
     
     """TRIG Command Testing"""
     
@@ -157,13 +152,13 @@ class rsa_api_test(unittest.TestCase):
             self.assertIsNone(TRIG_SetTriggerTransition_py(t))
             self.assertEqual(TRIG_GetTriggerTransition_py(), t)
         
-        self.assertRaises(TypeError, TRIG_SetTriggerTransition_py, 'transition')
+        self.assertRaises(TypeError, TRIG_SetTriggerTransition_py, 'abc')
     
     def test_TRIG_IFPowerTriggerLevel(self):
         trigLevel = -10
         self.assertIsNone(TRIG_SetIFPowerTriggerLevel_py(trigLevel))
         self.assertEqual(TRIG_GetIFPowerTriggerLevel_py(), trigLevel)
-        self.assertRaises(TypeError, TRIG_SetIFPowerTriggerLevel_py, 'trigger')
+        self.assertRaises(TypeError, TRIG_SetIFPowerTriggerLevel_py, 'abc')
         self.assertRaises(RSAError, TRIG_SetIFPowerTriggerLevel_py, 31)
         self.assertRaises(RSAError, TRIG_SetIFPowerTriggerLevel_py, -131)
     
@@ -215,22 +210,6 @@ class rsa_api_test(unittest.TestCase):
         self.assertTrue(trig)
         self.assertGreater(trigTs, 0)
     
-    """
-    def test_DEVICE_GetEventStatus_overrange(self):
-        CONFIG_Preset_py()
-        CONFIG_SetCenterFreq_py(2.4453e9)
-        CONFIG_SetReferenceLevel_py(-20)
-        # DEVICE_PrepareForRun_py()
-        # DEVICE_Run_py()
-        # Figure out a better way to do this.
-        IQBLK_Acquire_py()
-        overrange, overrangeTs = DEVICE_GetEventStatus_py(DEVEVENT_OVERRANGE)
-        self.assertTrue(overrange)
-        self.assertGreater(overrangeTs, 0)
-        CONFIG_SetReferenceLevel_py(0)
-        DEVICE_Stop_py()
-    """
-    
     """REFTIME Command Testing"""
     
     def test_REFTIME_GetTimestampRate_py(self):
@@ -250,11 +229,6 @@ class rsa_api_test(unittest.TestCase):
         self.assertEqual(o_timeSec, refTimeSec)
         self.assertEqual(o_timeNsec, refTimeNsec)
         self.assertEqual(o_timestamp, refTimestamp)
-    
-    # def test_REFTIME_GetIntervalSinceRefTimeSet_py(self):
-    #     sec = REFTIME_GetIntervalSinceRefTimeSet_py()
-    #    # print(sec)
-    #     self.assertTrue(False)
     
     """IQBLK Command Testing"""
     
@@ -388,9 +362,6 @@ class rsa_api_test(unittest.TestCase):
         self.assertIsNone(DPX_SetEnable_py(False))
         self.assertFalse(DPX_GetEnable_py())
 
-    # def test_placeholder(self):
-    #     self.assertTrue(False)
-        
     def test_DPX_Reset_py(self):
         self.assertIsNone(DPX_Reset_py())
         frameCount, fftCount = DPX_GetFrameInfo_py()
@@ -504,21 +475,6 @@ class rsa_api_test(unittest.TestCase):
         self.assertRaises(RSAError, AUDIO_SetFrequencyOffset_py, -50e6)
         self.assertRaises(TypeError, AUDIO_SetFrequencyOffset_py, 'abc')
         self.assertRaises(TypeError, AUDIO_SetFrequencyOffset_py, [num])
-
-    # def test_AUDIO_Capture(self):
-    #     """Commented out because of test length"""
-    #     self.assertTrue(False)
-    #     DEVICE_Run_py()
-    #     AUDIO_SetMode_py(3)
-    #     self.assertIsNone(AUDIO_Start_py())
-    #     self.assertTrue(AUDIO_GetEnable_py())
-    #     inSize = 1000
-    #     data = AUDIO_GetData_py(inSize)
-    #     self.assertIsInstance(data, np.ndarray)
-    #     self.assertEqual(len(data), inSize)
-    #     self.assertIsNone(AUDIO_Stop_py())
-    #     # plt.plot(data)
-    #     # plt.show()
 
     """IFSTREAM Command Testing"""
 
@@ -696,10 +652,6 @@ class rsa_api_test(unittest.TestCase):
 
         DEVICE_Stop_py()
 
-    # Develop a test for this function
-    # def test_IQSTREAM_WaitForIQDataReady_py(self):
-    #     pass
-
     def test_IQSTREAM_ClearAcqStatus_py(self):
         self.assertIsNone(IQSTREAM_ClearAcqStatus_py())
 
@@ -735,7 +687,6 @@ class rsa_api_test(unittest.TestCase):
     def test_GNSS_GetStatusRxLock_py(self):
         self.assertIsInstance(GNSS_GetStatusRxLock_py(), bool)
 
-
     def test_GNSS_ClearNavMessageData_py(self):
         self.assertIsNone(GNSS_ClearNavMessageData_py())
 
@@ -746,10 +697,19 @@ class rsa_api_test(unittest.TestCase):
         self.assertIsInstance(powerInfo, dict)
         self.assertEqual(len(powerInfo), 6)
 
-    def test_cleanup(self):
-        DEVICE_Stop_py()
-        DEVICE_Disconnect_py()
-
 
 if __name__ == '__main__':
+    """There must be a connected RSA in order to correctly test these params"""
+    DEVICE_Connect_py(0)
+    
+    nameList = ['RSA503A', 'RSA507A', 'RSA603A', 'RSA607A']
+    if DEVICE_GetNomenclature_py() not in nameList:
+        raise Exception('Incorrect RSA model, please connect RSA503A, RSA507A, RSA603A, or RSA607A')
+    
+    num = 400
+    neg = -400
     unittest.main()
+    
+    DEVICE_Stop_py()
+    DEVICE_Disconnect_py()
+
