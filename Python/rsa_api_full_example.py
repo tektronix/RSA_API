@@ -76,7 +76,7 @@ def search_connect():
         # note: the API can only currently access one at a time
         selection = 1024
         while (selection > numFound.value - 1) or (selection < 0):
-            selection = int(input('Select device between 0 and {}\n> '.format(numFound.value - 1)))
+            selection = int(rawinput('Select device between 0 and {}\n> '.format(numFound.value - 1)))
         err_check(rsa.DEVICE_Connect(deviceIDs[selection]))
     rsa.CONFIG_Preset()
 
