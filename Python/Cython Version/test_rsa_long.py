@@ -167,7 +167,7 @@ class rsa_api_test(unittest.TestCase):
         while not GNSS_GetStatusRxLock_py():
             pass
         message = b''
-        while len(message) == 0:
+        while not message:
             message, msgLen = GNSS_GetNavMessageData_py()
             self.assertEqual(len(message), msgLen)
 
