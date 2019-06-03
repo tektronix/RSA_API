@@ -235,7 +235,7 @@ def gnss_setup(satSystem):
     if not GNSS_GetHwInstalled_py():
         print(
             'No GNSS hardware installed, ensure there is a 1PPS signal present at the trigger/synch input.')
-        input('Press ''ENTER'' to continue > ')
+        raw_input('Press ''ENTER'' to continue > ')
         return False
     else:
         # send setup commands to RSA
