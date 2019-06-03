@@ -268,7 +268,7 @@ def get_gnss_message():
     messageString = ''.join(map(str, gnssMessage))
     # split message based on individual NMEA messages
     indivMessages = messageString.split('$')
-    for i in range(len(indivMessages)):
+    for i in enumerate(indivMessages):
         if 'GNGGA' in indivMessages[i]:
             print(indivMessages[i])
             # try:
