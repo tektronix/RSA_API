@@ -1,4 +1,4 @@
-# RSA_API
+# RSA_API [![Tektronix](https://tektronix.github.io/media/TEK-opensource_badge.svg)](https://github.com/tektronix)
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Ftektronixofficial%2FRSA_API.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Ftektronixofficial%2FRSA_API?ref=badge_shield)
 
 Code examples for the Tektronix RSA API used with RSA300/500/600 USB instruments. The RSA_API allows anyone to write scripts, lightweight applications, or plugins that directly control and acquire data from Tektronix USB RSA instruments without running SignalVu-PC. This repository contains complete RSA API usage examples for Python, C++, C#, Matlab, and VB.Net including configuring the RSA hardware, capturing data, and streaming IF and IQ data to disk.
