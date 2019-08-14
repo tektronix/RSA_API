@@ -1,4 +1,4 @@
-[![Teklogo ](https://tektronix.github.io/media/tektronix-logoFull.png)](https://github.com/tektronix)
+[![Teklogo](https://tektronix.github.io/media/tektronix-logoFull.png)](https://github.com/tektronix)
 
 TEKTRONIX SAMPLE SOURCE CODE LICENSE AGREEMENT
 
